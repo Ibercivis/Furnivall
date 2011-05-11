@@ -4,11 +4,12 @@ from WorkUnit import *
 from Assignment import *
 from collections import deque
 
-class job(object, CommonFunctions):
-    def __init__(self):
+class job(object, CommonFunctions, pluginObject):
+    def __init__(self, pluginObject):
         self.read_config
         self.initial_tasks=self.conf('main', 'initial_tasks')
         self.workunits=deque()
+        self.pluginObject=pluginObject 
     
     def produce_workunit(self):
         """

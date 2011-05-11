@@ -11,6 +11,7 @@ class workunit(object):
         self.tasks_ok=deque()
         self.tasks_fail=deque()
         self.expected=0 #TODO this should get workunit expected tasks to return.
+        self.results=deque()
 
     def consolidate_result(self):
         cr="" # TODO Consolidate result here.
@@ -51,7 +52,7 @@ class workunit(object):
 
         """
         description = False if not self.job else self.job.description
-        self.tasks.append([len(self.tasks), task(self, self, Volunteer(), description )]) #TODO tasks are still undefined.
+        self.tasks.append([len(self.tasks), task(self, self, Volunteer(), description )]) #TODO Store volunteer data somewhere.
 
     def initial_run_tasks(self, job):
         """
@@ -78,6 +79,8 @@ class workunit(object):
         if not expected:
             expected=self.expected
         return not len(self.tasks_ok) - expected
+
+    def launch_task(self, task):
 
 if __name__ == "__main__":
     """
