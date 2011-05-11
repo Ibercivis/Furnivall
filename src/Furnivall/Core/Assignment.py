@@ -55,13 +55,16 @@ class task(Assignment):
             [[<__main__.task object at 0x...>, <Future at 0x... state=finished returned NoneType>]]
 
         """
-        super(task, self).__init__(creator, workunit, volunteer) 
-        self.description=description
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            # concurrent.futures.wait(fs, timeout=None, return_when=ALL_COMPLETED) --> This might be interesting for workunits
+        super(task, self).__init__(creator, workunit, volunteer) # Initialize superclass. 
+        self.description=description 
+        MAX_WORKERS=20 # FIXME This has to be configurable!
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor: # Async call 
+            # Launch as executor launch function, wich will be a call to job.pluginobject.launch_task
+            # So, basically this is calling the plugin to get it's
             self.futureobject=executor.submit(self.launch) 
             self.futureobject.add_done_callback(self.task_validator) # We validate it once it's done.
-            self.notify_creator('tasks',[self, self.futureobject])
+            # We send to the creator (workunit)'s task list, the futureobject and the task itself
+            self.notify_creator('tasks',[self, self.futureobject]) 
 
     def launch(self):
         """
@@ -69,6 +72,7 @@ class task(Assignment):
             Once we have the Result (we can do whatever here, it's async...
         """
         # return getattr(getattr(self.creator, "job"), pluginObject).launch_task(self) # This can be done like that in a futureObject
+        # Maybe more readable with self.creator.job.pluginObject.launch_task(self) ?? Or even worse?
         # It's a way to have each job with a different launch function (Result producer)
         # Note we've got to use "Result" object for that.
         return
