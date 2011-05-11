@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 import asyncore
 from concurrent.futures import *
+from collections import deque
+from Personality import *
 
 class creatorTest(object):
     def __init__(self):
         self.tasks=[]
+        self.tasks_ok=[]
+        self.tasks_fail=[]
 
-class Assignment(object, asyncore.dispatcher):
+class Assignment(object):
     def __init__(self, creator, workunit, volunteer):
         """
-            Assignment: superclass of task and result
+            Assignment: superclass of task and Result
             >>> a=Assignment(creatorTest(),[],[])
         """
         self.creator=creator
@@ -47,35 +51,36 @@ class task(Assignment):
         super(task, self).__init__(creator, workunit, volunteer) 
         self.description=description
         with ThreadPoolExecutor(max_workers=1) as executor:
-            # concurrent.futures.wait(fs, timeout=None, return_when=ALL_COMPLETED) --> This might be interesting
+            # concurrent.futures.wait(fs, timeout=None, return_when=ALL_COMPLETED) --> This might be interesting for workunits
             self.futureobject=executor.submit(self.launch) 
             self.futureobject.add_done_callback(self.task_validator) # We validate it once it's done.
             self.notify_creator('tasks',[self, self.futureobject])
 
     def launch(self):
         """
-            Produces asynchronously the result.
-            Once we have the result (we can do whatever here, it's async...
+            Produces asynchronously the Result.
+            Once we have the Result (we can do whatever here, it's async...
         """
-
+        # return getattr(self.creator).launch_task(self) # This can be done like that in a futureObject
+        # It's a way to have each job with a different launch function (Result producer)
+        # Note we've got to use "Result" object for that.
         return
 
-    def task_validator(self):
-        # TODO Do validate checks here
-        passed=True
+    def task_validator(self, futureObject):
+        passed=getattr(self.creator,"creator").validate_task(self, futureObject)
         if passed:
             self.notify_creator('tasks_ok', self)
         else:
             self.notify_creator('tasks_fail', self)
 
-class result(Assignment):
+class Result(Assignment):
     def __init__(self, task, description):
         """
-            result of a task, having assignment + a description
+            Result of a task, having assignment + a description
             >>> a=task(creatorTest(),[],[],"Task test")
             >>> a.description
             'Task test'
-            >>> b=result(a,'result description')
+            >>> b=Result(a,'result description')
             >>> b.creator #doctest: +ELLIPSIS
             <__main__.creatorTest object at 0x...>
             >>> b.workunit
@@ -88,30 +93,16 @@ class result(Assignment):
 
         """
         
-        super(result, self).__init__(task.creator, task.workunit, task.volunteer)
+        super(Result, self).__init__(task.creator, task.workunit, task.volunteer)
         self.description=description 
 
-    def result_notification(self):
-         self.notify_creator('results', self)
+    def Result_notification(self):
+         self.notify_creator('results', self) # This adds to results deque in workunit this result object.
 
-class Personality(object):
-    def _ _init__(self, name):
-        self.host=host
-        self.user=user
-
-class Volunteer(Personality):
-    def __init__(self,  host=False, user=False):
-        super(Volunteer, self).__init__() 
-
-class Researcher(Personality):
-    def __init__(self, host, user):
-        super(Researcher, self).__init__() 
-        self.jobs=[]
-
-class ConsolidatedResult(object):
+class ConsolidatedResult(Result):
     def __init__(self, data):
         """
-           consolidated result, data property returns inittialized data.
+           consolidated Result, data property returns inittialized data.
         """
         self.data=data
 
