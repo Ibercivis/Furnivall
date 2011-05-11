@@ -92,17 +92,20 @@ class result(Assignment):
         self.description=description 
 
     def result_notification(self):
-        self.notify_creator('results', self)
+         self.notify_creator('results', self)
 
-class Volunteer(object):
-    def __init__(self, host=False, user=False):
+class Personality(object):
+    def _ _init__(self, name):
         self.host=host
         self.user=user
 
-class Researcher(object):
+class Volunteer(Personality):
+    def __init__(self,  host=False, user=False):
+        super(Volunteer, self).__init__() 
+
+class Researcher(Personality):
     def __init__(self, host, user):
-        self.host=host
-        self.user=user
+        super(Researcher, self).__init__() 
         self.jobs=[]
 
 class ConsolidatedResult(object):
