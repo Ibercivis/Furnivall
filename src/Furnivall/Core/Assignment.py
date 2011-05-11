@@ -67,7 +67,16 @@ class task(Assignment):
             self.futureobject=executor.submit(self.launch) 
             self.futureobject.add_done_callback(self.task_validator) # We validate it once it's done.
             # We send to the creator (workunit)'s task list, the futureobject and the task itself
-            self.notify_creator('tasks',[self, self.futureobject]) 
+            self.notify_creator('tasks',[self, self.futureobject])
+ 
+    def scoreMatch(self, volunteer): #surely not volunteer, but architecture or something so
+        """
+            Tells how adequate this task is for this volunteer.
+            Returns 0 if the task can not be executed by the volunteer's architecture. Else it returns
+            a real between 0 and 1.
+            (See also task_validator???)
+        """
+        return 0
 
     def launch(self):
         """
@@ -80,12 +89,13 @@ class task(Assignment):
         # Note we've got to use "Result" object for that.
         return
 
-    def task_validator(self, futureObject):
+    def task_validator(self, futureObject): #this is a bad name, because in BOINC validation is a wider concept
         passed=getattr(self.creator,"creator").validate_task(self, futureObject)
         if passed:
-            self.notify_creator('tasks_ok', self)
+            self.notify_creator('tasks_ok', self)  
+            #create a result here? Or from http service?
         else:
-            self.notify_creator('tasks_fail', self)
+            self.notify_creator('tasks_fail', self)  #quizas mejor self.creator.FailTask(self) ???
 
 class Result(Assignment):
     def __init__(self, task, description):
