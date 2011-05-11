@@ -32,7 +32,10 @@ class Assignment(object):
             Notify creator object appending it to "place"
             >>> a=Assignment(creatorTest(),[],[]) #doctest: +ELLIPSIS
             >>> a.notify_creator('tasks','fooobar')
-            >>> a.creator.tasks # should be empty, as tasks are not executed synchronously (except for the foobar we just notified)
+            >>> a.creator.tasks 
+            >>> # should be empty, as tasks are not executed synchronously
+            >>> # (except for the foobar we just notified) NOTE: As this is
+            >>> # not having control over the task time, MIGHT fail. )
             ['fooobar']
         
         """

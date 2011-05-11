@@ -10,6 +10,7 @@ class job(object, CommonFunctions):
         self.initial_tasks=self.conf('main', 'initial_tasks')
         self.workunits=deque()
         self.pluginObject=pluginObject 
+        # TODO: Produce the workunits. Where should I decide the number of workunits?
     
     def produce_workunit(self):
         """
