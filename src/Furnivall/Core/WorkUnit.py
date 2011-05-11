@@ -14,8 +14,8 @@ class workunit(object):
         self.results=deque()
 
     def consolidate_result(self):
-        cr="" # TODO Consolidate result here.
         if self.status:
+            cr=self.results # TODO Consolidate result here.
             self.ConsolidatedResult=ConsolidatedResult(cr)
         # What about making this one assignment's child too and notify "job" 
         # (creator) with notify_creator when it's got a consolidated result?
@@ -54,19 +54,6 @@ class workunit(object):
         description = False if not self.job else self.job.description
         self.tasks.append([len(self.tasks), task(self, self, Volunteer(), description )]) #TODO Store volunteer data somewhere.
 
-    def initial_run_tasks(self, job):
-        """
-            Foreach task needed for the initial job (job object, property initial_tasks)
-        """
-        initial_tasks = 1 if not self.job else self.job.initial_tasks
-        description = False if not self.job else self.job.description
-        tasks=deque()
-
-        for taska in range(0,initial_tasks):
-            tasks.append([taska, task(self, self, Volunteer(), description )])
-
-        return tasks
-
     def status(self, expected=False):
         """
             workunit.status: Boolean property displaying if there're enought ok tasks.
@@ -79,8 +66,6 @@ class workunit(object):
         if not expected:
             expected=self.expected
         return not len(self.tasks_ok) - expected
-
-    def launch_task(self, task):
 
 if __name__ == "__main__":
     """

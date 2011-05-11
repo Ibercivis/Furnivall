@@ -4,7 +4,7 @@ from WorkUnit import *
 from Assignment import *
 from collections import deque
 
-class job(object, CommonFunctions, pluginObject):
+class job(object, CommonFunctions):
     def __init__(self, pluginObject):
         self.read_config
         self.initial_tasks=self.conf('main', 'initial_tasks')

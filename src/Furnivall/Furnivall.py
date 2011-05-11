@@ -1,6 +1,6 @@
 from Core import *
 from Plugins import *
-
+from Core.common import CommonFunctions
 class main(CommonFunctions):
     def __init__(self):
         # We've got all in the core, but nothing about the views nor plugin support really implemented!!!

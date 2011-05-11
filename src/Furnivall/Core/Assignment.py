@@ -9,6 +9,13 @@ class creatorTest(object):
         self.tasks=[]
         self.tasks_ok=[]
         self.tasks_fail=[]
+        self.creator=self
+
+    def validate_task(self, task, futureobject):
+        return True
+
+    def consolidate_result(self, result):
+        return True
 
 class Assignment(object):
     def __init__(self, creator, workunit, volunteer):
@@ -61,7 +68,7 @@ class task(Assignment):
             Produces asynchronously the Result.
             Once we have the Result (we can do whatever here, it's async...
         """
-        # return getattr(self.creator).launch_task(self) # This can be done like that in a futureObject
+        # return getattr(getattr(self.creator, "job"), pluginObject).launch_task(self) # This can be done like that in a futureObject
         # It's a way to have each job with a different launch function (Result producer)
         # Note we've got to use "Result" object for that.
         return
@@ -97,7 +104,8 @@ class Result(Assignment):
         self.description=description 
 
     def Result_notification(self):
-         self.notify_creator('results', self) # This adds to results deque in workunit this result object.
+         self.notify_creator('results', self) # This adds to results deque in workunit this result object. 
+         self.creator.consolidate_result()
 
 class ConsolidatedResult(Result):
     def __init__(self, data):
