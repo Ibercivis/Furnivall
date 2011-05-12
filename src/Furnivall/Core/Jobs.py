@@ -5,12 +5,20 @@ from Assignment import *
 from collections import deque
 
 class job(object, CommonFunctions):
-    def __init__(self, pluginObject):
+    def __init__(self, viewObject):
+        """
+            Returns a job object (workunits container)
+            with plugin object and view object references.
+        """
         self.read_config
         self.initial_tasks=self.conf('main', 'initial_tasks')
         self.workunits=deque()
-        self.pluginObject=pluginObject 
+        self.viewObject=viewObject
+        self.pluginObject=getattr(viewObject.pluginmodule, viewObject.pluginclass)()
         # TODO: Produce the workunits. Where should I decide the number of workunits?
+        # Each job contains a view object, so I suppose we should do it there.
+        # By user interaction????
+        # asdf asdf asdf asdf ???
     
     def produce_workunit(self):
         """
