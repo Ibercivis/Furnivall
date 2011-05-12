@@ -4,6 +4,7 @@ from concurrent.futures import *
 from collections import deque
 from Personality import *
 
+
 class creatorTest(object):
     def __init__(self):
         self.tasks=[]
