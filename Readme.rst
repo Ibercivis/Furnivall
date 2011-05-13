@@ -32,10 +32,12 @@ Ideas
   - Task execution
 
 
-See more
-========
+See more, collaborate
+=====================
+
+At this moment:
 
 - Go to the wiki area, https://github.com/Ibercivis/Furnivall/wiki for more info
-- Use the issue tracker for ideas, or to offer yourself for some work
+- Use the https://github.com/Ibercivis/Furnivall/issues?sort=created&direction=desc&state=open&page=1 issue tracker for ideas, discuss, etc or to offer yourself for some work
 
 
