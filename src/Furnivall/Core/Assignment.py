@@ -84,11 +84,12 @@ class task(Assignment):
             Produces asynchronously the Result.
             Once we have the Result (we can do whatever here, it's async...
         """
-        # return getattr(getattr(self.creator, "job"), pluginObject).launch_task(self) # This can be done like that in a futureObject
+        return getattr(getattr(self.creator, "job"), self.pluginObject).launch_task(self) # This can be done like that in a futureObject
         # Maybe more readable with self.creator.job.pluginObject.launch_task(self) ?? Or even worse?
         # It's a way to have each job with a different launch function (Result producer)
-        # Note we've got to use "Result" object for that.
-        return
+        # Note we've got to use "Result" object for that, creating a result object in plugin.launch_task.
+        # Warn: Result needs the reference to task!!
+
 
     def task_validator(self, futureObject): #this is a bad name, because in BOINC validation is a wider concept
         passed=getattr(self.creator,"creator").validate_task(self, futureObject)
