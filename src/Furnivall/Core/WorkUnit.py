@@ -12,6 +12,7 @@ class workunit(object):
         self.tasks_fail=deque()
         self.expected=0 #TODO this should get workunit expected tasks to return.
         self.results=deque()
+        for i in range(0, int(job.initial_tasks)): self.new_task()
 
     def consolidate_result(self):
         if self.status:

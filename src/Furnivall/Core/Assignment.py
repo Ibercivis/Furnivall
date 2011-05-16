@@ -5,24 +5,23 @@ from collections import deque
 from Personality import *
 
 
-class creatorTest(object):
+
+
+class plugintest():
     def __init__(self):
-        self.tasks=[]
-        self.tasks_ok=[]
-        self.tasks_fail=[]
-        self.creator=self
+        self.workunits=10
+        self.pluginmodule=Tests
+        self.pluginclass="testclass"
+        self.description="foobar"
 
-    def validate_task(self, task, futureobject):
-        return True
-
-    def consolidate_result(self, result):
-        return True
+    def main(self):
+        return "foo" 
 
 class Assignment(object):
     def __init__(self, creator, workunit, volunteer):
         """
             Assignment: superclass of task and Result
-            >>> a=Assignment(creatorTest(),[],[])
+            >>> a=Assignment(Job(viewtest, plugintest),[],[])
         """
         self.creator=creator
         self.workunit=workunit
@@ -92,7 +91,7 @@ class task(Assignment):
 
 
     def task_validator(self, futureObject): #this is a bad name, because in BOINC validation is a wider concept
-        passed=getattr(self.creator,"creator").validate_task(self, futureObject)
+        passed=getattr(self.creator, "job").viewObject.validate_task(self, futureObject)
         if passed:
             self.notify_creator('tasks_ok', self)  
             #create a result here? Or from http service?
@@ -142,4 +141,6 @@ if __name__ == "__main__":
         This should never be used as standalone but for unittests
     """
     import doctest
+    from Jobs import *
+    from Tests import *
     doctest.testmod()

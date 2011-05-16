@@ -38,6 +38,12 @@ if __name__ == "__main__":
     """
         We call the tornado web server.
     """
-    application = tornado.web.Application([(r"/", main),]) # Here we can setup, for example, the multiple views. launch a handler foreach view.
+    m=main()
+    urls=[]
+    for job in created_jobs:
+        for url, object_ in job.viewObject.urls:
+            urls.append( (url, object_) ) # TODO Make sanity checks
+            
+    application = tornado.web.Application(urls) # Here we can setup, for example, the multiple views. launch a handler foreach view.
     application.listen(8080)
     tornado.ioloop.IOLoop.instance().start()
