@@ -1,5 +1,7 @@
 from Core import *
+import Plugins
 from Plugins import *
+import Views
 from Views import *
 from Core.common import CommonFunctions
 import tornado.web
@@ -13,7 +15,7 @@ class ViewManager():
             Check that there wasn't there before, as currently a view should only be executed once.
         """
         view=getattr(viewfile, view)()
-        self.created_jobs.append({view.name : job(getattr(view.plugin, view.class_)()) })
+        self.created_jobs.append({view.name : Jobs.job(getattr(view.plugin, view.class_)()) })
 
 class Scheduler(tornado.web.RequestHandler, ViewManager):
     def get(self):
@@ -32,8 +34,8 @@ class main(CommonFunctions, Scheduler):
             This way we can have multiple plugins for one view.
         """
         self.read_config()
-        self.initialize_views=( getattr(viewfile, self.conf('enabled_views', viewfile) )() for viewfile in self.config.options('enabled_views') ) # FIXME That's not the correct way to access view
-        self.created_jobs=[ { view.name : job(getattr(view.plugin, view.class_)()) } for view in self.initialize_views ]
+        self.initialize_views=( getattr(getattr(Views, viewfile), self.conf('enabled_views', viewfile) )() for viewfile in self.config.options('enabled_views') ) # FIXME That's not the correct way to access view
+        self.created_jobs=[ { view.name : Jobs.job(getattr(getattr(Plugins, view.plugin), view.class_)()) } for view in self.initialize_views ]
 
 if __name__ == "__main__":
     """
