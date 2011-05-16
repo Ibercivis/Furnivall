@@ -3,4 +3,5 @@ class SampleView():
         self.plugin="Sample"
         self.name="Sample_View"
         self.class_="main"
-
+    def main(self):
+        return "foo"

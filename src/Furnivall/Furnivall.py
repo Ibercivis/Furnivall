@@ -31,8 +31,9 @@ class main(CommonFunctions, Scheduler):
             Creates and provides a list of initialized jobs.
             This way we can have multiple plugins for one view.
         """
-        self.initialize_views=( getattr(viewfile, view)() for viewfile, view in self.config.options('enabled_views') )
-        self.created_jobs=[ { view.name : job(getattr(view.plugin, view.class_)()) } for view in initialize_views ]
+        self.read_config()
+        self.initialize_views=( getattr(viewfile, self.conf('enabled_views', viewfile) )() for viewfile in self.config.options('enabled_views') ) # FIXME That's not the correct way to access view
+        self.created_jobs=[ { view.name : job(getattr(view.plugin, view.class_)()) } for view in self.initialize_views ]
 
 if __name__ == "__main__":
     """
