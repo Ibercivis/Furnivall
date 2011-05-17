@@ -6,7 +6,7 @@ class SampleView(object):
         self.plugin="sample"
         self.class_="SamplePlugin"
         self.name="Sample_View"
-        self.description="foo"
+        self.description="Sample View"
         self.workunits=3
         self.templates=['SampleView']
         self.urls=[( '/sample/', creator.Scheduler ), ('/error', self.render_sample_view_external)] # Only scheduler can manage created jobs!

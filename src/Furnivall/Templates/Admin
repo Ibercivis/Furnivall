@@ -17,6 +17,12 @@
                         <input type="hidden" name="job_id" value="" />
                         <input type="submit" /> 
                     </form>
+                    <h3> Workunits </h3>
+                    {% for work in ajob[job].workunits %}
+                        <div class="Workunit">
+                            <p> {{ escape(work.__str__()) }} </p>
+                        </div>
+                    {%end%}
                 {%end%}
             {%end%}
         </div>

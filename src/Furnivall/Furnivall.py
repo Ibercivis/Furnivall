@@ -39,7 +39,7 @@ class main(CommonFunctions):
             if not slug:
                 slug="Landing"
             log('[Debug] [Scheduler] Launched to %s' %slug)
-            self.render('Templates/%s' %(slug), jobs=created_jobs )
+            self.render('Templates/%s' %(slug), jobs=created_jobs, slug=slug )
             # NOTE: You can do more things. We've got here access to the views' initialized object =)
 
 if __name__ == "__main__":
