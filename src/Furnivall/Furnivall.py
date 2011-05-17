@@ -29,11 +29,9 @@ class main(CommonFunctions):
         """
         global created_jobs
         created_jobs=[] # Don't delete, when views are created, they need a created_jobs argument in the creator.
-        log('Starting furnivall, reading config')
         self.read_config()
-        log('Creating views generator (should be instant)')
         self.initialize_views=( getattr(getattr(Views, viewfile), self.conf('enabled_views', viewfile) )(self) for viewfile in self.config.options('enabled_views') ) # FIXME That's not the correct way to access view
-        log('Creating jobs (may take a while) (If log enabled, you\'ll see a lot output now)')
+        log('Loading Furnivall (Creating jobs)')
         created_jobs=[ { view.name : Jobs.job(view, getattr(getattr(Plugins, view.plugin), view.class_)()) } for view in self.initialize_views ]
 
     class Scheduler(tornado.web.RequestHandler, ViewManager):
