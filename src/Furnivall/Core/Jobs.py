@@ -19,7 +19,7 @@ class job(object, CommonFunctions):
         self.viewObject=viewObject
         self.pluginObject=pluginObject
         log('Producing workunits... (%s) ' %self.viewObject.workunits)
-        #self.produce_workunits(self.viewObject.workunits) # TODO Keep track of workunits, and create new ones, and so on.
+        self.produce_workunits(self.viewObject.workunits) # TODO Keep track of workunits, and create new ones, and so on.
         log('Created new object job %s' %(self))
     
     def produce_workunits(self, number=1):
