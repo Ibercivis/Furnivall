@@ -4,5 +4,6 @@ class SampleView():
         self.name="Sample_View"
         self.class_="main"
         self.description="foo"
+
     def main(self):
         return "foo"

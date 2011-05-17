@@ -38,10 +38,11 @@ class main(CommonFunctions):
 
     class Scheduler(tornado.web.RequestHandler, ViewManager):
         def get(self, slug=False):
-            log('Scheduler launched to %s' %slug)
-            log('Trying to render argument %s' %(slug))
+            if not slug:
+                slug="Landing"
+            log('[Debug] [Scheduler] Launched to %s' %slug)
             self.render('Templates/%s' %(slug), jobs=created_jobs )
-            # TODO: Do more things. We've got here accesso to the views' initialized object =)
+            # NOTE: You can do more things. We've got here access to the views' initialized object =)
 
 if __name__ == "__main__":
     """

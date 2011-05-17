@@ -13,7 +13,7 @@ class workunit(object):
         self.tasks_fail=deque()
         self.expected=0 #TODO this should get workunit expected tasks to return.
         self.results=deque()
-        log('Producing %s tasks for workunit %s' %(job.initial_tasks, self))
+        log('\t\tWorkunit %s (%s tasks)' %(self, job.initial_tasks))
         for i in range(0, int(job.initial_tasks)): self.new_task()
 
     def consolidate_result(self):

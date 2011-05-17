@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html lang="en">
+    <head>
+        <title> Furnivall Administration Interface </title>
+        <meta name="generator" value="Furnivall" />
+    </head>
+    <body>
+        <h1> Jobs listing </h1>
+        <div class="job">
+            <p>{{ escape(jobs.__str__()) }}</p>
+            {% for ajob in jobs %}
+                {% for job in ajob.keys() %} 
+                    <h2>Job {{escape(ajob[job].__str__())}}</h2>
+                    <form target="#" onclick="$('#form.submit')" id="form">
+                        <label for="jobname">Job name </label /> <input type="text" name="jobname" value="{{ajob[job].name}}" /> <br/>
+                        <input type="hidden" name="view_name" value="{{job}}" />
+                        <input type="hidden" name="job_id" value="" />
+                        <input type="submit" /> 
+                    </form>
+                {%end%}
+            {%end%}
+        </div>
+    </body>
+</html>
+

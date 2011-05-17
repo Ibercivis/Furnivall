@@ -12,15 +12,16 @@ class job(object, CommonFunctions):
             with plugin object and view object references.
         """
         self.read_config()
-        log('Creating new object job %s' %(self))
         self.description=viewObject.description
         self.initial_tasks=self.conf('main', 'initial_tasks')
         self.workunits=deque()
+        self.name="Default job name"
         self.viewObject=viewObject
         self.pluginObject=pluginObject
-        log('Producing workunits... (%s) ' %self.viewObject.workunits)
-        self.produce_workunits(self.viewObject.workunits) # TODO Keep track of workunits, and create new ones, and so on.
-        log('Created new object job %s' %(self))
+
+        log('Creating job %s' %(self))
+        log('\tProducing workunits... (%s) ' %self.viewObject.workunits)
+        self.produce_workunits(self.viewObject.workunits)
     
     def produce_workunits(self, number=1):
         """
