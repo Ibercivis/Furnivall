@@ -19,3 +19,8 @@ class CommonFunctions():
             Custom function to read conf in two steps instead of three (..).
         """
         return self.config.get(section,option)
+
+
+
+def log(msg):
+    print msg

@@ -91,7 +91,7 @@ class task(Assignment):
 
 
     def task_validator(self, futureObject): #this is a bad name, because in BOINC validation is a wider concept
-        passed=getattr(self.creator, "job").viewObject.validate_task(self, futureObject)
+        passed=getattr(self.creator, "job").pluginObject.validate_task(self, futureObject)
         if passed:
             self.notify_creator('tasks_ok', self)  
             #create a result here? Or from http service?
