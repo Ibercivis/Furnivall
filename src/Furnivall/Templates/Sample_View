@@ -7,13 +7,14 @@
     <body>
         <h1> Jobs listing </h1>
         <div class="job">
-            {% if self.get_argument("create") == 1 %}
+
             <p>{{ escape(jobs.__str__()) }}</p>
             {% for ajob in jobs %}
                 {% for job in ajob.keys() %} 
                     {% if job == slug %}
-                    <h2>Hey! I'm job {{ job }} made explicitly for u =)</h2>
-                    <form action="#"> <input type="submit" value="Create new job for this view" /> <input type="hidden" name="create" value=1>  </form>
+                    {{ ajob[job].produce_workunits(1) }} <!-- Ey, this will create a workunit each page reload -->
+                    <h2>Hey! I'm job {{ job }} made explicitly for u =)</h2><p> my workunits are {{ escape(ajob[job].workunits.__str__()) }}</p>
+                    {%end%}
                 {%end%}
             {%end%}
         </div>
