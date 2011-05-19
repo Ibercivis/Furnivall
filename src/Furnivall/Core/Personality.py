@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import collections
+import tornado.sessions
 """
     Personality objects.
 """
@@ -17,6 +18,11 @@ class Volunteer(Personality):
         super(Volunteer, self).__init__(user, host)
         self.current_tasks=collections.deque()
         self.completed_tasks=collections.deque()
+
+    def set_data(self, host, user, id_):
+        self.host=host
+        self.user=user
+        self.id_=id_
 
 class Researcher(Personality):
     def __init__(self, host, user):
