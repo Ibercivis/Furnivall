@@ -9,7 +9,6 @@ import tornado.ioloop
 from Core.common import log
 import Personality
 
-
 class ViewManager(tornado.web.RequestHandler):
     def plug_view(self, viewfile, view):
         """
@@ -20,12 +19,11 @@ class ViewManager(tornado.web.RequestHandler):
         view=getattr(viewfile, view)()
         created_jobs.append({view.name : Jobs.job(getattr(view.plugin, view.class_)()) })
 
-        def get(self, slug=False):
-            if not slug:
-                slug="Landing"
-            log('[Debug] [Scheduler] Launched to %s' %slug)
-            self.render('Templates/%s' %(slug), jobs=created_jobs, slug=slug )
-            # NOTE: You can do more things. We've got here access to the views' initialized object =)
+     def get(self, slug=False):
+        if not slug:
+            slug="Landing"
+        log('[Debug] Rendering template %s' %slug)
+        self.render('Templates/%s' %(slug), jobs=created_jobs, slug=slug )
 
 class main(CommonFunctions):
     def __init__(self):
@@ -44,18 +42,17 @@ class main(CommonFunctions):
     class Scheduler(ViewManager):
         """
             Assigns a volunteer a specific task
-            TODO: Call this from somwhere
-        """
+        """ # TODO Call me.
+        def assign_session_to_user(self, volunteer):
+            #return volunteer.set_data(self.session.host, self.session.user, self.session_id)
+            return # TODO ^ FIX That to use real session data
+
         def assign_task(self):
-            # Lets see... volunteer == host?
-            # We should get a unique session id for it from the webserver (tornado).
-            # Hell, tornado itself doesnt store sessions!!!!
-            # That makes it impossible to use it for this... unless... hey! =D A fork! With session support!
-            # https://github.com/milancermak/tornado
-            # Then create a volunteer job.
-            v=Personality.Volunteer()
-            # And now get that volunteer into a specific task...
-            self.getn_freeTask().volunteer.id=get_id_from_server()
+            log('[Debug] Creating volunteer object and assigning it to a task.')
+            assign_session_to_user(self.getfreetask().volunteer)
+
+        def getfreetask(self):
+            # TODO determine the best free task to give? There's a pool of free tasks so we can get just one from there
 
 if __name__ == "__main__":
     """
