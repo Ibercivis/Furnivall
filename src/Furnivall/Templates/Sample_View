@@ -7,7 +7,6 @@
     <body>
         <h1> Jobs listing </h1>
         <div class="job">
-
             <p>{{ escape(jobs.__str__()) }}</p>
             {% for ajob in jobs %}
                 {% for job in ajob.keys() %} 
