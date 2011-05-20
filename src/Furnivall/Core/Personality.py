@@ -11,6 +11,7 @@ class Personality(object):
 
 class Volunteer(Personality):
     def __init__(self,  host=False, user=False):
+        # TODO Change the method volunteers work. Should be individual volunteers, by sessions, not by-task volunteers.
         """
             Volunteer object. Conttains host, user, current_tasks and completed_tasks for a user
             TODO: store everything about it in a datbase. Add auth to somewhere.

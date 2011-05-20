@@ -45,28 +45,28 @@ class main(CommonFunctions):
     class Scheduler(ViewManager):
         """
             Assigns a volunteer a specific task
+            WARN, NOTE: This might be loosing performance and scalability!
         """
         def assign_session_to_user(self, volunteer):
-            #return volunteer.set_data(self.session.host, self.session.user, self.session.session_id)
-            return # TODO ^ FIX That to use real session data from the user.
+            return volunteer.set_data(self.session.host, self.session.user, self.session.session_id) # TODO Use real session data from the user.
 
         def assign_task(self, view):
             # TODO: check if the user is already doing that task?
             log('[Debug] Creating volunteer object and assigning it to a task.')
             assign_session_to_user(self.getfreetask(view).volunteer)
-                
+
+        def getworkunit(self):
+            return WorkUnit.workunit() # TODO get workunit.
 
         def getfreetask(self, view):
-            # TODO determine the best free task to give? There's a pool of free tasks so we can get just one from there (that is on tasks object, just get the tasks's object function here
-            # Note: Should this be able to assign a correct task for the user? We're supposed to have host and so on, so we can do a sanity check here, that should be implemented in VIEW object.
-            # something like:
-            #for job in created_jobs:
-            #    for view, job in job:
-            #        if job.viewObject.check_view(volunteer): # Get volunteer object here! TODO
-            #            wk=job.produce_workunits(1) # This is not going to be like this isn't it? I'm needing some clarification about the three containers, or might be continue tomorrow.                        
-            #            if wk.tasks[0]: return wk.tasks[0]
-            #            else: return wk.new_task()
-            
+            # TODO: change ScoreMatch in workunit to call the plugin/view's compatibility class. TODO: Make a view's compatibility class
+            for job in created_jobs:
+                for view, job in job:
+                    if job.viewObject.check_view(volunteer): # Get volunteer object here! TODO
+                        wk=self.getworkunit()
+                        task=[sort(task, key=lambda t: t.ScoreMatch()) for task in wk.tasks if not task.volunteer.session_id ][0] # Get the best task ordered by ScoreMatch if it has not a volunteer assigned
+                        if task: return task
+                        else: return wk.new_task()
             return 
 
         def get_done_tasks(self):

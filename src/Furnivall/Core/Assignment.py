@@ -41,6 +41,7 @@ class Assignment(object):
         
 class task(Assignment):
     def __init__(self, creator, workunit, volunteer, description):
+        # TODO: by default task's assigning a volunteer, empty, change it to FALSE.'
         """
             Task object, having assignment + a description
             >>> a=task(creatorTest(),[],[],"Task test")
