@@ -7,7 +7,6 @@ from Core.common import CommonFunctions
 import tornado.web
 import tornado.ioloop
 from Core.common import log
-import Personality
 
 class ViewManager(tornado.web.RequestHandler):
     def plug_view(self, viewfile, view):
@@ -19,7 +18,7 @@ class ViewManager(tornado.web.RequestHandler):
         view=getattr(viewfile, view)()
         created_jobs.append({view.name : Jobs.job(getattr(view.plugin, view.class_)()) })
 
-     def get(self, slug=False):
+    def get(self, slug=False):
         if not slug:
             slug="Landing"
         log('[Debug] Rendering template %s' %slug)
@@ -95,7 +94,7 @@ if __name__ == "__main__":
         We call the tornado web server.
     """
     m=main()
-    main_urls=("/view/([^/]+)", m.ViewManager)
+    main_urls=("/view/([^/]+)", m.Scheduler)
     urls=[ b for b in [ a[a.keys()[0]].viewObject.urls for a in created_jobs ]][0]
     urls.append(main_urls)
     settings={'session_storage': 'mongodb:///tornado_sessions' }

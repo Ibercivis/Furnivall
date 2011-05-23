@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import collections
-import tornado.sessions
+import tornado.session
 """
     Personality objects.
 """

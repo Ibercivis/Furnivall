@@ -1,1 +1,1 @@
-__all__=['Assignment', 'common', 'Jobs', 'WorkUnit']
+__all__=['Assignment', 'common', 'Jobs', 'WorkUnit', 'Personality', 'Tests']
