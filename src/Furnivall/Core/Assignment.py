@@ -19,8 +19,11 @@ class plugintest(testclass):
 class Assignment(object):
     def __init__(self, creator, workunit, volunteer):
         """
-            Superclass of task and Result
+            Superclass of task and Result, contains common properties
+            for both.
+
             >>> a=Assignment(Job(viewtest, plugintest),[],[])
+            # Should not give response
         """
         self.creator=creator
         self.workunit=workunit
@@ -28,7 +31,13 @@ class Assignment(object):
 
     def notify_creator(self, place, notification):
         """
-            Notify creator object appending it to "place"
+            Append notification to Assignment object's creator' list. 
+
+            Will get parent's list as specified in place argument and append
+            notification.
+
+            Should not produce output.
+
             >>> a=Assignment(creatorTest(),[],[]) #doctest: +ELLIPSIS
             >>> a.notify_creator('tasks','fooobar')
             >>> a.creator.tasks 
@@ -43,10 +52,13 @@ class Assignment(object):
 class task(Assignment):
     def __init__(self, creator, workunit, volunteer, description):
         """
+            Will launch as executor the *launch* function, wich is actually a
+            call to job.pluginobject.launch_task. That will call the plugin
+            to launch the task itself, all of it is made asynchronously.
+            When created, it'll notify its creator that's been created,
+            and, when finished, it'll validate it.
+
             TODO: by default task's assigning a volunteer, empty, change it to FALSE.'
-            It will launch as executor the launch function, wich is actually a call to job.pluginobject.launch_task
-            So, basically this is calling the plugin to launch the task itself, asyncrounously via TrheadPoolExecutor
-            When created, it'll notify its creator that's been created, and, when finished, it'll validate it.'
 
             >>> a=task(creatorTest(),[],[],"Task test")
             >>> a.description
@@ -72,9 +84,10 @@ class task(Assignment):
     def scoreMatch(self, volunteer): #surely not volunteer, but architecture or something so
         """
             Tells how adequate this task is for this volunteer.
+
             Returns 0 if the task can not be executed by the volunteer's architecture. Else it returns
             a real between 0 and 1.
-            (See also task_validator???)
+
         """
         return 0
 
@@ -82,20 +95,33 @@ class task(Assignment):
         """
             Produces asynchronously the Result.
             Once we have the Result (we can do whatever here, it's async...
+
+            *Notes*
+
+            - We've got to use "Result" object for that, creating a result object in plugin.launch_task.
+
+            *Warns*
+
+            - Result needs the reference to task the task to notify its creator
+
+            *TODO*
+
+            - It might be more readable with self.creator.job.pluginObject.launch_task(self)
+            - It's a way to have each job with a different launch function (Result producer)
+
         """
         log('\t\t\t[Debug] Asynchronous init for task %s \n\t\t\t\t Parent %s \n\t\t\t\t Grandfather %s' %(self, self.workunit, self.creator.job))
         return getattr(getattr(self.creator, "job"), self.pluginObject).launch_task(self) # This can be done like that in a futureObject
-        # Maybe more readable with self.creator.job.pluginObject.launch_task(self) ?? Or even worse?
-        # It's a way to have each job with a different launch function (Result producer)
-        # Note we've got to use "Result" object for that, creating a result object in plugin.launch_task.
-        # Warn: Result needs the reference to task!!
 
 
     def task_validator(self, futureObject): #this is a bad name, because in BOINC validation is a wider concep
         """
             Validates the task, calling the pluginObject's validate_task function.
+
             If task has passed, it'll append it to task_ok pool at it's creator, 
             otherwise in tasks_fail
+
+
         """
         passed=getattr(self.creator, "job").pluginObject.validate_task(self, futureObject)
         if passed:
@@ -108,6 +134,7 @@ class Result(Assignment):
     def __init__(self, task, description):
         """
             Result object for a task.
+
             >>> a=task(creatorTest(),[],[],"Task test")
             >>> a.description
             'Task test'

@@ -48,7 +48,7 @@ Let's say we want to start developing one of the previously exposed ideas, we'd 
 - TODO: Maybe in a future we can make some plugin/view stuff in the web interface
 
 Plugin / views structure
-------------------------
+........................
 A view must have:
 
 - The view class name specified in config or web interface wich contains:
@@ -72,3 +72,29 @@ Example:
             self.urls=[( '/sample/', creator.Scheduler ),] # Only scheduler can manage created jobs!
 
 And about the plugin:
+
+- It must have a validate_task and consolidate_result class. 
+
+::
+
+    class SamplePlugin(object):
+        def __init__(self):
+            """
+                Sample plugin, containing validation and consolidation functions
+            """
+            self.description="Test plugin"
+
+
+        def validate_task(self, result, async):
+            """
+                Validate task.
+            """
+            return True
+
+        def consolidate_result(self, results):
+            """
+                Make results consolidation for a workunit here.
+            """
+            return results
+
+

@@ -16,6 +16,9 @@ Contents:
    tutorial
    inheritance
    API
+   Views
+   Plugins
+
 
 Indices and tables
 ==================

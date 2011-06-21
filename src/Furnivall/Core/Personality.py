@@ -8,7 +8,9 @@ import uuid
 class Personality(object):
     def __init__(self, user, host):
         """
-            *Personality object*, wich will be inherited by all personality-based objects
+
+            Inherited by all personality-based objects
+
         """
         self.host=host
         self.user=user
@@ -36,8 +38,10 @@ class Researcher(Personality):
 class Volunteer(Personality):
     def __init__(self,  host=False, user=False):
         """
+
             Volunteer object.
-            *TODO Change the method volunteers work. Should be individual volunteers, by sessions, not by-task volunteers.* (ongoing)
+            TODO Change the method volunteers work. Should be individual volunteers, by sessions, not by-task volunteers. (ongoing)
+
         """
         super(Volunteer, self).__init__(user, host)
         self.current_tasks=collections.deque()

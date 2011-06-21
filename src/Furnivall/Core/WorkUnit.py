@@ -19,10 +19,13 @@ class workunit(object):
 
     def consolidate_result(self):
         """
+
             If workunit.status is true, it will create a *ConsolidatedResult* object, 
-            passing self.results and job's viewObject.
+            passing self.results and job's viewObject
+            
             ConsolidatedResult will then store into it's data property a consolidated result 
             got from self.job.viewObject.consolidate_result
+
         """
         if self.status:
             self.ConsolidatedResult=ConsolidatedResult(self.results, self.job.pluginObject)
@@ -32,6 +35,7 @@ class workunit(object):
     def task_ok(self, task_id):
         """
             Append a task id to correct tasks queque.
+
             >>> a=workunit()
             >>> a.task_ok('123')
             >>> a.tasks_ok
@@ -42,6 +46,7 @@ class workunit(object):
     def task_failed(self, task_id):
         """
             Append a task id to failed tasks queque
+
             >>> a=workunit()
             >>> a.task_failed('123')
             >>> a.tasks_fail
@@ -52,6 +57,7 @@ class workunit(object):
     def new_task(self):
         """
             Create task object and append it to task list deque
+
             >>> a=workunit()
             >>> a.tasks #doctest: +ELLIPSIS
             deque([[0, <Assignment.task object at 0x...>]])
@@ -66,9 +72,9 @@ class workunit(object):
     @property
     def status(self, expected=False):
         """
-            workunit.status: Boolean property displaying if there're enought ok tasks.
+            Workunit.status: Boolean property displaying if there're enought ok tasks.
             If called as property, expected can't be specified, will be got from self.expected.
-            Unit testing:
+
             >>> workunit().status(0)
             True
             >>> workunit().status(1)
