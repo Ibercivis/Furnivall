@@ -1,9 +1,8 @@
-import Tests
 class testclass():
     def __init__(self):
         self.a="foo"
 
-class creatorTest(object):
+class creatorTest(testclass):
     def __init__(self):
         self.tasks=[]
         self.tasks_ok=[]
@@ -16,8 +15,8 @@ class creatorTest(object):
     def consolidate_result(self, result):
         return True
 
-class viewtest():
-    def __init__(self):
+class viewtest(testclass):
+    def __init__(testclass):
         self.workunits=10
         self.pluginmodule=Tests
         self.pluginclass="testclass"

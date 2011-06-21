@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-from common import CommonFunctions
+from Core.common import *
 from WorkUnit import *
 from Assignment import *
 from collections import deque
-from Core.common import log
 
 class job(object, CommonFunctions):
     def __init__(self, viewObject, pluginObject):

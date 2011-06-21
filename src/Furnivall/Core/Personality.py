@@ -8,7 +8,7 @@ import uuid
 class Personality(object):
     def __init__(self, user, host):
         """
-            Personality object, wich will be inherited by all personality-based objects
+            *Personality object*, wich will be inherited by all personality-based objects
         """
         self.host=host
         self.user=user
@@ -16,8 +16,8 @@ class Personality(object):
 class Researcher(Personality):
     def __init__(self,  host=False, user=False):
         """
-            Researcher object object. Conttains host, user, current_tasks and completed_tasks for a user
-            TODO: store everything about it in a datbase. Add auth to somewhere.
+            Researcher object.
+            *TODO: store everything about it in a datbase. Add auth to somewhere.*
         """
         super(self.__class__, self).__init__(user, host)
         self.current_tasks=collections.deque()
@@ -35,9 +35,9 @@ class Researcher(Personality):
 
 class Volunteer(Personality):
     def __init__(self,  host=False, user=False):
-        # TODO Change the method volunteers work. Should be individual volunteers, by sessions, not by-task volunteers.
         """
-            Volunteer object. Conttains host, user, current_tasks and completed_tasks for a user
+            Volunteer object.
+            *TODO Change the method volunteers work. Should be individual volunteers, by sessions, not by-task volunteers.* (ongoing)
         """
         super(Volunteer, self).__init__(user, host)
         self.current_tasks=collections.deque()
@@ -46,7 +46,7 @@ class Volunteer(Personality):
 
     def get_session_id(self):
         """
-            Gets a unique session id.
+            Gets a *unique* session id.
         """
         if not self.session_id:
             return uuid.uuid4()

@@ -4,8 +4,9 @@ from concurrent.futures import *
 from collections import deque
 from Personality import *
 from Core.common import log
+from Core.Tests import testclass
 
-class plugintest():
+class plugintest(testclass):
     def __init__(self):
         self.workunits=10
         self.pluginmodule=Tests
@@ -18,7 +19,7 @@ class plugintest():
 class Assignment(object):
     def __init__(self, creator, workunit, volunteer):
         """
-            Assignment: superclass of task and Result
+            Superclass of task and Result
             >>> a=Assignment(Job(viewtest, plugintest),[],[])
         """
         self.creator=creator
@@ -132,8 +133,8 @@ class Result(Assignment):
             Then, call creator's consolidate_result function (wich probably will call this tasks's plugin
             consolidate_result function)
         """
-         self.notify_creator('results', self) # This adds to results deque in workunit this result object. 
-         self.creator.consolidate_result()
+        self.notify_creator('results', self) # This adds to results deque in workunit this result object. 
+        self.creator.consolidate_result()
 
 class ConsolidatedResult(Result):
     def __init__(self, data, plugin):

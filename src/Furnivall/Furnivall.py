@@ -3,11 +3,11 @@
     It helps to organize batches of tasks, collect them form volunteers and do all the related housekeeping.
 """
 
-from Core import *
-from Core.common import CommonFunctions
-from Core.common import log
-from Plugins import *
-from Views import *
+from Core.Plugins import *
+from Core.Views import *
+import Core.Assignment
+import Core.WorkUnit
+import Core.Personality
 import Plugins
 import Views
 import tornado.web
@@ -41,13 +41,13 @@ class ViewManager(tornado.web.RequestHandler):
         """
         if not slug:
             slug="Landing"
-        log('[Debug] Rendering template %s' %slug)
+        core.log('[Debug] Rendering template %s' %slug)
         self.render('Templates/%s' %(slug), jobs=created_jobs, slug=slug )
 
         if self.get_argument('get_task'):
             self.assign_task(self.get_argument('view')) 
 
-class main(CommonFunctions):
+class main(core.CommonFunctions):
     def __init__(self):
         """
             Creates a list of researchers, wich SHOULD (todo) contain jobs.
@@ -57,7 +57,7 @@ class main(CommonFunctions):
         created_jobs=[] # Don't delete, when views are created, they need a created_jobs argument in the creator.
         self.read_config()
 
-        log('Loading Furnivall (Creating jobs)')
+        core.log('Loading Furnivall (Creating jobs)')
         researchers=self.InitializeResearchers()
 
     def InitializeResearchers(self):
@@ -81,7 +81,7 @@ class main(CommonFunctions):
             """
             auuid=uuid.uuid4()
             self.session.user_id=auuid # Assign user id to session.
-            log("[Debug Creating user %s,%s,%s" %(auuid, self.session.host, self.session.user))
+            core.log("[Debug Creating user %s,%s,%s" %(auuid, self.session.host, self.session.user))
             return volunteer.set_data(self.session.host, self.session.user, auuid )
 
         def assign_task(self, view):
@@ -90,9 +90,9 @@ class main(CommonFunctions):
             """
             free_task=self.getfreetask()
             if get_current_volunteer() is free_task.volunteer: 
-                log('[Debug] Not creating user, not return task... User is already doing that task, something failed!')
+                core.log('[Debug] Not creating user, not return task... User is already doing that task, something failed!')
                 return
-            log('[Debug] Creating volunteer object and assigning it to a task.')
+            core.log('[Debug] Creating volunteer object and assigning it to a task.')
             assign_session_to_user(self.getfreetask(view).volunteer)
 
         def getworkunit(self):
@@ -100,11 +100,11 @@ class main(CommonFunctions):
                 Return a workunit object, a new one if no unnasigned workunits available
             """
             for i in researcher.jobs.workunits:
-                log('Trying to return a free workunit. Currently processing %s' %(i))
+                core.log('Trying to return a free workunit. Currently processing %s' %(i))
                 if not i.status:
-                    log('%s is free!' %i)
+                    core.log('%s is free!' %i)
                     return i
-            log("Creating new workunit object")
+            core.log("Creating new workunit object")
             return researcher.jobs.produce_workunits()
 
         def get_current_volunteer(self):
@@ -115,7 +115,7 @@ class main(CommonFunctions):
             if not self.session.session_id:
                 return assign_session_to_user
             else:
-                log('Getting volunteer object for id: %s' %(self.session.session_id))
+                core.log('Getting volunteer object for id: %s' %(self.session.session_id))
                 return self.volunteers[self.session.session_id] # FIXME Make volunteers pool!!!
 
         def getfreetask(self, view):
@@ -128,13 +128,13 @@ class main(CommonFunctions):
             """
             # TODO: change ScoreMatch in workunit to call the plugin/view's compatibility class. TODO: Make a view's compatibility class
             for researcher in researchers:
-                log('Processing researcher %s' %researcher)
+                core.log('Processing researcher %s' %researcher)
                 for job in researcher.jobs:
-                    log('Processing job %s' %job)
+                    core.log('Processing job %s' %job)
                     for view, job in job:
-                        log('Processing view and job %s %s' %(view, job))
+                        core.log('Processing view and job %s %s' %(view, job))
                         if job.viewObject.check_view(self.get_current_volunteer()):
-                            log("View is supported by user: %s %s" %(job.viewObject, self.get_current_volunteer()))
+                            core.log("View is supported by user: %s %s" %(job.viewObject, self.get_current_volunteer()))
                             wk=self.getworkunit()
                             task=[sort(task, key=lambda t: t.ScoreMatch()) for task in wk.tasks if not task.volunteer.session_id ][0] # Get the best task ordered by ScoreMatch if it has not a volunteer assigned
                             if task: return task
@@ -147,10 +147,10 @@ class main(CommonFunctions):
             """
             atasks=[]
             volunteer=self.get_current_volunteer()
-            log('Getting done tasks for volunteer: %s' %volunteer)
+            core.log('Getting done tasks for volunteer: %s' %volunteer)
             for workunit in self.find_volunteer_workunits(volunteer):
                 atasks.extend([task in self.find_volunteer_tasks(volunteer, workunit.tasks_ok, workunit.tasks_fail)])
-            log('got %s' %atasks)
+            core.log('got %s' %atasks)
             return atasks
 
         def find_volunteer_workunits(self, volunteer):
@@ -158,7 +158,7 @@ class main(CommonFunctions):
                 Generator returning volunteer workunits. Warning: this might be dangerous, as we've seen that
                 generators seem to not work Ok when removing elements from its object.
             """
-            log('Getting workunits for volunteer: %s' %volunteer))9
+            core.log('Getting workunits for volunteer: %s' %volunteer))9
             for researcher in researchers: # TODO Make researchers pool, and make it global! Then check everywhere when it's changed
                 for job in researcher.jobs:
                     for name, job in job:
@@ -169,7 +169,7 @@ class main(CommonFunctions):
             """
                 return tasks from tasks_ok and task_fail if they're from volunteer
             """
-            log('Getting all tasks for volunteer %s' %volunteer)
+            core.log('Getting all tasks for volunteer %s' %volunteer)
             tasks_ok.extend(tasks_fail)
             return [ task for task in tasks_ok if task.volunteer is volunteer ]
 
@@ -186,7 +186,7 @@ if __name__ == "__main__":
         urls=[] # FIXME This should not happen should'nt it?
     urls.append(main_urls)
     settings={'session_storage': 'mongodb:///tornado_sessions' } # FIXME Document installation and configuration.
-    log('Starting web server with urls %s' %(urls))
+    core.log('Starting web server with urls %s' %(urls))
     application = tornado.web.Application(urls, **settings) # Here we can setup, for example, the multiple views. launch a handler foreach view.
     application.listen(8080)
     tornado.ioloop.IOLoop.instance().start()

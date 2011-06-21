@@ -2,6 +2,7 @@
 from collections import deque
 from Assignment import *
 from Core.common import log
+
 class workunit(object):
     def __init__(self, job=False):
         """
@@ -18,7 +19,7 @@ class workunit(object):
 
     def consolidate_result(self):
         """
-            If workunit.status is true, it will create a ConsolidatedResult object, 
+            If workunit.status is true, it will create a *ConsolidatedResult* object, 
             passing self.results and job's viewObject.
             ConsolidatedResult will then store into it's data property a consolidated result 
             got from self.job.viewObject.consolidate_result
