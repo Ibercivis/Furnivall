@@ -41,9 +41,12 @@ class Assignment(object):
         
 class task(Assignment):
     def __init__(self, creator, workunit, volunteer, description):
-        # TODO: by default task's assigning a volunteer, empty, change it to FALSE.'
         """
-            Task object, having assignment + a description
+            TODO: by default task's assigning a volunteer, empty, change it to FALSE.'
+            It will launch as executor the launch function, wich is actually a call to job.pluginobject.launch_task
+            So, basically this is calling the plugin to launch the task itself, asyncrounously via TrheadPoolExecutor
+            When created, it'll notify its creator that's been created, and, when finished, it'll validate it.'
+
             >>> a=task(creatorTest(),[],[],"Task test")
             >>> a.description
             'Task test'
@@ -61,11 +64,8 @@ class task(Assignment):
         self.description=description 
         MAX_WORKERS=20 # FIXME This has to be configurable!
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor: # Async call 
-            # Launch as executor launch function, wich will be a call to job.pluginobject.launch_task
-            # So, basically this is calling the plugin to get it's
             self.futureobject=executor.submit(self.launch) 
             self.futureobject.add_done_callback(self.task_validator) # We validate it once it's done.
-            # We send to the creator (workunit)'s task list, the futureobject and the task itself
             self.notify_creator('tasks',[self, self.futureobject])
  
     def scoreMatch(self, volunteer): #surely not volunteer, but architecture or something so
@@ -90,18 +90,23 @@ class task(Assignment):
         # Warn: Result needs the reference to task!!
 
 
-    def task_validator(self, futureObject): #this is a bad name, because in BOINC validation is a wider concept
+    def task_validator(self, futureObject): #this is a bad name, because in BOINC validation is a wider concep
+        """
+            Validates the task, calling the pluginObject's validate_task function.
+            If task has passed, it'll append it to task_ok pool at it's creator, 
+            otherwise in tasks_fail
+        """
         passed=getattr(self.creator, "job").pluginObject.validate_task(self, futureObject)
         if passed:
             self.notify_creator('tasks_ok', self)  
-            #create a result here? Or from http service?
+            # TODO: create a result here? Or from http service?
         else:
             self.notify_creator('tasks_fail', self)  #quizas mejor self.creator.FailTask(self) ???
 
 class Result(Assignment):
     def __init__(self, task, description):
         """
-            Result of a task, having assignment + a description
+            Result object for a task.
             >>> a=task(creatorTest(),[],[],"Task test")
             >>> a.description
             'Task test'
@@ -122,15 +127,20 @@ class Result(Assignment):
         self.description=description 
 
     def Result_notification(self):
+        """
+            Notify task's creator itself to result (this will be called when task is finished).
+            Then, call creator's consolidate_result function (wich probably will call this tasks's plugin
+            consolidate_result function)
+        """
          self.notify_creator('results', self) # This adds to results deque in workunit this result object. 
          self.creator.consolidate_result()
 
 class ConsolidatedResult(Result):
-    def __init__(self, data):
+    def __init__(self, data, plugin):
         """
            consolidated Result, data property returns inittialized data.
         """
-        self.data=data
+        self.data=plugin.consolidate_result(data)
 
     @property
     def data(self):

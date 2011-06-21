@@ -25,6 +25,10 @@ class job(object, CommonFunctions):
     
     def produce_workunits(self, number=1):
         """
+            Creates N new workunit objects, with this job as job and
+            appends them to our workunits queque.
+            If N is 1, it will also return the created workunit.
+
             >>> a=job(viewtest())
             >>> len(a.workunits)
             10
@@ -36,7 +40,11 @@ class job(object, CommonFunctions):
             >>> print a.workunits[0].tasks # doctest: +ELLIPSIS
             deque([[0, <Assignment.task object at 0x...>]])
         """
-        for n in range(0, number): self.workunits.append(workunit(self))
+
+        for n in range(0, number): 
+            a=workunit(self) # We 
+            self.workunits.append(a) # Append it to our workunits queuqe
+            if number is 1: return a #
 
 if __name__ == "__main__":
     """

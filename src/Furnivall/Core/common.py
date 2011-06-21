@@ -3,6 +3,10 @@
     Common functions.
 """
 class CommonFunctions():
+    """
+        Common functions for all furnivall
+        Right now, only config management is defined here.
+    """
     def read_config(self):
         """
             Reads default furnivall config from ./furnivall.conf ~/.furnivall.conf and /etc/furnivall.ConfigPars
@@ -19,8 +23,6 @@ class CommonFunctions():
             Custom function to read conf in two steps instead of three (..).
         """
         return self.config.get(section,option)
-
-
 
 def log(msg):
     print msg

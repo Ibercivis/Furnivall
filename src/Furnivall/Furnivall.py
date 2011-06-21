@@ -1,18 +1,19 @@
 """
-    Documentacion principal
-    
+    Ibervicis Furnivall is an open source framework for distributed volunteer science.
+    It helps to organize batches of tasks, collect them form volunteers and do all the related housekeeping.
 """
 
 from Core import *
-import Plugins
-from Plugins import *
-import Views
-from Views import *
 from Core.common import CommonFunctions
+from Core.common import log
+from Plugins import *
+from Views import *
+import Plugins
+import Views
 import tornado.web
 import tornado.ioloop
-from Core.common import log
 import uuid
+from tornado.options import define options
 
 class ViewManager(tornado.web.RequestHandler):
     """
@@ -22,6 +23,7 @@ class ViewManager(tornado.web.RequestHandler):
             { view.name : Jobs.job(<view.plugin.class object>) }
         that should be changed in a future for a []
     """
+
     def plug_view(self, viewfile, view):
         """
             Initialize a new job for a view and add it to job list.
@@ -59,7 +61,10 @@ class main(CommonFunctions):
         researchers=self.InitializeResearchers()
 
     def InitializeResearchers(self):
-        " Initialize researchers, foreach researcher stored in database, recreate it"
+        """
+            Initialize researchers, foreach researcher stored in database, recreate it
+            Actually, it's returning an empty set, as persistence is not implemented.
+        """
         # Initially, this can be like this, as we've not implemented persistence yet'.
         return []
 
@@ -92,10 +97,15 @@ class main(CommonFunctions):
 
         def getworkunit(self):
             """
-                Return a new workunit object.
+                Return a workunit object, a new one if no unnasigned workunits available
             """
+            for i in researcher.jobs.workunits:
+                log('Trying to return a free workunit. Currently processing %s' %(i))
+                if not i.status:
+                    log('%s is free!' %i)
+                    return i
             log("Creating new workunit object")
-            return WorkUnit.workunit() # TODO get workunit.
+            return researcher.jobs.produce_workunits()
 
         def get_current_volunteer(self):
             """
@@ -118,9 +128,13 @@ class main(CommonFunctions):
             """
             # TODO: change ScoreMatch in workunit to call the plugin/view's compatibility class. TODO: Make a view's compatibility class
             for researcher in researchers:
+                log('Processing researcher %s' %researcher)
                 for job in researcher.jobs:
+                    log('Processing job %s' %job)
                     for view, job in job:
-                        if job.viewObject.check_view(get_current_volunteer):
+                        log('Processing view and job %s %s' %(view, job))
+                        if job.viewObject.check_view(self.get_current_volunteer()):
+                            log("View is supported by user: %s %s" %(job.viewObject, self.get_current_volunteer()))
                             wk=self.getworkunit()
                             task=[sort(task, key=lambda t: t.ScoreMatch()) for task in wk.tasks if not task.volunteer.session_id ][0] # Get the best task ordered by ScoreMatch if it has not a volunteer assigned
                             if task: return task
@@ -133,8 +147,10 @@ class main(CommonFunctions):
             """
             atasks=[]
             volunteer=self.get_current_volunteer()
+            log('Getting done tasks for volunteer: %s' %volunteer)
             for workunit in self.find_volunteer_workunits(volunteer):
                 atasks.extend([task in self.find_volunteer_tasks(volunteer, workunit.tasks_ok, workunit.tasks_fail)])
+            log('got %s' %atasks)
             return atasks
 
         def find_volunteer_workunits(self, volunteer):
@@ -142,6 +158,7 @@ class main(CommonFunctions):
                 Generator returning volunteer workunits. Warning: this might be dangerous, as we've seen that
                 generators seem to not work Ok when removing elements from its object.
             """
+            log('Getting workunits for volunteer: %s' %volunteer))9
             for researcher in researchers: # TODO Make researchers pool, and make it global! Then check everywhere when it's changed
                 for job in researcher.jobs:
                     for name, job in job:
@@ -152,12 +169,14 @@ class main(CommonFunctions):
             """
                 return tasks from tasks_ok and task_fail if they're from volunteer
             """
+            log('Getting all tasks for volunteer %s' %volunteer)
             tasks_ok.extend(tasks_fail)
             return [ task for task in tasks_ok if task.volunteer is volunteer ]
 
 if __name__ == "__main__":
     """
-        Setup the tornado web server
+        Setup the tornado web server, you will need a local mongodb installation for this.
+
     """
     m=main()
     main_urls=("/view/([^/]+)", m.Scheduler)

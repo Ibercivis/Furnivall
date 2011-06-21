@@ -7,6 +7,9 @@ import uuid
 """
 class Personality(object):
     def __init__(self, user, host):
+        """
+            Personality object, wich will be inherited by all personality-based objects
+        """
         self.host=host
         self.user=user
 
@@ -23,6 +26,9 @@ class Researcher(Personality):
         self.jobs=[ Jobs.job(view, getattr(getattr(Plugins, view.plugin), view.class_)()) for view in self.initialize_views ]
 
     def set_data(self, host, user, id_):
+        """
+            Returns host user and id from a researcher object.
+        """
         self.host=host
         self.user=user
         self.id_=id_
@@ -39,8 +45,17 @@ class Volunteer(Personality):
         self.session_id=self.get_session_id()
 
     def get_session_id(self):
-        return uuid.uuid4()
+        """
+            Gets a unique session id.
+        """
+        if not self.session_id:
+            return uuid.uuid4()
+        else:
+            return self.session_id
 
     def set_data(self, host, user, id_):
+        """
+           Returns user and host.
+        """
         self.host=host
         self.user=user

@@ -17,15 +17,20 @@ class workunit(object):
         for i in range(0, int(job.initial_tasks)): self.new_task()
 
     def consolidate_result(self):
+        """
+            If workunit.status is true, it will create a ConsolidatedResult object, 
+            passing self.results and job's viewObject.
+            ConsolidatedResult will then store into it's data property a consolidated result 
+            got from self.job.viewObject.consolidate_result
+        """
         if self.status:
-            cr=self.results # TODO Consolidate result here.
-            self.ConsolidatedResult=ConsolidatedResult(cr)
+            self.ConsolidatedResult=ConsolidatedResult(self.results, self.job.pluginObject)
         # What about making this one assignment's child too and notify "job" 
         # (creator) with notify_creator when it's got a consolidated result?
 
     def task_ok(self, task_id):
         """
-            append a task id to ok tasks.
+            Append a task id to correct tasks queque.
             >>> a=workunit()
             >>> a.task_ok('123')
             >>> a.tasks_ok
@@ -35,7 +40,7 @@ class workunit(object):
     
     def task_failed(self, task_id):
         """
-            append a task id to failed tasks.
+            Append a task id to failed tasks queque
             >>> a=workunit()
             >>> a.task_failed('123')
             >>> a.tasks_fail
@@ -57,9 +62,11 @@ class workunit(object):
         description = False if not self.job else self.job.description
         self.tasks.append([len(self.tasks), task(self, self, Volunteer(), description )]) #TODO Store volunteer data somewhere.
 
+    @property
     def status(self, expected=False):
         """
             workunit.status: Boolean property displaying if there're enought ok tasks.
+            If called as property, expected can't be specified, will be got from self.expected.
             Unit testing:
             >>> workunit().status(0)
             True
