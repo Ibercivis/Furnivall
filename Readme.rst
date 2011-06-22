@@ -59,7 +59,8 @@ A view must have:
     + View template 
     + View urls, wich will be later parsed by tornado.
 
-Example: 
+
+::
 
     class SampleView(object):
         def __init__(self, creator):
