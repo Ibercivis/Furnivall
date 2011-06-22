@@ -20,7 +20,8 @@ from tornado.options import define, options
 define("port", default=8888, help="run on the given port", type=int)
 
 
-class Scheduler(tornado.web.RequestHandler):
+class ObjectManager(tornado.web.RequestHandler):
+
     def assign_session_to_user(self, volunteer):
         """
             Creates a unique session id and assigns it to volunteer object.
@@ -30,6 +31,22 @@ class Scheduler(tornado.web.RequestHandler):
         self.session.user_id=auuid # Assign user id to session.
         logging.info("Creating user %s,%s,%s" %(auuid, self.session.host, self.session.user))
         return volunteer.set_data(self.session.host, self.session.user, auuid )
+
+    def get(self, slug=False):
+        """
+            Tornado RequestHandler get function, renders slug as called 
+            from tornado, passing object id and slug as argument.
+            It also checks arguments to take actions when arguments are provided
+        """
+        logging.info("Creating new -%s-" %slug)
+        if "researcher" in slug:
+            logging.info("...")
+            self.application.researchers[self.get_argument('re_name')]=Core.Personality.Researcher(user=self.get_argument('re_name'))
+            logging.info(self.application.researchers)
+        self.render('Created', slug=slug)
+        
+
+class Scheduler(ObjectManager):
 
     def assign_task(self, view):
         """
@@ -125,11 +142,11 @@ class ViewManager(Scheduler):
         ViewManager Object, inherits tornado's requesthandler and provides
         the hability to plug a view into created_jobs list.
         Note that created_jobs has a dict foreach real job in the form
-            { view.name : Jobs.job(<view.plugin.class object>) }
+            { view.name : ( Jobs.job(<view.plugin.class object>), researcher ) }
         that should be changed in a future for a []
     """
 
-    def plug_view(self, viewfile, view):
+    def plug_view(self, viewfile, view, researcher):
         """
             Initialize a new job for a view and add it to job list.
             Check that there wasn't there before, as currently a view should only be executed once.
@@ -137,9 +154,10 @@ class ViewManager(Scheduler):
         logging.info('Pluging view  %s: %s' %(viewfile, view))
 
         view=getattr(viewfile, view)()
-        job={view.name : Jobs.job(getattr(view.plugin, view.class_)()) }
+        job={view.name : ( Jobs.job(getattr(view.plugin, view.class_)()), researcher ) }
         logging.info('Created job: %s' %job)
         
+        self.application.views.append(view.view)
         self.application.created_jobs.append(job)
 
     def get(self, slug=False):
@@ -148,10 +166,12 @@ class ViewManager(Scheduler):
             from tornado, passing jobs and slug as argument.
             It also checks arguments to take actions when arguments are provided
         """
+
         if not slug:
             slug="Landing"
         logging.info('[Debug] Rendering template %s' %slug)
-        self.render('%s' %(slug), jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
+        self.render('%s' %(slug), views=self.application.views, jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
+
         try:
             if self.get_argument('get_task'):
                 self.assign_task(self.get_argument('view')) 
@@ -166,19 +186,27 @@ class Application(common.CommonFunctions, tornado.web.Application):
             Then, setups the tornado web server, you will need a local mongodb installation for this.
         """
         self.created_jobs=[] # Don't delete, when views are created, they need a created_jobs argument in the creator.
+        self.views=[]
         self.read_config()
 
         logging.info('Loading Furnival')
         self.researchers=self.InitializeResearchers()
         logging.info('Researchers initialized by default: %s' %self.researchers)
-        main_urls=("/view/([^/]+)", ViewManager)
+        urls=[
+                ("/view/([^/]+)", ViewManager),
+                ("/new/([^/]+)", ObjectManager),
+                ]
+        """
 
-        try:
-            urls=[ b for b in [ a[a.keys()[0]].viewObject.urls for a in self.created_jobs ]][0]
-        except:
-            urls=[] # FIXME This should not happen should'nt it?
+            >>> try:
+            >>>    urls=[ b for b in [ a[a.keys()[0]].viewObject.urls for a in self.created_jobs ]][0]
+            >>> except:
+            >>>    urls=[] 
+            
+            FIXME This should not happen should'nt it? Wepa, actually, it should, and it has to. 
+            We'll have to restart webserver to hotplug views, so this is nothing.'
 
-        urls.append(main_urls)
+        """
 
         logging.info('Starting server with urls: %s' %urls)
 
@@ -200,7 +228,7 @@ class Application(common.CommonFunctions, tornado.web.Application):
             Actually, it's returning an empty set, as persistence is not implemented.
         """
         # Initially, this can be like this, as we've not implemented persistence yet'.
-        return []
+        return {}
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()

@@ -1,0 +1,4 @@
+<p>
+New {{ slug }} has been created
+<a href="/view/Admin"> Go back </a>
+</p>

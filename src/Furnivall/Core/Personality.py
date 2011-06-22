@@ -2,11 +2,12 @@
 import collections
 #import tornado.session
 import uuid
+import Core.common
 """
     Personality objects.
 """
 class Personality(object):
-    def __init__(self, user, host):
+    def __init__(self, user, host, id_=False):
         """
 
             Inherited by all personality-based objects
@@ -14,18 +15,23 @@ class Personality(object):
         """
         self.host=host
         self.user=user
+        self.id_=id_
 
-class Researcher(Personality):
+class Researcher(Personality, Core.common.CommonFunctions):
     def __init__(self,  host=False, user=False):
         """
             Researcher object.
             *TODO: store everything about it in a datbase. Add auth to somewhere.*
         """
         super(self.__class__, self).__init__(user, host)
+        self.read_config()
         self.current_tasks=collections.deque()
         self.completed_tasks=collections.deque()
-        self.initialize_views=( getattr(getattr(Views, viewfile), self.conf('enabled_views', viewfile) )(self) for viewfile in self.config.options('enabled_views') if self.view_ )
-        self.jobs=[ Jobs.job(view, getattr(getattr(Plugins, view.plugin), view.class_)()) for view in self.initialize_views ]
+        self.initialize_views=collections.deque()
+        self.jobs=[]
+
+#        self.initialize_views=( getattr(getattr(Views, viewfile), self.conf('enabled_views', viewfile) )(self) for viewfile in self.config.options('enabled_views') if self.view_ )
+#        self.jobs=[ Jobs.job(view, getattr(getattr(Plugins, view.plugin), view.class_)()) for view in self.initialize_views ]
 
     def set_data(self, host, user, id_):
         """
