@@ -3,7 +3,6 @@ import asyncore
 from concurrent.futures import *
 from collections import deque
 from Personality import *
-from Core.common import log
 from Core.Tests import testclass
 
 class plugintest(testclass):
@@ -110,7 +109,7 @@ class task(Assignment):
             - It's a way to have each job with a different launch function (Result producer)
 
         """
-        log('\t\t\t[Debug] Asynchronous init for task %s \n\t\t\t\t Parent %s \n\t\t\t\t Grandfather %s' %(self, self.workunit, self.creator.job))
+        logging.info('\t\t\t[Debug] Asynchronous init for task %s \n\t\t\t\t Parent %s \n\t\t\t\t Grandfather %s' %(self, self.workunit, self.creator.job))
         return getattr(getattr(self.creator, "job"), self.pluginObject).launch_task(self) # This can be done like that in a futureObject
 
 

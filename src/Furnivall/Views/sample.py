@@ -1,5 +1,4 @@
 import tornado.web
-from Core.common import log
 
 class SampleView(object):
     def __init__(self, creator):

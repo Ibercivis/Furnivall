@@ -81,7 +81,7 @@ class Scheduler(tornado.web.RequestHandler):
                 for view, job in job:
                     logging.info('Processing view and job %s %s' %(view, job))
                     if job.viewObject.check_view(self.get_current_volunteer()):
-                        logging.info("View is supported by user: %s %s" %(job.viewObject, self.get_current_volunteer()))
+                        logging.info("View is supported by user (ViewOjbect: %s) (Volunteer: %s)" %(job.viewObject, self.get_current_volunteer()))
                         wk=self.getworkunit()
                         task=[sort(task, key=lambda t: t.ScommonMatch()) for task in wk.tasks if not task.volunteer.session_id ][0] # Get the best task ordered by ScommonMatch if it has not a volunteer assigned
                         if task: return task
@@ -151,10 +151,12 @@ class ViewManager(Scheduler):
         if not slug:
             slug="Landing"
         logging.info('[Debug] Rendering template %s' %slug)
-        self.render('Templates/%s' %(slug), jobs=created_jobs, slug=slug )
-
-        if self.get_argument('get_task'):
-            self.assign_task(self.get_argument('view')) 
+        self.render('%s' %(slug), jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
+        try:
+            if self.get_argument('get_task'):
+                self.assign_task(self.get_argument('view')) 
+        except:
+            pass
 
 class Application(common.CommonFunctions, tornado.web.Application):
     def __init__(self):

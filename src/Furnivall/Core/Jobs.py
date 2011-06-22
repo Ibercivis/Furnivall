@@ -3,6 +3,7 @@ from Core.common import *
 from WorkUnit import *
 from Assignment import *
 from collections import deque
+import logging
 
 class job(object, CommonFunctions):
     def __init__(self, viewObject, pluginObject):
@@ -18,8 +19,8 @@ class job(object, CommonFunctions):
         self.viewObject=viewObject
         self.pluginObject=pluginObject
 
-        log('Creating job %s' %(self))
-        log('\tProducing workunits... (%s) ' %self.viewObject.workunits)
+        logging.info('Creating job %s' %(self))
+        logging.info('\tProducing workunits... (%s) ' %self.viewObject.workunits)
         self.produce_workunits(self.viewObject.workunits)
     
     def produce_workunits(self, number=1):
