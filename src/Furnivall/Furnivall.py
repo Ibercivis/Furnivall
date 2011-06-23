@@ -50,7 +50,7 @@ class ObjectManager(tornado.web.RequestHandler):
             This will start the view's main class and add the created objects to initialize_views object.
             Todo: Refactorize that awful name to initialized_views
         """
-        if researcher: researcher.initialize_views[viewfile]=getattr(getattr(Views, viewfile), self.application.conf('enabled_views', viewfile) )(researcher)
+        if researcher: researcher.initialize_views[viewfile]=getattr(getattr(Views, viewfile), self.application.conf('enabled_views', viewfile) )(self.application)
 
     def get(self, slug=False):
         """
@@ -174,29 +174,6 @@ class Scheduler(ObjectManager):
         tasks_ok.extend(tasks_fail)
         return [ task for task in tasks_ok if task.volunteer is volunteer ]
 
-class MainHandler(Scheduler):
-    """
-        MainHandler, inherits tornado's requesthandler and shows up display templastes
-    """
-
-
-    def get(self, slug=False):
-        """
-            Tornado RequestHandler get function, renders slug as called 
-            from tornado, passing jobs and slug as argument.
-            It also checks arguments to take actions when arguments are provided
-        """
-
-        if not slug:
-            slug="Landing"
-        logging.info('[Debug] Rendering template %s' %slug)
-        self.render('%s' %(slug), views=self.application.views, jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
-
-        try:
-            if self.get_argument('get_task'):
-                self.assign_task(self.get_argument('view')) 
-        except:
-            pass
 
 class Application(common.CommonFunctions, tornado.web.Application):
     def __init__(self):
@@ -213,7 +190,7 @@ class Application(common.CommonFunctions, tornado.web.Application):
         self.researchers=self.InitializeResearchers()
         logging.info('Researchers initialized by default: %s' %self.researchers)
         urls=[
-                ("/view/([^/]+)", MainHandler),
+                ("/view/([^/]+)", self.MainHandler),
                 ("/new/([^/]+)", ObjectManager),
                 ]
         """
@@ -249,6 +226,30 @@ class Application(common.CommonFunctions, tornado.web.Application):
         """
         # Initially, this can be like this, as we've not implemented persistence yet'.
         return {}
+
+    class MainHandler(Scheduler):
+        """
+            MainHandler, inherits tornado's requesthandler and shows up display templastes
+        """
+
+
+        def get(self, slug=False):
+            """
+                Tornado RequestHandler get function, renders slug as called 
+                from tornado, passing jobs and slug as argument.
+                It also checks arguments to take actions when arguments are provided
+            """
+    
+            if not slug:
+                slug="Landing"
+            logging.info('[Debug] Rendering template %s' %slug)
+            self.render('%s' %(slug), views=self.application.views, jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
+    
+            try:
+                if self.get_argument('get_task'):
+                    self.assign_task(self.get_argument('view')) 
+            except:
+                pass
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()

@@ -14,12 +14,8 @@
                     <label for="researcher_name"> Name: </label> <input type="text" name="researcher_name" value="{{ researchers[researcher].user }}" /><br/>
                     <label for="researcher_id"> ID: </label> <span name="researcher_id" value="{{ researchers[researcher].id_ or False }} " />
                      <h2>Current jobs:</h2>
-                        {% for option in researchers[researcher].initialize_views %} <a href="/view/researcher_view?researcher={{researcher.id}}&view={{option.id}}"> {{ option.name }}</a><br/> {%end%} 
                         <div class="jobs_creator">
                             Available views to create new jobs:
-                            {%for option in views %}
-                                <a href="/assign/{{view.id}}" >{{view.name}}</a>
-                            {%end%}
                         </div>
                 </form>
 
@@ -29,9 +25,8 @@
                     <input type="hidden" name="researcher" value="{{ researcher }}" />
                     <input type="submit"/>
                 </form>
-
-                {% for view in views %}
-                    <a href="/assign/{{view.id}}" >{{view.name}}</a>
+                {% for view in researchers[researcher].initialize_views %}
+                    <a href="/assign/{{ researchers[researcher].initialize_views[view].name }}" > {{ researchers[researcher].initialize_views[view].description }} </a>
                 {% end %}
             {%end%}
         </div>
