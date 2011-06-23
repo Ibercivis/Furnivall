@@ -66,6 +66,10 @@
 
 
 <div class="viewcode-block" id="ObjectManager"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager">[docs]</a><span class="k">class</span> <span class="nc">ObjectManager</span><span class="p">(</span><span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">RequestHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Object manager, creation, delete and modify petitions should go here.</span>
+<span class="sd">        Right now, it&#39;s able to assign a session to a user, a job and a view to a researhcer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ObjectManager.assign_session_to_user"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager.assign_session_to_user">[docs]</a>    <span class="k">def</span> <span class="nf">assign_session_to_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volunteer</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -77,7 +81,7 @@
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Creating user </span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">auuid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">volunteer</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">auuid</span> <span class="p">)</span>
 </div>
-<div class="viewcode-block" id="ObjectManager.assign_job_to_researcher"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager.assign_job_to_researcher">[docs]</a>    <span class="k">def</span> <span class="nf">assign_job_to_researcher</span><span class="p">(</span><span class="n">viewfile</span><span class="p">,</span> <span class="n">researcher</span><span class="p">):</span>
+<div class="viewcode-block" id="ObjectManager.assign_job_to_researcher"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager.assign_job_to_researcher">[docs]</a>    <span class="k">def</span> <span class="nf">assign_job_to_researcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">,</span> <span class="n">researcher</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Having a the view filename (wich is used in views pool),</span>
 <span class="sd">            create a jobs object with the view object from the views pool.</span>
@@ -85,13 +89,13 @@
         <span class="n">view</span><span class="o">=</span><span class="n">researcher</span><span class="o">.</span><span class="n">initialize_views</span><span class="p">[</span><span class="n">viewfile</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">researcher</span><span class="p">:</span> <span class="n">researcher</span><span class="o">.</span><span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Jobs</span><span class="o">.</span><span class="n">job</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Plugins</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">plugin</span><span class="p">),</span> <span class="n">view</span><span class="o">.</span><span class="n">class_</span><span class="p">)()))</span>
 </div>
-<div class="viewcode-block" id="ObjectManager.assign_view_to_researcher"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager.assign_view_to_researcher">[docs]</a>    <span class="k">def</span> <span class="nf">assign_view_to_researcher</span><span class="p">(</span><span class="n">viewfile</span><span class="p">,</span> <span class="n">researcher</span><span class="p">):</span>
+<div class="viewcode-block" id="ObjectManager.assign_view_to_researcher"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager.assign_view_to_researcher">[docs]</a>    <span class="k">def</span> <span class="nf">assign_view_to_researcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">,</span> <span class="n">researcher</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            This has to be called before adding a job to a researcher, in order to initialize the view.</span>
 <span class="sd">            This will start the view&#39;s main class and add the created objects to initialize_views object.</span>
 <span class="sd">            Todo: Refactorize that awful name to initialized_views</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">researcher</span><span class="p">:</span> <span class="n">researcher</span><span class="o">.</span><span class="n">initialize_views</span><span class="p">[</span><span class="n">viewfile</span><span class="p">]</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Views</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">(</span><span class="s">&#39;enabled_views&#39;</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">)</span> <span class="p">)(</span><span class="n">researcher</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">researcher</span><span class="p">:</span> <span class="n">researcher</span><span class="o">.</span><span class="n">initialize_views</span><span class="p">[</span><span class="n">viewfile</span><span class="p">]</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Views</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">conf</span><span class="p">(</span><span class="s">&#39;enabled_views&#39;</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">)</span> <span class="p">)(</span><span class="n">researcher</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="ObjectManager.get"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -215,30 +219,13 @@
         <span class="n">tasks_ok</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tasks_fail</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span> <span class="n">task</span> <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks_ok</span> <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">volunteer</span> <span class="ow">is</span> <span class="n">volunteer</span> <span class="p">]</span>
 </div></div>
-<div class="viewcode-block" id="ViewManager"><a class="viewcode-back" href="../API.html#Furnivall.ViewManager">[docs]</a><span class="k">class</span> <span class="nc">ViewManager</span><span class="p">(</span><span class="n">Scheduler</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">MainHandler</span><span class="p">(</span><span class="n">Scheduler</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        ViewManager Object, inherits tornado&#39;s requesthandler and provides</span>
-<span class="sd">        the hability to plug a view into created_jobs list.</span>
-<span class="sd">        Note that created_jobs has a dict foreach real job in the form</span>
-<span class="sd">            { view.name : ( Jobs.job(&lt;view.plugin.class object&gt;), researcher ) }</span>
-<span class="sd">        that should be changed in a future for a []</span>
+<span class="sd">        MainHandler, inherits tornado&#39;s requesthandler and shows up display templastes</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ViewManager.plug_view"><a class="viewcode-back" href="../API.html#Furnivall.ViewManager.plug_view">[docs]</a>    <span class="k">def</span> <span class="nf">plug_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">researcher</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Initialize a new job for a view and add it to job list.</span>
-<span class="sd">            Check that there wasn&#39;t there before, as currently a view should only be executed once.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Pluging view  </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">viewfile</span><span class="p">,</span> <span class="n">view</span><span class="p">))</span>
 
-        <span class="n">view</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">viewfile</span><span class="p">,</span> <span class="n">view</span><span class="p">)()</span>
-        <span class="n">job</span><span class="o">=</span><span class="p">{</span><span class="n">view</span><span class="o">.</span><span class="n">name</span> <span class="p">:</span> <span class="p">(</span> <span class="n">Jobs</span><span class="o">.</span><span class="n">job</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">plugin</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">class_</span><span class="p">)()),</span> <span class="n">researcher</span> <span class="p">)</span> <span class="p">}</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Created job: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">job</span><span class="p">)</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">view</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">created_jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="ViewManager.get"><a class="viewcode-back" href="../API.html#Furnivall.ViewManager.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Tornado RequestHandler get function, renders slug as called </span>
 <span class="sd">            from tornado, passing jobs and slug as argument.</span>
@@ -255,7 +242,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">assign_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s">&#39;view&#39;</span><span class="p">))</span> 
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
-</div></div>
+
 <div class="viewcode-block" id="Application"><a class="viewcode-back" href="../API.html#Furnivall.Application">[docs]</a><span class="k">class</span> <span class="nc">Application</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">CommonFunctions</span><span class="p">,</span> <span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -271,7 +258,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">researchers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">InitializeResearchers</span><span class="p">()</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Researchers initialized by default: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">researchers</span><span class="p">)</span>
         <span class="n">urls</span><span class="o">=</span><span class="p">[</span>
-                <span class="p">(</span><span class="s">&quot;/view/([^/]+)&quot;</span><span class="p">,</span> <span class="n">ViewManager</span><span class="p">),</span>
+                <span class="p">(</span><span class="s">&quot;/view/([^/]+)&quot;</span><span class="p">,</span> <span class="n">MainHandler</span><span class="p">),</span>
                 <span class="p">(</span><span class="s">&quot;/new/([^/]+)&quot;</span><span class="p">,</span> <span class="n">ObjectManager</span><span class="p">),</span>
                 <span class="p">]</span>
         <span class="sd">&quot;&quot;&quot;</span>

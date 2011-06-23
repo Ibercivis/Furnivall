@@ -8,8 +8,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>Core.Personality &mdash; Furnivall v0.1 documentation</title>
-    <link rel="stylesheet" href="../../static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
@@ -19,9 +19,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../static/jquery.js"></script>
-    <script type="text/javascript" src="../../static/underscore.js"></script>
-    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Furnivall v0.1 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
@@ -45,13 +45,14 @@
   <h1>Source code for Core.Personality</h1><div class="highlight"><pre>
 <span class="c">#!/usr/bin/env python</span>
 <span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">tornado.session</span>
+<span class="c">#import tornado.session</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">Core.common</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Personality objects.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Personality"><a class="viewcode-back" href="../../API.html#Core.Personality.Personality">[docs]</a><span class="k">class</span> <span class="nc">Personality</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">host</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">            Inherited by all personality-based objects</span>
@@ -59,18 +60,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">=</span><span class="n">host</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">=</span><span class="n">user</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_</span><span class="o">=</span><span class="n">id_</span>
 </div>
-<div class="viewcode-block" id="Researcher"><a class="viewcode-back" href="../../API.html#Core.Personality.Researcher">[docs]</a><span class="k">class</span> <span class="nc">Researcher</span><span class="p">(</span><span class="n">Personality</span><span class="p">):</span>
+<div class="viewcode-block" id="Researcher"><a class="viewcode-back" href="../../API.html#Core.Personality.Researcher">[docs]</a><span class="k">class</span> <span class="nc">Researcher</span><span class="p">(</span><span class="n">Personality</span><span class="p">,</span> <span class="n">Core</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">CommonFunctions</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">host</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Researcher object.</span>
 <span class="sd">            *TODO: store everything about it in a datbase. Add auth to somewhere.*</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_tasks</span><span class="o">=</span><span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">completed_tasks</span><span class="o">=</span><span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">initialize_views</span><span class="o">=</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Views</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">(</span><span class="s">&#39;enabled_views&#39;</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">)</span> <span class="p">)(</span><span class="bp">self</span><span class="p">)</span> <span class="k">for</span> <span class="n">viewfile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="s">&#39;enabled_views&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="o">=</span><span class="p">[</span> <span class="n">Jobs</span><span class="o">.</span><span class="n">job</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Plugins</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">plugin</span><span class="p">),</span> <span class="n">view</span><span class="o">.</span><span class="n">class_</span><span class="p">)())</span> <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialize_views</span> <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize_views</span><span class="o">=</span><span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="o">=</span><span class="p">[]</span>
+
 
 <div class="viewcode-block" id="Researcher.set_data"><a class="viewcode-back" href="../../API.html#Core.Personality.Researcher.set_data">[docs]</a>    <span class="k">def</span> <span class="nf">set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">id_</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

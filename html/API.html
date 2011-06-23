@@ -8,8 +8,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>Core API &mdash; Furnivall v0.1 documentation</title>
-    <link rel="stylesheet" href="static/default.css" type="text/css" />
-    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
@@ -19,9 +19,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="static/jquery.js"></script>
-    <script type="text/javascript" src="static/underscore.js"></script>
-    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Furnivall v0.1 documentation" href="index.html" />
     <link rel="next" title="Views API" href="Views.html" />
     <link rel="prev" title="Inheritance diagrams" href="inheritance.html" /> 
@@ -52,29 +52,29 @@
 <h1>Core API<a class="headerlink" href="#core-api" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="Furnivall.Scheduler">
-<em class="property">class </em><tt class="descclassname">Furnivall.</tt><tt class="descname">Scheduler</tt><big>(</big><em>application</em>, <em>request</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/Furnivall.html#Scheduler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Furnivall.</tt><tt class="descname">Scheduler</tt><big>(</big><em>application</em>, <em>request</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/Furnivall.html#Scheduler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Furnivall.Scheduler.assign_task">
-<tt class="descname">assign_task</tt><big>(</big><em>view</em><big>)</big><a class="reference internal" href="modules/Furnivall.html#Scheduler.assign_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.assign_task" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">assign_task</tt><big>(</big><em>view</em><big>)</big><a class="reference internal" href="_modules/Furnivall.html#Scheduler.assign_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.assign_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a free task, if volunteer is doing that task, return an error, otherwise</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="Furnivall.Scheduler.find_volunteer_tasks">
-<tt class="descname">find_volunteer_tasks</tt><big>(</big><em>volunteer</em>, <em>tasks_ok</em>, <em>tasks_fail</em><big>)</big><a class="reference internal" href="modules/Furnivall.html#Scheduler.find_volunteer_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.find_volunteer_tasks" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">find_volunteer_tasks</tt><big>(</big><em>volunteer</em>, <em>tasks_ok</em>, <em>tasks_fail</em><big>)</big><a class="reference internal" href="_modules/Furnivall.html#Scheduler.find_volunteer_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.find_volunteer_tasks" title="Permalink to this definition">¶</a></dt>
 <dd><p>return tasks from tasks_ok and task_fail if they&#8217;re from volunteer</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="Furnivall.Scheduler.find_volunteer_workunits">
-<tt class="descname">find_volunteer_workunits</tt><big>(</big><em>volunteer</em><big>)</big><a class="reference internal" href="modules/Furnivall.html#Scheduler.find_volunteer_workunits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.find_volunteer_workunits" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">find_volunteer_workunits</tt><big>(</big><em>volunteer</em><big>)</big><a class="reference internal" href="_modules/Furnivall.html#Scheduler.find_volunteer_workunits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.find_volunteer_workunits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generator returning volunteer workunits. Warning: this might be dangerous, as we&#8217;ve seen that
 generators seem to not work Ok when removing elements from its object.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="Furnivall.Scheduler.get_current_volunteer">
-<tt class="descname">get_current_volunteer</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Furnivall.html#Scheduler.get_current_volunteer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.get_current_volunteer" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_current_volunteer</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Furnivall.html#Scheduler.get_current_volunteer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.get_current_volunteer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get current volunteer, by session id (session_id is
 scheduler-specific, should be for each user)
 If no session_id, calls assign_session_to_user</p>
@@ -82,13 +82,13 @@ If no session_id, calls assign_session_to_user</p>
 
 <dl class="method">
 <dt id="Furnivall.Scheduler.get_done_tasks">
-<tt class="descname">get_done_tasks</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Furnivall.html#Scheduler.get_done_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.get_done_tasks" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_done_tasks</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Furnivall.html#Scheduler.get_done_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.get_done_tasks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return tasks in status &#8220;ok&#8221; and &#8220;failed&#8221; from a volunteer&#8217;s tasks_fail and tasks_ok pools.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="Furnivall.Scheduler.getfreetask">
-<tt class="descname">getfreetask</tt><big>(</big><em>view</em><big>)</big><a class="reference internal" href="modules/Furnivall.html#Scheduler.getfreetask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.getfreetask" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">getfreetask</tt><big>(</big><em>view</em><big>)</big><a class="reference internal" href="_modules/Furnivall.html#Scheduler.getfreetask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.getfreetask" title="Permalink to this definition">¶</a></dt>
 <dd><p>If user is able to execute a determinated view task,
 get a workunit and return the task
 with better scommon, and with no session_id.
@@ -100,7 +100,7 @@ split jobs in view, job, and check view&#8217;s compatibility.</p>
 
 <dl class="method">
 <dt id="Furnivall.Scheduler.getworkunit">
-<tt class="descname">getworkunit</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Furnivall.html#Scheduler.getworkunit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.getworkunit" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">getworkunit</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Furnivall.html#Scheduler.getworkunit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Scheduler.getworkunit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a workunit object, a new one if no unnasigned workunits available</p>
 </dd></dl>
 
@@ -108,26 +108,26 @@ split jobs in view, job, and check view&#8217;s compatibility.</p>
 
 <dl class="class">
 <dt id="Furnivall.ObjectManager">
-<em class="property">class </em><tt class="descclassname">Furnivall.</tt><tt class="descname">ObjectManager</tt><big>(</big><em>application</em>, <em>request</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/Furnivall.html#ObjectManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.ObjectManager" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Furnivall.</tt><tt class="descname">ObjectManager</tt><big>(</big><em>application</em>, <em>request</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/Furnivall.html#ObjectManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.ObjectManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object manager, creation, delete and modify petitions should go here.
 Right now, it&#8217;s able to assign a session to a user, a job and a view to a researhcer.</p>
 <dl class="method">
 <dt id="Furnivall.ObjectManager.assign_job_to_researcher">
-<tt class="descname">assign_job_to_researcher</tt><big>(</big><em>viewfile</em>, <em>researcher</em><big>)</big><a class="reference internal" href="modules/Furnivall.html#ObjectManager.assign_job_to_researcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.ObjectManager.assign_job_to_researcher" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">assign_job_to_researcher</tt><big>(</big><em>viewfile</em>, <em>researcher</em><big>)</big><a class="reference internal" href="_modules/Furnivall.html#ObjectManager.assign_job_to_researcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.ObjectManager.assign_job_to_researcher" title="Permalink to this definition">¶</a></dt>
 <dd><p>Having a the view filename (wich is used in views pool),
 create a jobs object with the view object from the views pool.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="Furnivall.ObjectManager.assign_session_to_user">
-<tt class="descname">assign_session_to_user</tt><big>(</big><em>volunteer</em><big>)</big><a class="reference internal" href="modules/Furnivall.html#ObjectManager.assign_session_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.ObjectManager.assign_session_to_user" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">assign_session_to_user</tt><big>(</big><em>volunteer</em><big>)</big><a class="reference internal" href="_modules/Furnivall.html#ObjectManager.assign_session_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.ObjectManager.assign_session_to_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a unique session id and assigns it to volunteer object.
 then, it returns the volunteer with host and user data.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="Furnivall.ObjectManager.assign_view_to_researcher">
-<tt class="descname">assign_view_to_researcher</tt><big>(</big><em>viewfile</em>, <em>researcher</em><big>)</big><a class="reference internal" href="modules/Furnivall.html#ObjectManager.assign_view_to_researcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.ObjectManager.assign_view_to_researcher" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">assign_view_to_researcher</tt><big>(</big><em>viewfile</em>, <em>researcher</em><big>)</big><a class="reference internal" href="_modules/Furnivall.html#ObjectManager.assign_view_to_researcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.ObjectManager.assign_view_to_researcher" title="Permalink to this definition">¶</a></dt>
 <dd><p>This has to be called before adding a job to a researcher, in order to initialize the view.
 This will start the view&#8217;s main class and add the created objects to initialize_views object.
 Todo: Refactorize that awful name to initialized_views</p>
@@ -135,7 +135,7 @@ Todo: Refactorize that awful name to initialized_views</p>
 
 <dl class="method">
 <dt id="Furnivall.ObjectManager.get">
-<tt class="descname">get</tt><big>(</big><em>slug=False</em><big>)</big><a class="reference internal" href="modules/Furnivall.html#ObjectManager.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.ObjectManager.get" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get</tt><big>(</big><em>slug=False</em><big>)</big><a class="reference internal" href="_modules/Furnivall.html#ObjectManager.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.ObjectManager.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tornado RequestHandler get function, renders slug as called 
 from tornado, passing object id and slug as argument.
 It also checks arguments to take actions when arguments are provided</p>
@@ -145,10 +145,10 @@ It also checks arguments to take actions when arguments are provided</p>
 
 <dl class="class">
 <dt id="Furnivall.Application">
-<em class="property">class </em><tt class="descclassname">Furnivall.</tt><tt class="descname">Application</tt><a class="reference internal" href="modules/Furnivall.html#Application"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Application" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Furnivall.</tt><tt class="descname">Application</tt><a class="reference internal" href="_modules/Furnivall.html#Application"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Application" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Furnivall.Application.InitializeResearchers">
-<tt class="descname">InitializeResearchers</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Furnivall.html#Application.InitializeResearchers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Application.InitializeResearchers" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">InitializeResearchers</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Furnivall.html#Application.InitializeResearchers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Furnivall.Application.InitializeResearchers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize researchers, foreach researcher stored in database, recreate it
 Actually, it&#8217;s returning an empty set, as persistence is not implemented.</p>
 </dd></dl>
@@ -170,10 +170,10 @@ We&#8217;ll have to restart webserver to hotplug views, so this is nothing.&#821
 
 <dl class="class">
 <dt id="Core.Assignment.Assignment">
-<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">Assignment</tt><big>(</big><em>creator</em>, <em>workunit</em>, <em>volunteer</em><big>)</big><a class="reference internal" href="modules/Core/Assignment.html#Assignment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Assignment" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">Assignment</tt><big>(</big><em>creator</em>, <em>workunit</em>, <em>volunteer</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Assignment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Assignment" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Core.Assignment.Assignment.notify_creator">
-<tt class="descname">notify_creator</tt><big>(</big><em>place</em>, <em>notification</em><big>)</big><a class="reference internal" href="modules/Core/Assignment.html#Assignment.notify_creator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Assignment.notify_creator" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">notify_creator</tt><big>(</big><em>place</em>, <em>notification</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Assignment.notify_creator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Assignment.notify_creator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append notification to Assignment object&#8217;s creator&#8217; list.</p>
 <p>Will get parent&#8217;s list as specified in place argument and append
 notification.</p>
@@ -193,10 +193,10 @@ notification.</p>
 
 <dl class="class">
 <dt id="Core.Assignment.task">
-<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">task</tt><big>(</big><em>creator</em>, <em>workunit</em>, <em>volunteer</em>, <em>description</em><big>)</big><a class="reference internal" href="modules/Core/Assignment.html#task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.task" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">task</tt><big>(</big><em>creator</em>, <em>workunit</em>, <em>volunteer</em>, <em>description</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.task" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Core.Assignment.task.launch">
-<tt class="descname">launch</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Core/Assignment.html#task.launch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.task.launch" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">launch</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#task.launch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.task.launch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produces asynchronously the Result.
 Once we have the Result (we can do whatever here, it&#8217;s async...</p>
 <p><em>Notes</em></p>
@@ -234,7 +234,7 @@ notification.</p>
 
 <dl class="method">
 <dt id="Core.Assignment.task.scoreMatch">
-<tt class="descname">scoreMatch</tt><big>(</big><em>volunteer</em><big>)</big><a class="reference internal" href="modules/Core/Assignment.html#task.scoreMatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.task.scoreMatch" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">scoreMatch</tt><big>(</big><em>volunteer</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#task.scoreMatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.task.scoreMatch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tells how adequate this task is for this volunteer.</p>
 <p>Returns 0 if the task can not be executed by the volunteer&#8217;s architecture. Else it returns
 a real between 0 and 1.</p>
@@ -242,7 +242,7 @@ a real between 0 and 1.</p>
 
 <dl class="method">
 <dt id="Core.Assignment.task.task_validator">
-<tt class="descname">task_validator</tt><big>(</big><em>futureObject</em><big>)</big><a class="reference internal" href="modules/Core/Assignment.html#task.task_validator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.task.task_validator" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">task_validator</tt><big>(</big><em>futureObject</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#task.task_validator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.task.task_validator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validates the task, calling the pluginObject&#8217;s validate_task function.</p>
 <p>If task has passed, it&#8217;ll append it to task_ok pool at it&#8217;s creator, 
 otherwise in tasks_fail</p>
@@ -252,10 +252,10 @@ otherwise in tasks_fail</p>
 
 <dl class="class">
 <dt id="Core.Assignment.Result">
-<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">Result</tt><big>(</big><em>task</em>, <em>description</em><big>)</big><a class="reference internal" href="modules/Core/Assignment.html#Result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Result" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">Result</tt><big>(</big><em>task</em>, <em>description</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Result" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Core.Assignment.Result.Result_notification">
-<tt class="descname">Result_notification</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Core/Assignment.html#Result.Result_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Result.Result_notification" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">Result_notification</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Result.Result_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Result.Result_notification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Notify task&#8217;s creator itself to result (this will be called when task is finished).
 Then, call creator&#8217;s consolidate_result function (wich probably will call this tasks&#8217;s plugin
 consolidate_result function)</p>
@@ -283,7 +283,7 @@ notification.</p>
 
 <dl class="class">
 <dt id="Core.Assignment.ConsolidatedResult">
-<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">ConsolidatedResult</tt><big>(</big><em>data</em>, <em>plugin</em><big>)</big><a class="reference internal" href="modules/Core/Assignment.html#ConsolidatedResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.ConsolidatedResult" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">ConsolidatedResult</tt><big>(</big><em>data</em>, <em>plugin</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#ConsolidatedResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.ConsolidatedResult" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Core.Assignment.ConsolidatedResult.Result_notification">
 <tt class="descname">Result_notification</tt><big>(</big><big>)</big><a class="headerlink" href="#Core.Assignment.ConsolidatedResult.Result_notification" title="Permalink to this definition">¶</a></dt>
@@ -294,7 +294,7 @@ consolidate_result function)</p>
 
 <dl class="attribute">
 <dt id="Core.Assignment.ConsolidatedResult.data">
-<tt class="descname">data</tt><a class="reference internal" href="modules/Core/Assignment.html#ConsolidatedResult.data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.ConsolidatedResult.data" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">data</tt><a class="reference internal" href="_modules/Core/Assignment.html#ConsolidatedResult.data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.ConsolidatedResult.data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -319,7 +319,7 @@ notification.</p>
 
 <dl class="class">
 <dt id="Core.Jobs.job">
-<em class="property">class </em><tt class="descclassname">Core.Jobs.</tt><tt class="descname">job</tt><big>(</big><em>viewObject</em>, <em>pluginObject</em><big>)</big><a class="reference internal" href="modules/Core/Jobs.html#job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Jobs.job" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Jobs.</tt><tt class="descname">job</tt><big>(</big><em>viewObject</em>, <em>pluginObject</em><big>)</big><a class="reference internal" href="_modules/Core/Jobs.html#job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Jobs.job" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Core.Jobs.job.conf">
 <tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#Core.Jobs.job.conf" title="Permalink to this definition">¶</a></dt>
@@ -328,7 +328,7 @@ notification.</p>
 
 <dl class="method">
 <dt id="Core.Jobs.job.produce_workunits">
-<tt class="descname">produce_workunits</tt><big>(</big><em>number=1</em><big>)</big><a class="reference internal" href="modules/Core/Jobs.html#job.produce_workunits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Jobs.job.produce_workunits" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">produce_workunits</tt><big>(</big><em>number=1</em><big>)</big><a class="reference internal" href="_modules/Core/Jobs.html#job.produce_workunits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Jobs.job.produce_workunits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates N new workunit objects, with this job as job and
 appends them to our workunits queque.
 If N is 1, it will also return the created workunit.</p>
@@ -357,18 +357,18 @@ Stores it in self.conf and returns it.</p>
 
 <dl class="class">
 <dt id="Core.common.CommonFunctions">
-<em class="property">class </em><tt class="descclassname">Core.common.</tt><tt class="descname">CommonFunctions</tt><a class="reference internal" href="modules/Core/common.html#CommonFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.common.CommonFunctions" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.common.</tt><tt class="descname">CommonFunctions</tt><a class="reference internal" href="_modules/Core/common.html#CommonFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.common.CommonFunctions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Common functions for all furnivall
 Right now, only config management is defined here.</p>
 <dl class="method">
 <dt id="Core.common.CommonFunctions.conf">
-<tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="reference internal" href="modules/Core/common.html#CommonFunctions.conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.common.CommonFunctions.conf" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="reference internal" href="_modules/Core/common.html#CommonFunctions.conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.common.CommonFunctions.conf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Custom function to read conf in two steps instead of three (..).</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="Core.common.CommonFunctions.read_config">
-<tt class="descname">read_config</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Core/common.html#CommonFunctions.read_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.common.CommonFunctions.read_config" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">read_config</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/common.html#CommonFunctions.read_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.common.CommonFunctions.read_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads default furnivall config from ./furnivall.conf ~/.furnivall.conf and /etc/furnivall.ConfigPars
 Stores it in self.conf and returns it.</p>
 </dd></dl>
@@ -377,21 +377,21 @@ Stores it in self.conf and returns it.</p>
 
 <dl class="class">
 <dt id="Core.Personality.Personality">
-<em class="property">class </em><tt class="descclassname">Core.Personality.</tt><tt class="descname">Personality</tt><big>(</big><em>user</em>, <em>host</em>, <em>id_=False</em><big>)</big><a class="reference internal" href="modules/Core/Personality.html#Personality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Personality" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Personality.</tt><tt class="descname">Personality</tt><big>(</big><em>user</em>, <em>host</em>, <em>id_=False</em><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#Personality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Personality" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
 <dt id="Core.Personality.Volunteer">
-<em class="property">class </em><tt class="descclassname">Core.Personality.</tt><tt class="descname">Volunteer</tt><big>(</big><em>host=False</em>, <em>user=False</em><big>)</big><a class="reference internal" href="modules/Core/Personality.html#Volunteer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Volunteer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Personality.</tt><tt class="descname">Volunteer</tt><big>(</big><em>host=False</em>, <em>user=False</em><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#Volunteer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Volunteer" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Core.Personality.Volunteer.get_session_id">
-<tt class="descname">get_session_id</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Core/Personality.html#Volunteer.get_session_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Volunteer.get_session_id" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_session_id</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#Volunteer.get_session_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Volunteer.get_session_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets a <em>unique</em> session id.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="Core.Personality.Volunteer.set_data">
-<tt class="descname">set_data</tt><big>(</big><em>host</em>, <em>user</em>, <em>id_</em><big>)</big><a class="reference internal" href="modules/Core/Personality.html#Volunteer.set_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Volunteer.set_data" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set_data</tt><big>(</big><em>host</em>, <em>user</em>, <em>id_</em><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#Volunteer.set_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Volunteer.set_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns user and host.</p>
 </dd></dl>
 
@@ -399,7 +399,7 @@ Stores it in self.conf and returns it.</p>
 
 <dl class="class">
 <dt id="Core.Personality.Researcher">
-<em class="property">class </em><tt class="descclassname">Core.Personality.</tt><tt class="descname">Researcher</tt><big>(</big><em>host=False</em>, <em>user=False</em><big>)</big><a class="reference internal" href="modules/Core/Personality.html#Researcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Researcher" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Personality.</tt><tt class="descname">Researcher</tt><big>(</big><em>host=False</em>, <em>user=False</em><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#Researcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Researcher" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Core.Personality.Researcher.conf">
 <tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#Core.Personality.Researcher.conf" title="Permalink to this definition">¶</a></dt>
@@ -415,7 +415,7 @@ Stores it in self.conf and returns it.</p>
 
 <dl class="method">
 <dt id="Core.Personality.Researcher.set_data">
-<tt class="descname">set_data</tt><big>(</big><em>host</em>, <em>user</em>, <em>id_</em><big>)</big><a class="reference internal" href="modules/Core/Personality.html#Researcher.set_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Researcher.set_data" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">set_data</tt><big>(</big><em>host</em>, <em>user</em>, <em>id_</em><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#Researcher.set_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.Researcher.set_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns host user and id from a researcher object.</p>
 </dd></dl>
 
@@ -423,16 +423,16 @@ Stores it in self.conf and returns it.</p>
 
 <dl class="class">
 <dt id="Core.Tests.creatorTest">
-<em class="property">class </em><tt class="descclassname">Core.Tests.</tt><tt class="descname">creatorTest</tt><a class="reference internal" href="modules/Core/Tests.html#creatorTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.creatorTest" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Tests.</tt><tt class="descname">creatorTest</tt><a class="reference internal" href="_modules/Core/Tests.html#creatorTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.creatorTest" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Core.Tests.creatorTest.consolidate_result">
-<tt class="descname">consolidate_result</tt><big>(</big><em>result</em><big>)</big><a class="reference internal" href="modules/Core/Tests.html#creatorTest.consolidate_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.creatorTest.consolidate_result" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">consolidate_result</tt><big>(</big><em>result</em><big>)</big><a class="reference internal" href="_modules/Core/Tests.html#creatorTest.consolidate_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.creatorTest.consolidate_result" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fake consolidtaror that returns result itself as ConsolidatedResult</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="Core.Tests.creatorTest.validate_task">
-<tt class="descname">validate_task</tt><big>(</big><em>task</em>, <em>futureobject</em><big>)</big><a class="reference internal" href="modules/Core/Tests.html#creatorTest.validate_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.creatorTest.validate_task" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">validate_task</tt><big>(</big><em>task</em>, <em>futureobject</em><big>)</big><a class="reference internal" href="_modules/Core/Tests.html#creatorTest.validate_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.creatorTest.validate_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fake validator that validates all tasks as ok</p>
 </dd></dl>
 
@@ -440,16 +440,16 @@ Stores it in self.conf and returns it.</p>
 
 <dl class="class">
 <dt id="Core.Tests.viewtest">
-<em class="property">class </em><tt class="descclassname">Core.Tests.</tt><tt class="descname">viewtest</tt><big>(</big><em>testclass</em><big>)</big><a class="reference internal" href="modules/Core/Tests.html#viewtest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.viewtest" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Tests.</tt><tt class="descname">viewtest</tt><big>(</big><em>testclass</em><big>)</big><a class="reference internal" href="_modules/Core/Tests.html#viewtest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.viewtest" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Core.Tests.viewtest.main">
-<tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Core/Tests.html#viewtest.main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.viewtest.main" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/Tests.html#viewtest.main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.viewtest.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return foo as result</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="Core.Tests.viewtest.validate_task">
-<tt class="descname">validate_task</tt><big>(</big><em>foo</em>, <em>bar</em><big>)</big><a class="reference internal" href="modules/Core/Tests.html#viewtest.validate_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.viewtest.validate_task" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">validate_task</tt><big>(</big><em>foo</em>, <em>bar</em><big>)</big><a class="reference internal" href="_modules/Core/Tests.html#viewtest.validate_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.viewtest.validate_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Secondary task validator for tests, can override plugin&#8217;s one</p>
 </dd></dl>
 
@@ -457,15 +457,15 @@ Stores it in self.conf and returns it.</p>
 
 <dl class="class">
 <dt id="Core.Tests.testclass">
-<em class="property">class </em><tt class="descclassname">Core.Tests.</tt><tt class="descname">testclass</tt><a class="reference internal" href="modules/Core/Tests.html#testclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.testclass" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.Tests.</tt><tt class="descname">testclass</tt><a class="reference internal" href="_modules/Core/Tests.html#testclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Tests.testclass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
 <dt id="Core.WorkUnit.workunit">
-<em class="property">class </em><tt class="descclassname">Core.WorkUnit.</tt><tt class="descname">workunit</tt><big>(</big><em>job=False</em><big>)</big><a class="reference internal" href="modules/Core/WorkUnit.html#workunit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">Core.WorkUnit.</tt><tt class="descname">workunit</tt><big>(</big><em>job=False</em><big>)</big><a class="reference internal" href="_modules/Core/WorkUnit.html#workunit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="Core.WorkUnit.workunit.consolidate_result">
-<tt class="descname">consolidate_result</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Core/WorkUnit.html#workunit.consolidate_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit.consolidate_result" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">consolidate_result</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/WorkUnit.html#workunit.consolidate_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit.consolidate_result" title="Permalink to this definition">¶</a></dt>
 <dd><p>If workunit.status is true, it will create a <em>ConsolidatedResult</em> object, 
 passing self.results and job&#8217;s viewObject</p>
 <p>ConsolidatedResult will then store into it&#8217;s data property a consolidated result 
@@ -474,7 +474,7 @@ got from self.job.viewObject.consolidate_result</p>
 
 <dl class="method">
 <dt id="Core.WorkUnit.workunit.new_task">
-<tt class="descname">new_task</tt><big>(</big><big>)</big><a class="reference internal" href="modules/Core/WorkUnit.html#workunit.new_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit.new_task" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">new_task</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/WorkUnit.html#workunit.new_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit.new_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create task object and append it to task list deque</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">=</span><span class="n">workunit</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tasks</span> 
@@ -488,7 +488,7 @@ got from self.job.viewObject.consolidate_result</p>
 
 <dl class="attribute">
 <dt id="Core.WorkUnit.workunit.status">
-<tt class="descname">status</tt><a class="reference internal" href="modules/Core/WorkUnit.html#workunit.status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit.status" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">status</tt><a class="reference internal" href="_modules/Core/WorkUnit.html#workunit.status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit.status" title="Permalink to this definition">¶</a></dt>
 <dd><p>Workunit.status: Boolean property displaying if there&#8217;re enought ok tasks.
 If called as property, expected can&#8217;t be specified, will be got from self.expected.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">workunit</span><span class="p">()</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -501,7 +501,7 @@ If called as property, expected can&#8217;t be specified, will be got from self.
 
 <dl class="method">
 <dt id="Core.WorkUnit.workunit.task_failed">
-<tt class="descname">task_failed</tt><big>(</big><em>task_id</em><big>)</big><a class="reference internal" href="modules/Core/WorkUnit.html#workunit.task_failed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit.task_failed" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">task_failed</tt><big>(</big><em>task_id</em><big>)</big><a class="reference internal" href="_modules/Core/WorkUnit.html#workunit.task_failed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit.task_failed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append a task id to failed tasks queque</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">=</span><span class="n">workunit</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">task_failed</span><span class="p">(</span><span class="s">&#39;123&#39;</span><span class="p">)</span>
@@ -513,7 +513,7 @@ If called as property, expected can&#8217;t be specified, will be got from self.
 
 <dl class="method">
 <dt id="Core.WorkUnit.workunit.task_ok">
-<tt class="descname">task_ok</tt><big>(</big><em>task_id</em><big>)</big><a class="reference internal" href="modules/Core/WorkUnit.html#workunit.task_ok"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit.task_ok" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">task_ok</tt><big>(</big><em>task_id</em><big>)</big><a class="reference internal" href="_modules/Core/WorkUnit.html#workunit.task_ok"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.workunit.task_ok" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append a task id to correct tasks queque.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">=</span><span class="n">workunit</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">task_ok</span><span class="p">(</span><span class="s">&#39;123&#39;</span><span class="p">)</span>
@@ -541,7 +541,7 @@ If called as property, expected can&#8217;t be specified, will be got from self.
                         title="next chapter">Views API</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="sources/API.txt"
+    <li><a href="_sources/API.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

@@ -44,12 +44,24 @@
             
   <h1>Source code for Views.sample</h1><div class="highlight"><pre>
 <span class="kn">import</span> <span class="nn">tornado.web</span>
-<span class="kn">from</span> <span class="nn">Core.common</span> <span class="kn">import</span> <span class="n">log</span>
 
 <div class="viewcode-block" id="SampleView"><a class="viewcode-back" href="../../Views.html#Views.sample.SampleView">[docs]</a><span class="k">class</span> <span class="nc">SampleView</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">creator</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Sample view object.</span>
+<span class="sd">            Sample view object. </span>
+<span class="sd">            Notes:</span>
+<span class="sd">            - If you want a view acting like this one looks to act, you&#39;ll have to implement persistence (see below)</span>
+<span class="sd">            - This one relys completly on plugin for the action.</span>
+<span class="sd">            </span>
+<span class="sd">            *Persistence implementation*</span>
+<span class="sd">            </span>
+<span class="sd">            If you figure out any other way to do this, hell, do it!</span>
+<span class="sd">            urls for tornado may not be inserted on plug time, so</span>
+<span class="sd">            you&#39;ll have to add it on code, NOT HERE, in Furnivall.py&#39;s urls</span>
+<span class="sd">            In a future, when persistence is implemented, you might</span>
+<span class="sd">            be able to restart webserver (thus reloading the urls) and conserving all the objects.</span>
+<span class="sd">            May be possible now, but it&#39;s risky and will probably fail.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plugin</span><span class="o">=</span><span class="s">&quot;sample&quot;</span> <span class="c"># Plugin file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">class_</span><span class="o">=</span><span class="s">&quot;SamplePlugin&quot;</span> <span class="c"># Plugin class (inside that file, so we can make multiple &quot;plugins&quot; from a plugin</span>
@@ -57,7 +69,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">=</span><span class="s">&quot;Sample View&quot;</span> <span class="c"># View description</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">workunits</span><span class="o">=</span><span class="mi">3</span> <span class="c"># Initial workunits, this is the number of workunits that will be used.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">templates</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;SampleView&#39;</span><span class="p">]</span> <span class="c"># Templates for the web server.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">urls</span><span class="o">=</span><span class="p">[(</span> <span class="s">&#39;/sample/&#39;</span><span class="p">,</span> <span class="n">creator</span><span class="o">.</span><span class="n">Scheduler</span> <span class="p">),</span> <span class="p">(</span><span class="s">&#39;/error&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_sample_view_external</span><span class="p">)]</span> <span class="c"># Only scheduler can manage created jobs!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urls</span><span class="o">=</span><span class="p">[(</span> <span class="s">&#39;/sample/&#39;</span><span class="p">,</span> <span class="n">creator</span><span class="o">.</span><span class="n">MainHandler</span> <span class="p">),</span> <span class="p">(</span><span class="s">&#39;/error&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_sample_view_external</span><span class="p">)]</span> <span class="c"># Only scheduler can manage created jobs!</span>
 
 <div class="viewcode-block" id="SampleView.render_sample_view_external"><a class="viewcode-back" href="../../Views.html#Views.sample.SampleView.render_sample_view_external">[docs]</a>    <span class="k">class</span> <span class="nc">render_sample_view_external</span><span class="p">(</span><span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">RequestHandler</span><span class="p">):</span>
 <div class="viewcode-block" id="SampleView.render_sample_view_external.get"><a class="viewcode-back" href="../../Views.html#Views.sample.SampleView.render_sample_view_external.get">[docs]</a>        <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

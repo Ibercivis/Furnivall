@@ -8,8 +8,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>Core.Assignment &mdash; Furnivall v0.1 documentation</title>
-    <link rel="stylesheet" href="../../static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
@@ -19,9 +19,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../static/jquery.js"></script>
-    <script type="text/javascript" src="../../static/underscore.js"></script>
-    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Furnivall v0.1 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
@@ -48,7 +48,6 @@
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
 <span class="kn">from</span> <span class="nn">Personality</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">Core.common</span> <span class="kn">import</span> <span class="n">log</span>
 <span class="kn">from</span> <span class="nn">Core.Tests</span> <span class="kn">import</span> <span class="n">testclass</span>
 
 <span class="k">class</span> <span class="nc">plugintest</span><span class="p">(</span><span class="n">testclass</span><span class="p">):</span>
@@ -155,7 +154,7 @@
 <span class="sd">            - It&#39;s a way to have each job with a different launch function (Result producer)</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">log</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t\t\t</span><span class="s">[Debug] Asynchronous init for task </span><span class="si">%s</span><span class="s"> </span><span class="se">\n\t\t\t\t</span><span class="s"> Parent </span><span class="si">%s</span><span class="s"> </span><span class="se">\n\t\t\t\t</span><span class="s"> Grandfather </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workunit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="o">.</span><span class="n">job</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t\t\t</span><span class="s">[Debug] Asynchronous init for task </span><span class="si">%s</span><span class="s"> </span><span class="se">\n\t\t\t\t</span><span class="s"> Parent </span><span class="si">%s</span><span class="s"> </span><span class="se">\n\t\t\t\t</span><span class="s"> Grandfather </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workunit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="o">.</span><span class="n">job</span><span class="p">))</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="p">,</span> <span class="s">&quot;job&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">pluginObject</span><span class="p">)</span><span class="o">.</span><span class="n">launch_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="c"># This can be done like that in a futureObject</span>
 
 </div>

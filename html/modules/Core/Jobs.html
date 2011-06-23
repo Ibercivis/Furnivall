@@ -8,8 +8,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>Core.Jobs &mdash; Furnivall v0.1 documentation</title>
-    <link rel="stylesheet" href="../../static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
@@ -19,9 +19,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../static/jquery.js"></script>
-    <script type="text/javascript" src="../../static/underscore.js"></script>
-    <script type="text/javascript" src="../../static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Furnivall v0.1 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
@@ -48,6 +48,7 @@
 <span class="kn">from</span> <span class="nn">WorkUnit</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">Assignment</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <div class="viewcode-block" id="job"><a class="viewcode-back" href="../../API.html#Core.Jobs.job">[docs]</a><span class="k">class</span> <span class="nc">job</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">CommonFunctions</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewObject</span><span class="p">,</span> <span class="n">pluginObject</span><span class="p">):</span>
@@ -63,8 +64,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">viewObject</span><span class="o">=</span><span class="n">viewObject</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pluginObject</span><span class="o">=</span><span class="n">pluginObject</span>
 
-        <span class="n">log</span><span class="p">(</span><span class="s">&#39;Creating job </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
-        <span class="n">log</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">Producing workunits... (</span><span class="si">%s</span><span class="s">) &#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">viewObject</span><span class="o">.</span><span class="n">workunits</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Creating job </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">Producing workunits... (</span><span class="si">%s</span><span class="s">) &#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">viewObject</span><span class="o">.</span><span class="n">workunits</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">produce_workunits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewObject</span><span class="o">.</span><span class="n">workunits</span><span class="p">)</span>
     
 <div class="viewcode-block" id="job.produce_workunits"><a class="viewcode-back" href="../../API.html#Core.Jobs.job.produce_workunits">[docs]</a>    <span class="k">def</span> <span class="nf">produce_workunits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
