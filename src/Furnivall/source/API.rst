@@ -5,10 +5,6 @@ Core API
     :members:
     :undoc-members:
 
-.. autoclass:: Furnivall.ViewManager
-    :members:
-    :undoc-members:
-
 .. autoclass:: Furnivall.ObjectManager
     :members:
     :undoc-members:
