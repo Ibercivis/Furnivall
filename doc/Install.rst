@@ -15,10 +15,8 @@ Installing deps
 ----------------
 
 ::
+    easy_install tornado
 
-    git clone https://github.com/milancermak/tornado && cd tornado
-    sudo python setup.py install 
-    apt-get install mongodb python-pymongo
 
 Installing Furnivall
 --------------------
@@ -27,6 +25,15 @@ Installing Furnivall
 
     python setup.py install 
 
+Launching Furnivall
+-------------------
+
+::
+
+    python Furnivall.py --port=80
+
+TODO
+-------------------
 This will setup a init script in /etc/init.d called "furnivall", so, we'll 
 start furnivall with:
 
@@ -35,4 +42,5 @@ start furnivall with:
     invoke-rc.d furnivall start
     # or 
     service furnivall start
+
 
