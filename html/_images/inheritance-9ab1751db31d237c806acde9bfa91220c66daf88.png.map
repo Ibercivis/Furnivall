@@ -1,0 +1,15 @@
+<map id="inheritancec1d79cc9ac" name="inheritancec1d79cc9ac">
+<area shape="rect" id="node1" href="API.html#Core.Assignment.Result" title="Core.Assignment.Result" alt="" coords="291,295,457,322"/>
+<area shape="rect" id="node13" href="API.html#Core.Assignment.ConsolidatedResult" title="Core.Assignment.ConsolidatedResult" alt="" coords="517,295,762,322"/>
+<area shape="rect" id="node2" href="API.html#Core.Assignment.Assignment" title="Core.Assignment.Assignment" alt="" coords="18,320,219,346"/>
+<area shape="rect" id="node20" href="API.html#Core.Assignment.task" title="Core.Assignment.task" alt="" coords="296,344,452,371"/>
+<area shape="rect" id="node4" href="API.html#Core.Jobs.job" title="Core.Jobs.job" alt="" coords="324,247,424,274"/>
+<area shape="rect" id="node5" href="API.html#Core.common.CommonFunctions" title="Core.common.CommonFunctions" alt="" coords="6,247,231,274"/>
+<area shape="rect" id="node7" href="API.html#Core.Personality.Researcher" title="Core.Personality.Researcher" alt="" coords="279,150,468,177"/>
+<area shape="rect" id="node8" href="API.html#Core.Personality.Personality" title="Core.Personality.Personality" alt="" coords="24,174,213,201"/>
+<area shape="rect" id="node18" href="API.html#Core.Personality.Volunteer" title="Core.Personality.Volunteer" alt="" coords="283,198,464,225"/>
+<area shape="rect" id="node10" href="API.html#Core.Tests.testclass" title="Core.Tests.testclass" alt="" coords="47,53,190,80"/>
+<area shape="rect" id="node11" href="API.html#Core.Tests.viewtest" title="Core.Tests.viewtest" alt="" coords="305,4,443,31"/>
+<area shape="rect" id="node16" href="API.html#Core.Tests.creatorTest" title="Core.Tests.creatorTest" alt="" coords="296,53,452,80"/>
+<area shape="rect" id="node15" href="API.html#Core.WorkUnit.workunit" title="Core.WorkUnit.workunit" alt="" coords="38,4,199,31"/>
+</map>

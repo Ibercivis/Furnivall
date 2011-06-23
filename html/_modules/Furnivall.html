@@ -1,0 +1,355 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Furnivall &mdash; Furnivall v0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Furnivall v0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Furnivall v0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for Furnivall</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ibervicis Furnivall is an open source framework for distributed volunteer science.</span>
+<span class="sd">    It helps to organize batches of tasks, collect them form volunteers and do all the related housekeeping.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">Plugins</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Views</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">Core.Assignment</span>
+<span class="kn">import</span> <span class="nn">Core.WorkUnit</span>
+<span class="kn">import</span> <span class="nn">Core.Personality</span> 
+<span class="kn">import</span> <span class="nn">Core.common</span> <span class="kn">as</span> <span class="nn">common</span>
+<span class="kn">import</span> <span class="nn">Plugins</span>
+<span class="kn">import</span> <span class="nn">Views</span>
+<span class="kn">import</span> <span class="nn">tornado.web</span>
+<span class="kn">import</span> <span class="nn">tornado.ioloop</span>
+<span class="kn">import</span> <span class="nn">tornado.httpserver</span>
+<span class="kn">import</span> <span class="nn">uuid</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">tornado.options</span> <span class="kn">import</span> <span class="n">define</span><span class="p">,</span> <span class="n">options</span>
+
+<span class="n">define</span><span class="p">(</span><span class="s">&quot;port&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">8888</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&quot;run on the given port&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ObjectManager"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager">[docs]</a><span class="k">class</span> <span class="nc">ObjectManager</span><span class="p">(</span><span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">RequestHandler</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ObjectManager.assign_session_to_user"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager.assign_session_to_user">[docs]</a>    <span class="k">def</span> <span class="nf">assign_session_to_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volunteer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Creates a unique session id and assigns it to volunteer object.</span>
+<span class="sd">            then, it returns the volunteer with host and user data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">auuid</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user_id</span><span class="o">=</span><span class="n">auuid</span> <span class="c"># Assign user id to session.</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Creating user </span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">auuid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">volunteer</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">auuid</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ObjectManager.assign_job_to_researcher"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager.assign_job_to_researcher">[docs]</a>    <span class="k">def</span> <span class="nf">assign_job_to_researcher</span><span class="p">(</span><span class="n">viewfile</span><span class="p">,</span> <span class="n">researcher</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Having a the view filename (wich is used in views pool),</span>
+<span class="sd">            create a jobs object with the view object from the views pool.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">view</span><span class="o">=</span><span class="n">researcher</span><span class="o">.</span><span class="n">initialize_views</span><span class="p">[</span><span class="n">viewfile</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">researcher</span><span class="p">:</span> <span class="n">researcher</span><span class="o">.</span><span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Jobs</span><span class="o">.</span><span class="n">job</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Plugins</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">plugin</span><span class="p">),</span> <span class="n">view</span><span class="o">.</span><span class="n">class_</span><span class="p">)()))</span>
+</div>
+<div class="viewcode-block" id="ObjectManager.assign_view_to_researcher"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager.assign_view_to_researcher">[docs]</a>    <span class="k">def</span> <span class="nf">assign_view_to_researcher</span><span class="p">(</span><span class="n">viewfile</span><span class="p">,</span> <span class="n">researcher</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This has to be called before adding a job to a researcher, in order to initialize the view.</span>
+<span class="sd">            This will start the view&#39;s main class and add the created objects to initialize_views object.</span>
+<span class="sd">            Todo: Refactorize that awful name to initialized_views</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">researcher</span><span class="p">:</span> <span class="n">researcher</span><span class="o">.</span><span class="n">initialize_views</span><span class="p">[</span><span class="n">viewfile</span><span class="p">]</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Views</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">(</span><span class="s">&#39;enabled_views&#39;</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">)</span> <span class="p">)(</span><span class="n">researcher</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ObjectManager.get"><a class="viewcode-back" href="../API.html#Furnivall.ObjectManager.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Tornado RequestHandler get function, renders slug as called </span>
+<span class="sd">            from tornado, passing object id and slug as argument.</span>
+<span class="sd">            It also checks arguments to take actions when arguments are provided</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Creating new -</span><span class="si">%s</span><span class="s">-&quot;</span> <span class="o">%</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s">&quot;researcher&quot;</span> <span class="ow">in</span> <span class="n">slug</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">researchers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s">&#39;re_name&#39;</span><span class="p">)]</span><span class="o">=</span><span class="n">Core</span><span class="o">.</span><span class="n">Personality</span><span class="o">.</span><span class="n">Researcher</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s">&#39;re_name&#39;</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">researchers</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">researcher</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">researchers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s">&#39;researcher&#39;</span><span class="p">)]</span>
+                <span class="n">viewfile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s">&#39;viewfile&#39;</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">viewfile</span><span class="o">=</span><span class="bp">False</span>
+                <span class="n">researcher</span><span class="o">=</span><span class="bp">False</span>
+
+        <span class="k">if</span> <span class="s">&quot;job&quot;</span> <span class="ow">in</span> <span class="n">slug</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_job_to_researcher</span><span class="p">(</span><span class="n">viewfile</span><span class="p">,</span> <span class="n">researcher</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&quot;view&quot;</span> <span class="ow">in</span> <span class="n">slug</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_view_to_researcher</span><span class="p">(</span><span class="n">viewfile</span><span class="p">,</span> <span class="n">researcher</span><span class="p">)</span> 
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s">&#39;Created&#39;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="Scheduler"><a class="viewcode-back" href="../API.html#Furnivall.Scheduler">[docs]</a><span class="k">class</span> <span class="nc">Scheduler</span><span class="p">(</span><span class="n">ObjectManager</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Scheduler.assign_task"><a class="viewcode-back" href="../API.html#Furnivall.Scheduler.assign_task">[docs]</a>    <span class="k">def</span> <span class="nf">assign_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get a free task, if volunteer is doing that task, return an error, otherwise </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">free_task</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getfreetask</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">get_current_volunteer</span><span class="p">()</span> <span class="ow">is</span> <span class="n">free_task</span><span class="o">.</span><span class="n">volunteer</span><span class="p">:</span> 
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;[Debug] Not creating user, not return task... User is already doing that task, something failed!&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;[Debug] Creating volunteer object and assigning it to a task.&#39;</span><span class="p">)</span>
+        <span class="n">assign_session_to_user</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getfreetask</span><span class="p">(</span><span class="n">view</span><span class="p">)</span><span class="o">.</span><span class="n">volunteer</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Scheduler.getworkunit"><a class="viewcode-back" href="../API.html#Furnivall.Scheduler.getworkunit">[docs]</a>    <span class="k">def</span> <span class="nf">getworkunit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Return a workunit object, a new one if no unnasigned workunits available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">researcher</span><span class="o">.</span><span class="n">jobs</span><span class="o">.</span><span class="n">workunits</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Trying to return a free workunit. Currently processing </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">i</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> is free!&#39;</span> <span class="o">%</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">i</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Creating new workunit object&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">researcher</span><span class="o">.</span><span class="n">jobs</span><span class="o">.</span><span class="n">produce_workunits</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Scheduler.get_current_volunteer"><a class="viewcode-back" href="../API.html#Furnivall.Scheduler.get_current_volunteer">[docs]</a>    <span class="k">def</span> <span class="nf">get_current_volunteer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get current volunteer, by session id (session_id is</span>
+<span class="sd">            scheduler-specific, should be for each user)</span>
+<span class="sd">            If no session_id, calls assign_session_to_user</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">assign_session_to_user</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Getting volunteer object for id: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">volunteers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">]</span> <span class="c"># FIXME Make volunteers pool!!!</span>
+</div>
+<div class="viewcode-block" id="Scheduler.getfreetask"><a class="viewcode-back" href="../API.html#Furnivall.Scheduler.getfreetask">[docs]</a>    <span class="k">def</span> <span class="nf">getfreetask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            If user is able to execute a determinated view task,</span>
+<span class="sd">            get a workunit and return the task</span>
+<span class="sd">            with better scommon, and with no session_id.</span>
+<span class="sd">            If user is able to execute the task, but no pre-created </span>
+<span class="sd">            (and not assigned) tasks are available, return a new task.</span>
+<span class="sd">            Should iterate trough a researcher pool, getting jobs, then </span>
+<span class="sd">            split jobs in view, job, and check view&#39;s compatibility.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># TODO: change ScommonMatch in workunit to call the plugin/view&#39;s compatibility class. TODO: Make a view&#39;s compatibility class</span>
+        <span class="k">for</span> <span class="n">researcher</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">researchers</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Processing researcher </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">researcher</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">researcher</span><span class="o">.</span><span class="n">jobs</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Processing job </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">job</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">view</span><span class="p">,</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">job</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Processing view and job </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">job</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">viewObject</span><span class="o">.</span><span class="n">check_view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_current_volunteer</span><span class="p">()):</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;View is supported by user (ViewOjbect: </span><span class="si">%s</span><span class="s">) (Volunteer: </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">viewObject</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_current_volunteer</span><span class="p">()))</span>
+                        <span class="n">wk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getworkunit</span><span class="p">()</span>
+                        <span class="n">task</span><span class="o">=</span><span class="p">[</span><span class="n">sort</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">ScommonMatch</span><span class="p">())</span> <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">wk</span><span class="o">.</span><span class="n">tasks</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">volunteer</span><span class="o">.</span><span class="n">session_id</span> <span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="c"># Get the best task ordered by ScommonMatch if it has not a volunteer assigned</span>
+                        <span class="k">if</span> <span class="n">task</span><span class="p">:</span> <span class="k">return</span> <span class="n">task</span>
+                        <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">wk</span><span class="o">.</span><span class="n">new_task</span><span class="p">()</span>
+        <span class="k">return</span> 
+</div>
+<div class="viewcode-block" id="Scheduler.get_done_tasks"><a class="viewcode-back" href="../API.html#Furnivall.Scheduler.get_done_tasks">[docs]</a>    <span class="k">def</span> <span class="nf">get_done_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Return tasks in status &quot;ok&quot; and &quot;failed&quot; from a volunteer&#39;s tasks_fail and tasks_ok pools.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">atasks</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">volunteer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_current_volunteer</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Getting done tasks for volunteer: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">volunteer</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">workunit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_volunteer_workunits</span><span class="p">(</span><span class="n">volunteer</span><span class="p">):</span>
+            <span class="n">atasks</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_volunteer_tasks</span><span class="p">(</span><span class="n">volunteer</span><span class="p">,</span> <span class="n">workunit</span><span class="o">.</span><span class="n">tasks_ok</span><span class="p">,</span> <span class="n">workunit</span><span class="o">.</span><span class="n">tasks_fail</span><span class="p">)])</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;got </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">atasks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">atasks</span>
+</div>
+<div class="viewcode-block" id="Scheduler.find_volunteer_workunits"><a class="viewcode-back" href="../API.html#Furnivall.Scheduler.find_volunteer_workunits">[docs]</a>    <span class="k">def</span> <span class="nf">find_volunteer_workunits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volunteer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Generator returning volunteer workunits. Warning: this might be dangerous, as we&#39;ve seen that</span>
+<span class="sd">            generators seem to not work Ok when removing elements from its object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Getting workunits for volunteer: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">volunteer</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">researcher</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">researchers</span><span class="p">:</span> <span class="c"># TODO Make researchers pool, and make it global! Then check everywhere when it&#39;s changed</span>
+            <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">researcher</span><span class="o">.</span><span class="n">jobs</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">job</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">workunit</span> <span class="ow">in</span> <span class="n">job</span><span class="o">.</span><span class="n">workunits</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">volunteer</span> <span class="ow">is</span> <span class="n">workunit</span><span class="o">.</span><span class="n">volunteer</span><span class="p">:</span> <span class="k">yield</span> <span class="n">volunteer</span>
+</div>
+<div class="viewcode-block" id="Scheduler.find_volunteer_tasks"><a class="viewcode-back" href="../API.html#Furnivall.Scheduler.find_volunteer_tasks">[docs]</a>    <span class="k">def</span> <span class="nf">find_volunteer_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volunteer</span><span class="p">,</span> <span class="n">tasks_ok</span><span class="p">,</span> <span class="n">tasks_fail</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            return tasks from tasks_ok and task_fail if they&#39;re from volunteer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Getting all tasks for volunteer </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">volunteer</span><span class="p">)</span>
+        <span class="n">tasks_ok</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tasks_fail</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span> <span class="n">task</span> <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks_ok</span> <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">volunteer</span> <span class="ow">is</span> <span class="n">volunteer</span> <span class="p">]</span>
+</div></div>
+<div class="viewcode-block" id="ViewManager"><a class="viewcode-back" href="../API.html#Furnivall.ViewManager">[docs]</a><span class="k">class</span> <span class="nc">ViewManager</span><span class="p">(</span><span class="n">Scheduler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ViewManager Object, inherits tornado&#39;s requesthandler and provides</span>
+<span class="sd">        the hability to plug a view into created_jobs list.</span>
+<span class="sd">        Note that created_jobs has a dict foreach real job in the form</span>
+<span class="sd">            { view.name : ( Jobs.job(&lt;view.plugin.class object&gt;), researcher ) }</span>
+<span class="sd">        that should be changed in a future for a []</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ViewManager.plug_view"><a class="viewcode-back" href="../API.html#Furnivall.ViewManager.plug_view">[docs]</a>    <span class="k">def</span> <span class="nf">plug_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewfile</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">researcher</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Initialize a new job for a view and add it to job list.</span>
+<span class="sd">            Check that there wasn&#39;t there before, as currently a view should only be executed once.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Pluging view  </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">viewfile</span><span class="p">,</span> <span class="n">view</span><span class="p">))</span>
+
+        <span class="n">view</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">viewfile</span><span class="p">,</span> <span class="n">view</span><span class="p">)()</span>
+        <span class="n">job</span><span class="o">=</span><span class="p">{</span><span class="n">view</span><span class="o">.</span><span class="n">name</span> <span class="p">:</span> <span class="p">(</span> <span class="n">Jobs</span><span class="o">.</span><span class="n">job</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">plugin</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">class_</span><span class="p">)()),</span> <span class="n">researcher</span> <span class="p">)</span> <span class="p">}</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Created job: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">job</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">view</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">created_jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ViewManager.get"><a class="viewcode-back" href="../API.html#Furnivall.ViewManager.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Tornado RequestHandler get function, renders slug as called </span>
+<span class="sd">            from tornado, passing jobs and slug as argument.</span>
+<span class="sd">            It also checks arguments to take actions when arguments are provided</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">slug</span><span class="p">:</span>
+            <span class="n">slug</span><span class="o">=</span><span class="s">&quot;Landing&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;[Debug] Rendering template </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">slug</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">slug</span><span class="p">),</span> <span class="n">views</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">views</span><span class="p">,</span> <span class="n">jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">created_jobs</span><span class="p">,</span> <span class="n">researchers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">researchers</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span> <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s">&#39;get_task&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assign_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s">&#39;view&#39;</span><span class="p">))</span> 
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+</div></div>
+<div class="viewcode-block" id="Application"><a class="viewcode-back" href="../API.html#Furnivall.Application">[docs]</a><span class="k">class</span> <span class="nc">Application</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">CommonFunctions</span><span class="p">,</span> <span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Creates a list of researchers, wich SHOULD (todo) contain jobs.</span>
+<span class="sd">            That might be done via web interface</span>
+<span class="sd">            Then, setups the tornado web server, you will need a local mongodb installation for this.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created_jobs</span><span class="o">=</span><span class="p">[]</span> <span class="c"># Don&#39;t delete, when views are created, they need a created_jobs argument in the creator.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">views</span><span class="o">=</span><span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">()</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Loading Furnival&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">researchers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">InitializeResearchers</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Researchers initialized by default: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">researchers</span><span class="p">)</span>
+        <span class="n">urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">(</span><span class="s">&quot;/view/([^/]+)&quot;</span><span class="p">,</span> <span class="n">ViewManager</span><span class="p">),</span>
+                <span class="p">(</span><span class="s">&quot;/new/([^/]+)&quot;</span><span class="p">,</span> <span class="n">ObjectManager</span><span class="p">),</span>
+                <span class="p">]</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">            &gt;&gt;&gt; try:</span>
+<span class="sd">            &gt;&gt;&gt;    urls=[ b for b in [ a[a.keys()[0]].viewObject.urls for a in self.created_jobs ]][0]</span>
+<span class="sd">            &gt;&gt;&gt; except:</span>
+<span class="sd">            &gt;&gt;&gt;    urls=[] </span>
+<span class="sd">            </span>
+<span class="sd">            FIXME This should not happen should&#39;nt it? Wepa, actually, it should, and it has to. </span>
+<span class="sd">            We&#39;ll have to restart webserver to hotplug views, so this is nothing.&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Starting server with urls: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">urls</span><span class="p">)</span>
+
+        <span class="n">settings</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="c">#session_storage= &#39;mongodb:///tornado_sessions&#39;,</span>
+                <span class="n">template_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">&quot;templates&quot;</span><span class="p">),</span>
+                <span class="n">static_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">&quot;static&quot;</span><span class="p">),</span>
+                <span class="n">xsrf_cookies</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                <span class="n">cookie_secret</span><span class="o">=</span><span class="s">&quot;11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        
+        <span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urls</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+
+
+
+<div class="viewcode-block" id="Application.InitializeResearchers"><a class="viewcode-back" href="../API.html#Furnivall.Application.InitializeResearchers">[docs]</a>    <span class="k">def</span> <span class="nf">InitializeResearchers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Initialize researchers, foreach researcher stored in database, recreate it</span>
+<span class="sd">            Actually, it&#39;s returning an empty set, as persistence is not implemented.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Initially, this can be like this, as we&#39;ve not implemented persistence yet&#39;.</span>
+        <span class="k">return</span> <span class="p">{}</span>
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">tornado</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">parse_command_line</span><span class="p">()</span>
+    <span class="n">http_server</span> <span class="o">=</span> <span class="n">tornado</span><span class="o">.</span><span class="n">httpserver</span><span class="o">.</span><span class="n">HTTPServer</span><span class="p">(</span><span class="n">Application</span><span class="p">())</span>
+    <span class="n">http_server</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+    <span class="n">tornado</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">IOLoop</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Furnivall v0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Ibercivis.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

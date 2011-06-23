@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Core.Assignment &mdash; Furnivall v0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Furnivall v0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../index.html">Furnivall v0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for Core.Assignment</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">asyncore</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">Personality</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Core.common</span> <span class="kn">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">Core.Tests</span> <span class="kn">import</span> <span class="n">testclass</span>
+
+<span class="k">class</span> <span class="nc">plugintest</span><span class="p">(</span><span class="n">testclass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workunits</span><span class="o">=</span><span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pluginmodule</span><span class="o">=</span><span class="n">Tests</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pluginclass</span><span class="o">=</span><span class="s">&quot;testclass&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">=</span><span class="s">&quot;foobar&quot;</span>
+
+    <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;foo&quot;</span> 
+
+<div class="viewcode-block" id="Assignment"><a class="viewcode-back" href="../../API.html#Core.Assignment.Assignment">[docs]</a><span class="k">class</span> <span class="nc">Assignment</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">creator</span><span class="p">,</span> <span class="n">workunit</span><span class="p">,</span> <span class="n">volunteer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Superclass of task and Result, contains common properties</span>
+<span class="sd">            for both.</span>
+
+<span class="sd">            &gt;&gt;&gt; a=Assignment(Job(viewtest, plugintest),[],[])</span>
+<span class="sd">            # Should not give response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="o">=</span><span class="n">creator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workunit</span><span class="o">=</span><span class="n">workunit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volunteer</span><span class="o">=</span><span class="n">volunteer</span>
+
+<div class="viewcode-block" id="Assignment.notify_creator"><a class="viewcode-back" href="../../API.html#Core.Assignment.Assignment.notify_creator">[docs]</a>    <span class="k">def</span> <span class="nf">notify_creator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">place</span><span class="p">,</span> <span class="n">notification</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Append notification to Assignment object&#39;s creator&#39; list. </span>
+
+<span class="sd">            Will get parent&#39;s list as specified in place argument and append</span>
+<span class="sd">            notification.</span>
+
+<span class="sd">            Should not produce output.</span>
+
+<span class="sd">            &gt;&gt;&gt; a=Assignment(creatorTest(),[],[]) #doctest: +ELLIPSIS</span>
+<span class="sd">            &gt;&gt;&gt; a.notify_creator(&#39;tasks&#39;,&#39;fooobar&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; a.creator.tasks </span>
+<span class="sd">            &gt;&gt;&gt; # should be empty, as tasks are not executed synchronously</span>
+<span class="sd">            &gt;&gt;&gt; # (except for the foobar we just notified) NOTE: As this is</span>
+<span class="sd">            &gt;&gt;&gt; # not having control over the task time, MIGHT fail. )</span>
+<span class="sd">            [&#39;fooobar&#39;]</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="p">,</span> <span class="n">place</span><span class="p">)</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">notification</span><span class="p">)</span>
+        </div></div>
+<div class="viewcode-block" id="task"><a class="viewcode-back" href="../../API.html#Core.Assignment.task">[docs]</a><span class="k">class</span> <span class="nc">task</span><span class="p">(</span><span class="n">Assignment</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">creator</span><span class="p">,</span> <span class="n">workunit</span><span class="p">,</span> <span class="n">volunteer</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Will launch as executor the *launch* function, wich is actually a</span>
+<span class="sd">            call to job.pluginobject.launch_task. That will call the plugin</span>
+<span class="sd">            to launch the task itself, all of it is made asynchronously.</span>
+<span class="sd">            When created, it&#39;ll notify its creator that&#39;s been created,</span>
+<span class="sd">            and, when finished, it&#39;ll validate it.</span>
+
+<span class="sd">            TODO: by default task&#39;s assigning a volunteer, empty, change it to FALSE.&#39;</span>
+
+<span class="sd">            &gt;&gt;&gt; a=task(creatorTest(),[],[],&quot;Task test&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; a.description</span>
+<span class="sd">            &#39;Task test&#39;</span>
+<span class="sd">            &gt;&gt;&gt; a.creator #doctest: +ELLIPSIS</span>
+<span class="sd">            &lt;__main__.creatorTest object at 0x...&gt;</span>
+<span class="sd">            &gt;&gt;&gt; a.workunit</span>
+<span class="sd">            []</span>
+<span class="sd">            &gt;&gt;&gt; a.volunteer</span>
+<span class="sd">            []</span>
+<span class="sd">            &gt;&gt;&gt; a.creator.tasks #doctest: +ELLIPSIS</span>
+<span class="sd">            [[&lt;__main__.task object at 0x...&gt;, &lt;Future at 0x... state=finished returned NoneType&gt;]]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">creator</span><span class="p">,</span> <span class="n">workunit</span><span class="p">,</span> <span class="n">volunteer</span><span class="p">)</span> <span class="c"># Initialize superclass. </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">=</span><span class="n">description</span> 
+        <span class="n">MAX_WORKERS</span><span class="o">=</span><span class="mi">20</span> <span class="c"># FIXME This has to be configurable!</span>
+        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">MAX_WORKERS</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span> <span class="c"># Async call </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">futureobject</span><span class="o">=</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">launch</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">futureobject</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_validator</span><span class="p">)</span> <span class="c"># We validate it once it&#39;s done.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify_creator</span><span class="p">(</span><span class="s">&#39;tasks&#39;</span><span class="p">,[</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">futureobject</span><span class="p">])</span>
+ 
+<div class="viewcode-block" id="task.scoreMatch"><a class="viewcode-back" href="../../API.html#Core.Assignment.task.scoreMatch">[docs]</a>    <span class="k">def</span> <span class="nf">scoreMatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volunteer</span><span class="p">):</span> <span class="c">#surely not volunteer, but architecture or something so</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Tells how adequate this task is for this volunteer.</span>
+
+<span class="sd">            Returns 0 if the task can not be executed by the volunteer&#39;s architecture. Else it returns</span>
+<span class="sd">            a real between 0 and 1.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="task.launch"><a class="viewcode-back" href="../../API.html#Core.Assignment.task.launch">[docs]</a>    <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Produces asynchronously the Result.</span>
+<span class="sd">            Once we have the Result (we can do whatever here, it&#39;s async...</span>
+
+<span class="sd">            *Notes*</span>
+
+<span class="sd">            - We&#39;ve got to use &quot;Result&quot; object for that, creating a result object in plugin.launch_task.</span>
+
+<span class="sd">            *Warns*</span>
+
+<span class="sd">            - Result needs the reference to task the task to notify its creator</span>
+
+<span class="sd">            *TODO*</span>
+
+<span class="sd">            - It might be more readable with self.creator.job.pluginObject.launch_task(self)</span>
+<span class="sd">            - It&#39;s a way to have each job with a different launch function (Result producer)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t\t\t</span><span class="s">[Debug] Asynchronous init for task </span><span class="si">%s</span><span class="s"> </span><span class="se">\n\t\t\t\t</span><span class="s"> Parent </span><span class="si">%s</span><span class="s"> </span><span class="se">\n\t\t\t\t</span><span class="s"> Grandfather </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workunit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="o">.</span><span class="n">job</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="p">,</span> <span class="s">&quot;job&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">pluginObject</span><span class="p">)</span><span class="o">.</span><span class="n">launch_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="c"># This can be done like that in a futureObject</span>
+
+</div>
+<div class="viewcode-block" id="task.task_validator"><a class="viewcode-back" href="../../API.html#Core.Assignment.task.task_validator">[docs]</a>    <span class="k">def</span> <span class="nf">task_validator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">futureObject</span><span class="p">):</span> <span class="c">#this is a bad name, because in BOINC validation is a wider concep</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Validates the task, calling the pluginObject&#39;s validate_task function.</span>
+
+<span class="sd">            If task has passed, it&#39;ll append it to task_ok pool at it&#39;s creator, </span>
+<span class="sd">            otherwise in tasks_fail</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">passed</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="p">,</span> <span class="s">&quot;job&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">pluginObject</span><span class="o">.</span><span class="n">validate_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">futureObject</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">passed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify_creator</span><span class="p">(</span><span class="s">&#39;tasks_ok&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>  
+            <span class="c"># TODO: create a result here? Or from http service?</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify_creator</span><span class="p">(</span><span class="s">&#39;tasks_fail&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>  <span class="c">#quizas mejor self.creator.FailTask(self) ???</span>
+</div></div>
+<div class="viewcode-block" id="Result"><a class="viewcode-back" href="../../API.html#Core.Assignment.Result">[docs]</a><span class="k">class</span> <span class="nc">Result</span><span class="p">(</span><span class="n">Assignment</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Result object for a task.</span>
+
+<span class="sd">            &gt;&gt;&gt; a=task(creatorTest(),[],[],&quot;Task test&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; a.description</span>
+<span class="sd">            &#39;Task test&#39;</span>
+<span class="sd">            &gt;&gt;&gt; b=Result(a,&#39;result description&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; b.creator #doctest: +ELLIPSIS</span>
+<span class="sd">            &lt;__main__.creatorTest object at 0x...&gt;</span>
+<span class="sd">            &gt;&gt;&gt; b.workunit</span>
+<span class="sd">            []</span>
+<span class="sd">            &gt;&gt;&gt; b.volunteer</span>
+<span class="sd">            []</span>
+<span class="sd">            &gt;&gt;&gt; b.notify_creator(&#39;tasks&#39;,&#39;fooobar&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; b.creator.tasks #doctest: +ELLIPSIS</span>
+<span class="sd">            [[&lt;__main__.task object at 0x...&gt;, &lt;Future at 0x... state=finished returned NoneType&gt;], &#39;fooobar&#39;]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="nb">super</span><span class="p">(</span><span class="n">Result</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">creator</span><span class="p">,</span> <span class="n">task</span><span class="o">.</span><span class="n">workunit</span><span class="p">,</span> <span class="n">task</span><span class="o">.</span><span class="n">volunteer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">=</span><span class="n">description</span> 
+
+<div class="viewcode-block" id="Result.Result_notification"><a class="viewcode-back" href="../../API.html#Core.Assignment.Result.Result_notification">[docs]</a>    <span class="k">def</span> <span class="nf">Result_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Notify task&#39;s creator itself to result (this will be called when task is finished).</span>
+<span class="sd">            Then, call creator&#39;s consolidate_result function (wich probably will call this tasks&#39;s plugin</span>
+<span class="sd">            consolidate_result function)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notify_creator</span><span class="p">(</span><span class="s">&#39;results&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span> <span class="c"># This adds to results deque in workunit this result object. </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="o">.</span><span class="n">consolidate_result</span><span class="p">()</span>
+</div></div>
+<div class="viewcode-block" id="ConsolidatedResult"><a class="viewcode-back" href="../../API.html#Core.Assignment.ConsolidatedResult">[docs]</a><span class="k">class</span> <span class="nc">ConsolidatedResult</span><span class="p">(</span><span class="n">Result</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">plugin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">           consolidated Result, data property returns inittialized data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">=</span><span class="n">plugin</span><span class="o">.</span><span class="n">consolidate_result</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="ConsolidatedResult.data"><a class="viewcode-back" href="../../API.html#Core.Assignment.ConsolidatedResult.data">[docs]</a>    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This should never be used as standalone but for unittests</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="kn">from</span> <span class="nn">Jobs</span> <span class="kn">import</span> <span class="o">*</span>
+    <span class="kn">from</span> <span class="nn">Tests</span> <span class="kn">import</span> <span class="o">*</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../index.html">Furnivall v0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Ibercivis.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

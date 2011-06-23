@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Views API &mdash; Furnivall v0.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Furnivall v0.1 documentation" href="index.html" />
+    <link rel="next" title="Plugins API" href="Plugins.html" />
+    <link rel="prev" title="Core API" href="API.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Plugins.html" title="Plugins API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="API.html" title="Core API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Furnivall v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="views-api">
+<h1>Views API<a class="headerlink" href="#views-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="Views.sample.SampleView">
+<em class="property">class </em><tt class="descclassname">Views.sample.</tt><tt class="descname">SampleView</tt><big>(</big><em>creator</em><big>)</big><a class="reference internal" href="_modules/Views/sample.html#SampleView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Views.sample.SampleView" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="class">
+<dt id="Views.sample.SampleView.render_sample_view_external">
+<em class="property">class </em><tt class="descname">render_sample_view_external</tt><big>(</big><em>application</em>, <em>request</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/Views/sample.html#SampleView.render_sample_view_external"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.async_callback">
+<tt class="descname">async_callback</tt><big>(</big><em>callback</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.async_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obsolete - catches exceptions from the wrapped function.</p>
+<p>This function is unnecessary since Tornado 1.1.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.check_xsrf_cookie">
+<tt class="descname">check_xsrf_cookie</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.check_xsrf_cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies that the &#8216;_xsrf&#8217; cookie matches the &#8216;_xsrf&#8217; argument.</p>
+<p>To prevent cross-site request forgery, we set an &#8216;_xsrf&#8217;
+cookie and include the same value as a non-cookie
+field with all POST requests. If the two do not match, we
+reject the form submission as a potential forgery.</p>
+<p>The _xsrf value may be set as either a form field named _xsrf
+or in a custom HTTP header named X-XSRFToken or X-CSRFToken
+(the latter is accepted for compatibility with Django).</p>
+<p>See <a class="reference external" href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">http://en.wikipedia.org/wiki/Cross-site_request_forgery</a></p>
+<p>Prior to release 1.1.1, this check was ignored if the HTTP header
+&#8220;X-Requested-With: XMLHTTPRequest&#8221; was present.  This exception
+has been shown to be insecure and has been removed.  For more
+information please see
+<a class="reference external" href="http://www.djangoproject.com/weblog/2011/feb/08/security/">http://www.djangoproject.com/weblog/2011/feb/08/security/</a>
+<a class="reference external" href="http://weblog.rubyonrails.org/2011/2/8/csrf-protection-bypass-in-ruby-on-rails">http://weblog.rubyonrails.org/2011/2/8/csrf-protection-bypass-in-ruby-on-rails</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets all headers and content for this response.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.clear_all_cookies">
+<tt class="descname">clear_all_cookies</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.clear_all_cookies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all the cookies the user sent with this request.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.clear_cookie">
+<tt class="descname">clear_cookie</tt><big>(</big><em>name</em>, <em>path='/'</em>, <em>domain=None</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.clear_cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the cookie with the given name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.compute_etag">
+<tt class="descname">compute_etag</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.compute_etag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the etag header to be used for this request.</p>
+<p>May be overridden to provide custom etag implementations,
+or may return None to disable tornado&#8217;s default etag support.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Views.sample.SampleView.render_sample_view_external.cookies">
+<tt class="descname">cookies</tt><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.cookies" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary of Cookie.Morsel objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.create_signed_value">
+<tt class="descname">create_signed_value</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.create_signed_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signs and timestamps a string so it cannot be forged.</p>
+<p>Normally used via set_secure_cookie, but provided as a separate
+method for non-cookie uses.  To decode a value not stored
+as a cookie use the optional value argument to get_secure_cookie.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.create_template_loader">
+<tt class="descname">create_template_loader</tt><big>(</big><em>template_path</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.create_template_loader" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Views.sample.SampleView.render_sample_view_external.current_user">
+<tt class="descname">current_user</tt><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.current_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>The authenticated user for this request.</p>
+<p>Determined by either get_current_user, which you can override to
+set the user based on, e.g., a cookie. If that method is not
+overridden, this method always returns None.</p>
+<p>We lazy-load the current user the first time this method is called
+and cache the result after that.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.decode_argument">
+<tt class="descname">decode_argument</tt><big>(</big><em>value</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.decode_argument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decodes an argument from the request.</p>
+<p>The argument has been percent-decoded and is now a byte string.
+By default, this method decodes the argument as utf-8 and returns
+a unicode string, but this may be overridden in subclasses.</p>
+<p>This method is used as a filter for both get_argument() and for
+values extracted from the url and passed to get()/post()/etc.</p>
+<p>The name of the argument is provided if known, but may be None
+(e.g. for unnamed groups in the url regex).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.delete">
+<tt class="descname">delete</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.finish">
+<tt class="descname">finish</tt><big>(</big><em>chunk=None</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.finish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finishes this response, ending the HTTP request.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.flush">
+<tt class="descname">flush</tt><big>(</big><em>include_footers=False</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flushes the current output buffer to the network.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get">
+<tt class="descname">get</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Views/sample.html#SampleView.render_sample_view_external.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Web requests will be made here, we can use get_argument to process data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_argument">
+<tt class="descname">get_argument</tt><big>(</big><em>name</em>, <em>default=</em><span class="optional">[</span><span class="optional">]</span>, <em>strip=True</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_argument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the argument with the given name.</p>
+<p>If default is not provided, the argument is considered to be
+required, and we throw an HTTP 400 exception if it is missing.</p>
+<p>If the argument appears in the url more than once, we return the
+last value.</p>
+<p>The returned value is always unicode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_arguments">
+<tt class="descname">get_arguments</tt><big>(</big><em>name</em>, <em>strip=True</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the arguments with the given name.</p>
+<p>If the argument is not present, returns an empty list.</p>
+<p>The returned values are always unicode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_browser_locale">
+<tt class="descname">get_browser_locale</tt><big>(</big><em>default='en_US'</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_browser_locale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the user&#8217;s locale from Accept-Language header.</p>
+<p>See <a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_cookie">
+<tt class="descname">get_cookie</tt><big>(</big><em>name</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the value of the cookie with the given name, else default.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_current_user">
+<tt class="descname">get_current_user</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_current_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override to determine the current user from, e.g., a cookie.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_error_html">
+<tt class="descname">get_error_html</tt><big>(</big><em>status_code</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_error_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override to implement custom error pages.</p>
+<p>get_error_html() should return a string containing the error page,
+and should not produce output via self.write().  If you use a
+Tornado template for the error page, you must use
+&#8220;return self.render_string(...)&#8221; instead of &#8220;self.render()&#8221;.</p>
+<p>If this error was caused by an uncaught exception, the
+exception object can be found in kwargs e.g. kwargs[&#8216;exception&#8217;]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_login_url">
+<tt class="descname">get_login_url</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_login_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override to customize the login URL based on the request.</p>
+<p>By default, we use the &#8216;login_url&#8217; application setting.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_secure_cookie">
+<tt class="descname">get_secure_cookie</tt><big>(</big><em>name</em>, <em>include_name=True</em>, <em>value=None</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_secure_cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the given signed cookie if it validates, or None.</p>
+<p>In older versions of Tornado (0.1 and 0.2), we did not include the
+name of the cookie in the cookie signature. To read these old-style
+cookies, pass include_name=False to this method. Otherwise, all
+attempts to read old-style cookies will fail (and you may log all
+your users out whose cookies were written with a previous Tornado
+version).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_status">
+<tt class="descname">get_status</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the status code for our response.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_template_path">
+<tt class="descname">get_template_path</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_template_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override to customize template path for each handler.</p>
+<p>By default, we use the &#8216;template_path&#8217; application setting.
+Return None to load templates relative to the calling file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.get_user_locale">
+<tt class="descname">get_user_locale</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.get_user_locale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override to determine the locale from the authenticated user.</p>
+<p>If None is returned, we fall back to get_browser_locale().</p>
+<p>This method should return a tornado.locale.Locale object,
+most likely obtained via a call like tornado.locale.get(&#8220;en&#8221;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.head">
+<tt class="descname">head</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.head" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.initialize">
+<tt class="descname">initialize</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook for subclass initialization.</p>
+<p>A dictionary passed as the third argument of a url spec will be
+supplied as keyword arguments to initialize().</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ProfileHandler</span><span class="p">(</span><span class="n">RequestHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span>
+
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+        <span class="o">...</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Application</span><span class="p">([</span>
+    <span class="p">(</span><span class="s">r&#39;/user/(.*)&#39;</span><span class="p">,</span> <span class="n">ProfileHandler</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">)),</span>
+    <span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Views.sample.SampleView.render_sample_view_external.locale">
+<tt class="descname">locale</tt><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.locale" title="Permalink to this definition">¶</a></dt>
+<dd><p>The local for the current session.</p>
+<p>Determined by either get_user_locale, which you can override to
+set the locale based on, e.g., a user preference stored in a
+database, or get_browser_locale, which uses the Accept-Language
+header.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.on_connection_close">
+<tt class="descname">on_connection_close</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.on_connection_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called in async handlers if the client closed the connection.</p>
+<p>You may override this to clean up resources associated with
+long-lived connections.</p>
+<p>Proxies may keep a connection open for a time (perhaps
+indefinitely) after the client has gone away, so this method
+may not be called promptly after the end user closes their
+connection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.options">
+<tt class="descname">options</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.options" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.post">
+<tt class="descname">post</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.post" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.prepare">
+<tt class="descname">prepare</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called before the actual handler method.</p>
+<p>Useful to override in a handler if you want a common bottleneck for
+all of your requests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.put">
+<tt class="descname">put</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.put" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.redirect">
+<tt class="descname">redirect</tt><big>(</big><em>url</em>, <em>permanent=False</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.redirect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a redirect to the given (optionally relative) URL.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.render">
+<tt class="descname">render</tt><big>(</big><em>template_name</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renders the template with the given arguments as the response.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.render_string">
+<tt class="descname">render_string</tt><big>(</big><em>template_name</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.render_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the given template with the given arguments.</p>
+<p>We return the generated string. To generate and write a template
+as a response, use render() above.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.require_setting">
+<tt class="descname">require_setting</tt><big>(</big><em>name</em>, <em>feature='this feature'</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.require_setting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises an exception if the given app setting is not defined.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.reverse_url">
+<tt class="descname">reverse_url</tt><big>(</big><em>name</em>, <em>*args</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.reverse_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for <cite>Application.reverse_url</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.send_error">
+<tt class="descname">send_error</tt><big>(</big><em>status_code=500</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.send_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends the given HTTP error code to the browser.</p>
+<p>We also send the error HTML for the given error code as returned by
+get_error_html. Override that method if you want custom error pages
+for your application.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.set_cookie">
+<tt class="descname">set_cookie</tt><big>(</big><em>name</em>, <em>value</em>, <em>domain=None</em>, <em>expires=None</em>, <em>path='/'</em>, <em>expires_days=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.set_cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the given cookie name/value with the given options.</p>
+<p>Additional keyword arguments are set on the Cookie.Morsel
+directly.
+See <a class="reference external" href="http://docs.python.org/library/cookie.html#morsel-objects">http://docs.python.org/library/cookie.html#morsel-objects</a>
+for available attributes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.set_header">
+<tt class="descname">set_header</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.set_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the given response header name and value.</p>
+<p>If a datetime is given, we automatically format it according to the
+HTTP specification. If the value is not a string, we convert it to
+a string. All header values are then encoded as UTF-8.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.set_secure_cookie">
+<tt class="descname">set_secure_cookie</tt><big>(</big><em>name</em>, <em>value</em>, <em>expires_days=30</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.set_secure_cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signs and timestamps a cookie so it cannot be forged.</p>
+<p>You must specify the &#8216;cookie_secret&#8217; setting in your Application
+to use this method. It should be a long, random sequence of bytes
+to be used as the HMAC secret for the signature.</p>
+<p>To read a cookie set with this method, use get_secure_cookie().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.set_status">
+<tt class="descname">set_status</tt><big>(</big><em>status_code</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.set_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the status code for our response.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Views.sample.SampleView.render_sample_view_external.settings">
+<tt class="descname">settings</tt><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>An alias for <cite>self.application.settings</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.static_url">
+<tt class="descname">static_url</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.static_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a static URL for the given relative static file path.</p>
+<p>This method requires you set the &#8216;static_path&#8217; setting in your
+application (which specifies the root directory of your static
+files).</p>
+<p>We append ?v=&lt;signature&gt; to the returned URL, which makes our
+static file handler set an infinite expiration header on the
+returned content. The signature is based on the content of the
+file.</p>
+<p>If this handler has a &#8220;include_host&#8221; attribute, we include the
+full host for every static URL, including the &#8220;<a class="reference external" href="http://">http://</a>&#8221;. Set
+this attribute for handlers whose output needs non-relative static
+path names.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.write">
+<tt class="descname">write</tt><big>(</big><em>chunk</em><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the given chunk to the output buffer.</p>
+<p>To write the output to the network, use the flush() method below.</p>
+<p>If the given chunk is a dictionary, we write it as JSON and set
+the Content-Type of the response to be application/json.
+(if you want to send JSON as a different Content-Type, call
+set_header <em>after</em> calling write()).</p>
+<p>Note that lists are not converted to JSON because of a potential
+cross-site security vulnerability.  All JSON output should be
+wrapped in a dictionary.  More details at
+<a class="reference external" href="http://haacked.com/archive/2008/11/20/anatomy-of-a-subtle-json-vulnerability.aspx">http://haacked.com/archive/2008/11/20/anatomy-of-a-subtle-json-vulnerability.aspx</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Views.sample.SampleView.render_sample_view_external.xsrf_form_html">
+<tt class="descname">xsrf_form_html</tt><big>(</big><big>)</big><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.xsrf_form_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>An HTML &lt;input/&gt; element to be included with all POST forms.</p>
+<p>It defines the _xsrf input value, which we check on all POST
+requests to prevent cross-site request forgery. If you have set
+the &#8216;xsrf_cookies&#8217; application setting, you must include this
+HTML within all of your HTML forms.</p>
+<p>See check_xsrf_cookie() above for more information.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Views.sample.SampleView.render_sample_view_external.xsrf_token">
+<tt class="descname">xsrf_token</tt><a class="headerlink" href="#Views.sample.SampleView.render_sample_view_external.xsrf_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>The XSRF-prevention token for the current user/session.</p>
+<p>To prevent cross-site request forgery, we set an &#8216;_xsrf&#8217; cookie
+and include the same &#8216;_xsrf&#8217; value as an argument with all POST
+requests. If the two do not match, we reject the form submission
+as a potential forgery.</p>
+<p>See <a class="reference external" href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">http://en.wikipedia.org/wiki/Cross-site_request_forgery</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="API.html"
+                        title="previous chapter">Core API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Plugins.html"
+                        title="next chapter">Plugins API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Views.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Plugins.html" title="Plugins API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="API.html" title="Core API"
+             >previous</a> |</li>
+        <li><a href="index.html">Furnivall v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Ibercivis.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

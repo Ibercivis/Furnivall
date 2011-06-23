@@ -1,0 +1,140 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Core.Jobs &mdash; Furnivall v0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Furnivall v0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../index.html">Furnivall v0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for Core.Jobs</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">Core.common</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">WorkUnit</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Assignment</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+
+<div class="viewcode-block" id="job"><a class="viewcode-back" href="../../API.html#Core.Jobs.job">[docs]</a><span class="k">class</span> <span class="nc">job</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">CommonFunctions</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewObject</span><span class="p">,</span> <span class="n">pluginObject</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns a job object (workunits container)</span>
+<span class="sd">            with plugin object and view object references.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">=</span><span class="n">viewObject</span><span class="o">.</span><span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_tasks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">(</span><span class="s">&#39;main&#39;</span><span class="p">,</span> <span class="s">&#39;initial_tasks&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workunits</span><span class="o">=</span><span class="n">deque</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;Default job name&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewObject</span><span class="o">=</span><span class="n">viewObject</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pluginObject</span><span class="o">=</span><span class="n">pluginObject</span>
+
+        <span class="n">log</span><span class="p">(</span><span class="s">&#39;Creating job </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="n">log</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">Producing workunits... (</span><span class="si">%s</span><span class="s">) &#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">viewObject</span><span class="o">.</span><span class="n">workunits</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">produce_workunits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewObject</span><span class="o">.</span><span class="n">workunits</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="job.produce_workunits"><a class="viewcode-back" href="../../API.html#Core.Jobs.job.produce_workunits">[docs]</a>    <span class="k">def</span> <span class="nf">produce_workunits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Creates N new workunit objects, with this job as job and</span>
+<span class="sd">            appends them to our workunits queque.</span>
+<span class="sd">            If N is 1, it will also return the created workunit.</span>
+
+<span class="sd">            &gt;&gt;&gt; a=job(viewtest())</span>
+<span class="sd">            &gt;&gt;&gt; len(a.workunits)</span>
+<span class="sd">            10</span>
+<span class="sd">            &gt;&gt;&gt; a.produce_workunits(10)</span>
+<span class="sd">            &gt;&gt;&gt; len(a.workunits)</span>
+<span class="sd">            20</span>
+<span class="sd">            &gt;&gt;&gt; print a.workunits[0] # doctest: +ELLIPSIS</span>
+<span class="sd">            &lt;WorkUnit.workunit object at 0x...&gt;</span>
+<span class="sd">            &gt;&gt;&gt; print a.workunits[0].tasks # doctest: +ELLIPSIS</span>
+<span class="sd">            deque([[0, &lt;Assignment.task object at 0x...&gt;]])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span> 
+            <span class="n">a</span><span class="o">=</span><span class="n">workunit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="c"># We </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">workunits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c"># Append it to our workunits queuqe</span>
+            <span class="k">if</span> <span class="n">number</span> <span class="ow">is</span> <span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="n">a</span> <span class="c">#</span>
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This should never be used as standalone but for unittests</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="kn">from</span> <span class="nn">Tests</span> <span class="kn">import</span> <span class="n">viewtest</span>
+    <span class="kn">import</span> <span class="nn">Tests</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../index.html">Furnivall v0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Ibercivis.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
