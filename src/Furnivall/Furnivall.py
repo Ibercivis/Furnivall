@@ -21,6 +21,10 @@ define("port", default=8888, help="run on the given port", type=int)
 
 
 class ObjectManager(tornado.web.RequestHandler):
+    """
+        Object manager, creation, delete and modify petitions should go here.
+        Right now, it's able to assign a session to a user, a job and a view to a researhcer.
+    """
 
     def assign_session_to_user(self, volunteer):
         """
@@ -32,19 +36,48 @@ class ObjectManager(tornado.web.RequestHandler):
         logging.info("Creating user %s,%s,%s" %(auuid, self.session.host, self.session.user))
         return volunteer.set_data(self.session.host, self.session.user, auuid )
 
+    def assign_job_to_researcher(self, viewfile, researcher):
+        """
+            Having a the view filename (wich is used in views pool),
+            create a jobs object with the view object from the views pool.
+        """
+        view=researcher.initialize_views[viewfile]
+        if researcher: researcher.jobs.append(Jobs.job(view, getattr(getattr(Plugins, view.plugin), view.class_)()))
+
+    def assign_view_to_researcher(self, viewfile, researcher):
+        """
+            This has to be called before adding a job to a researcher, in order to initialize the view.
+            This will start the view's main class and add the created objects to initialize_views object.
+            Todo: Refactorize that awful name to initialized_views
+        """
+        if researcher: researcher.initialize_views[viewfile]=getattr(getattr(Views, viewfile), self.application.conf('enabled_views', viewfile) )(researcher)
+
     def get(self, slug=False):
         """
             Tornado RequestHandler get function, renders slug as called 
             from tornado, passing object id and slug as argument.
             It also checks arguments to take actions when arguments are provided
         """
+
         logging.info("Creating new -%s-" %slug)
+
         if "researcher" in slug:
-            logging.info("...")
             self.application.researchers[self.get_argument('re_name')]=Core.Personality.Researcher(user=self.get_argument('re_name'))
             logging.info(self.application.researchers)
+
+        else: 
+            try:
+                researcher=self.application.researchers[self.get_argument('researcher')]
+                viewfile=self.get_argument('viewfile')
+            except:
+                viewfile=False
+                researcher=False
+
+        if "job" in slug: self.assign_job_to_researcher(viewfile, researcher)
+        if "view" in slug: self.assign_view_to_researcher(viewfile, researcher) 
+
+
         self.render('Created', slug=slug)
-        
 
 class Scheduler(ObjectManager):
 
@@ -73,7 +106,8 @@ class Scheduler(ObjectManager):
 
     def get_current_volunteer(self):
         """
-            Get current volunteer, by session id (session_id is scheduler-specific, should be for each user)
+            Get current volunteer, by session id (session_id is
+            scheduler-specific, should be for each user)
             If no session_id, calls assign_session_to_user
         """
         if not self.session.session_id:
@@ -84,10 +118,13 @@ class Scheduler(ObjectManager):
 
     def getfreetask(self, view):
         """
-            If user is able to execute a determinated view task, get a workunit and return the task
+            If user is able to execute a determinated view task,
+            get a workunit and return the task
             with better scommon, and with no session_id.
-            If user is able to execute the task, but no pre-created (and not assigned) tasks are available, return a new task.
-            Should iterate trough a researcher pool, getting jobs, then split jobs in view, job, and check view's compatibility.
+            If user is able to execute the task, but no pre-created 
+            (and not assigned) tasks are available, return a new task.
+            Should iterate trough a researcher pool, getting jobs, then 
+            split jobs in view, job, and check view's compatibility.
             
         """
         # TODO: change ScommonMatch in workunit to call the plugin/view's compatibility class. TODO: Make a view's compatibility class
@@ -137,28 +174,11 @@ class Scheduler(ObjectManager):
         tasks_ok.extend(tasks_fail)
         return [ task for task in tasks_ok if task.volunteer is volunteer ]
 
-class ViewManager(Scheduler):
+class MainHandler(Scheduler):
     """
-        ViewManager Object, inherits tornado's requesthandler and provides
-        the hability to plug a view into created_jobs list.
-        Note that created_jobs has a dict foreach real job in the form
-            { view.name : ( Jobs.job(<view.plugin.class object>), researcher ) }
-        that should be changed in a future for a []
+        MainHandler, inherits tornado's requesthandler and shows up display templastes
     """
 
-    def plug_view(self, viewfile, view, researcher):
-        """
-            Initialize a new job for a view and add it to job list.
-            Check that there wasn't there before, as currently a view should only be executed once.
-        """
-        logging.info('Pluging view  %s: %s' %(viewfile, view))
-
-        view=getattr(viewfile, view)()
-        job={view.name : ( Jobs.job(getattr(view.plugin, view.class_)()), researcher ) }
-        logging.info('Created job: %s' %job)
-        
-        self.application.views.append(view.view)
-        self.application.created_jobs.append(job)
 
     def get(self, slug=False):
         """
@@ -193,7 +213,7 @@ class Application(common.CommonFunctions, tornado.web.Application):
         self.researchers=self.InitializeResearchers()
         logging.info('Researchers initialized by default: %s' %self.researchers)
         urls=[
-                ("/view/([^/]+)", ViewManager),
+                ("/view/([^/]+)", MainHandler),
                 ("/new/([^/]+)", ObjectManager),
                 ]
         """

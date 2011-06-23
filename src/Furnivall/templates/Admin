@@ -23,6 +23,13 @@
                         </div>
                 </form>
 
+                <h3> Add new view </h3>
+                <form action="/new/view">
+                    <label for="viewfile">File: </label><input type="text" name="viewfile" />
+                    <input type="hidden" name="researcher" value="{{ researcher }}" />
+                    <input type="submit"/>
+                </form>
+
                 {% for view in views %}
                     <a href="/assign/{{view.id}}" >{{view.name}}</a>
                 {% end %}

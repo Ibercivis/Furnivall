@@ -27,11 +27,9 @@ class Researcher(Personality, Core.common.CommonFunctions):
         self.read_config()
         self.current_tasks=collections.deque()
         self.completed_tasks=collections.deque()
-        self.initialize_views=collections.deque()
+        self.initialize_views={}
         self.jobs=[]
 
-#        self.initialize_views=( getattr(getattr(Views, viewfile), self.conf('enabled_views', viewfile) )(self) for viewfile in self.config.options('enabled_views') if self.view_ )
-#        self.jobs=[ Jobs.job(view, getattr(getattr(Plugins, view.plugin), view.class_)()) for view in self.initialize_views ]
 
     def set_data(self, host, user, id_):
         """

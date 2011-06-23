@@ -1,6 +1,22 @@
 Core API
 ========
 
+.. autoclass:: Furnivall.Scheduler
+    :members:
+    :undoc-members:
+
+.. autoclass:: Furnivall.ViewManager
+    :members:
+    :undoc-members:
+
+.. autoclass:: Furnivall.ObjectManager
+    :members:
+    :undoc-members:
+
+.. autoclass:: Furnivall.Application
+    :members:
+    :undoc-members:
+
 .. autoclass:: Core.Assignment.Assignment
     :members:
     :inherited-members:
