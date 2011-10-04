@@ -1,10 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<html lang="en">
-    <head>
-        <title> Furnivall Administration Interface </title>
-        <meta name="generator" value="Furnivall" />
-    </head>
-    <body>
+{% extends "base.html" %}
+{% block title %} Furnivall Administration interface {%end%}
+{% block head %} <meta name="generator" value="Furnivall" /> {%end%}
+{% block body %}
+        {% if user_permissions == "root" %}
         <h1> Researcher listing </h1>
         <div class="researchers">
             {% for researcher in researchers.keys() %}
@@ -19,14 +18,15 @@
                         </div>
                 </form>
 
-                <h3> Add new view </h3>
+                <h3> Load plugin </h3>
                 <form action="/new/view">
                     <label for="viewfile">File: </label><input type="text" name="viewfile" />
                     <input type="hidden" name="researcher" value="{{ researcher }}" />
                     <input type="submit"/>
                 </form>
+                <h3> Create new job from plugin </h3> 
                 {% for view in researchers[researcher].initialize_views %}
-                    <a href="/assign/{{ researchers[researcher].initialize_views[view].name }}" > {{ researchers[researcher].initialize_views[view].description }} </a>
+                    <a href="/new/job?viewfile=\"{{researchers[researcher].initialize_views[view].name }}\"&researcher=\"{{researcher}}\"" > {{ researchers[researcher].initialize_views[view].description }} </a>
                 {% end %}
             {%end%}
         </div>
@@ -37,6 +37,6 @@
                 <input type="submit" />
             </form>
         </div>
-    </body>
-</html>
-
+        {% else %}
+        <h1> Access denied </h1> <!-- Priority TODO: Implement an ACL. We should check current user permissions for creating/deleting/modifying others' researcher objects. So, check in each object if its owner is root or its own owner before doing anyghing. !-->
+{%end%}       

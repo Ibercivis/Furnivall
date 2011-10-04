@@ -19,11 +19,11 @@ from tornado.options import define, options
 
 define("port", default=8888, help="run on the given port", type=int)
 
-
 class ObjectManager(tornado.web.RequestHandler):
     """
         Object manager, creation, delete and modify petitions should go here.
-        Right now, it's able to assign a session to a user, a job and a view to a researhcer.
+        Right now, it's able to assign a session to a user, a job and a view to a researhcer. 
+        NOTE: I see this awful now, refactor it if there's time
     """
 
     def assign_session_to_user(self, volunteer):
@@ -76,8 +76,7 @@ class ObjectManager(tornado.web.RequestHandler):
         if "job" in slug: self.assign_job_to_researcher(viewfile, researcher)
         if "view" in slug: self.assign_view_to_researcher(viewfile, researcher) 
 
-
-        self.render('Created', slug=slug)
+        self.render('Created', views=self.application.views, jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
 
 class Scheduler(ObjectManager):
 

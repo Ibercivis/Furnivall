@@ -1,1 +1,7 @@
-Landing page
+{% extends "base.html" %}
+{% block content %}
+    <a href="/login?next=/Admin"> Master of the universe </a> <!-- TODO: Please, define/decide a better name than that (I'm bad with names) for the root user !-->
+    <a href="/login=next=/Research"> Researcher login </a> <!-- TODO: Please, define/decide a better name than that (I'm bad with names) for the root user !-->
+
+{%end%}
+

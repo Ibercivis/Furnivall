@@ -1,4 +1,7 @@
-<p>
-New {{ slug }} has been created
-<a href="/view/Admin"> Go back </a>
-</p>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+{% extends "Admin" %}
+{% block alerts %}
+    <p>
+        New {{ slug }} has been created.
+    </p>
+{% end %}       
