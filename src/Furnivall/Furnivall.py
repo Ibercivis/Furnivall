@@ -14,10 +14,12 @@ import Views
 import tornado.web
 import tornado.ioloop
 import tornado.httpserver
+import tornado.database
 import uuid, os, logging
 from tornado.options import define, options
 
 define("port", default=8888, help="run on the given port", type=int)
+db = tornado.database.Connection("localhost", "tornado", user="root", password="root")
 
 class ObjectManager(tornado.web.RequestHandler):
     """
@@ -76,7 +78,7 @@ class ObjectManager(tornado.web.RequestHandler):
         if "job" in slug: self.assign_job_to_researcher(viewfile, researcher)
         if "view" in slug: self.assign_view_to_researcher(viewfile, researcher) 
 
-        self.render('Created', views=self.application.views, jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
+        self.redirect(self.get_argument('next'), '/')
 
 class Scheduler(ObjectManager):
 
@@ -231,7 +233,42 @@ class Application(common.CommonFunctions, tornado.web.Application):
             MainHandler, inherits tornado's requesthandler and shows up display templastes
         """
 
+        # Right now, db is only needed here.
 
+        def get_current_user(self):
+            """
+                Gets current user from cookie
+            """
+            try:
+                return tornado.escape.json_decode(self.get_secure_cookie('user'))
+            except:
+                return None
+
+        def login(self):
+            """
+                Checks out login against a database, given username and passwor as url params
+                and sets out a cookie.
+            """
+
+            username = self.get_argument("username", "")
+            password = self.get_argument("password", "")
+            auth = db.execute("select user, pass from auth where user=%s and pass=%s"
+                    %(username, self.get_argument('password','')))
+
+            if auth:
+               if username:
+                   self.set_secure_cookie("user", tornado.escape.json_encode(user))
+               else:
+                   self.clear_cookie("user")
+                   self.redirect(self.get_argument("next", u"/"))
+            else:
+                if username:
+                    error_msg = u"?error=" + tornado.escape.url_escape("Login incorrect.")
+                    self.redirect(u"/login" + error_msg)
+                else:
+                    self.clear_cookie('user')
+                    self.redirect(self.get_argument('next', u"/"))
+        
         def get(self, slug=False):
             """
                 Tornado RequestHandler get function, renders slug as called 
@@ -239,10 +276,31 @@ class Application(common.CommonFunctions, tornado.web.Application):
                 It also checks arguments to take actions when arguments are provided
             """
     
-            if not slug:
+            user_permissions="None" # Default user permissions is None
+
+            if not slug: # Default to landing if /view/ called. TODO: Do this as / too
                 slug="Landing"
+
+            if slug is "Login": 
+                self.login() # Login...
+                user=self.get_current_user() # Get user after login (from cookie set in login process)
+
+
+                if user: # If login succeeded and we have a user on secure_cookie
+                    user_permissions=db.get("select permissions from auth where user=%s" %(user)) # Check for user permissions
+                    if user_permissions is 'root': # We're admins
+                        slug="Admin" # So render admin page
+                    else: # Ups, we're not but we're logged in, right now we can only be researchers
+                        slug="Researcher" # Se render researcher page 
+                elif self.get_argument('username',''): # Ok, if we tryed to login but we've no user set, we failed loggin in...
+                    errors=self.get_argument('error') # TODO Login failed here, do something more.
+
+            if slug is "Logout":
+                self.login()
+                slug="Login"
+
             logging.info('[Debug] Rendering template %s' %slug)
-            self.render('%s' %(slug), views=self.application.views, jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
+            self.render('%s' %(slug), user_permissions=user_permissions, views=self.application.views, jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
     
             try:
                 if self.get_argument('get_task'):

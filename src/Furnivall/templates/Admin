@@ -39,4 +39,5 @@
         </div>
         {% else %}
         <h1> Access denied </h1> <!-- Priority TODO: Implement an ACL. We should check current user permissions for creating/deleting/modifying others' researcher objects. So, check in each object if its owner is root or its own owner before doing anyghing. !-->
+        {%end%}
 {%end%}       
