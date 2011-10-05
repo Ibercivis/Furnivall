@@ -8,7 +8,6 @@
         <div class="researchers">
             {% for researcher in researchers.keys() %}
             <div class="researcher">
-                <h2> {{ researchers[researcher].user }} </h2>
                 <form action="#" onclick="$('#form.submit')" id="form">
                     <label for="researcher_name"> Name: </label> <input type="text" name="researcher_name" value="{{ researchers[researcher].user }}" /><br/>
                     <label for="researcher_id"> ID: </label> <span name="researcher_id" value="{{ researchers[researcher].id_ or False }} " />

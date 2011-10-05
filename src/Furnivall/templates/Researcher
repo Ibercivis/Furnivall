@@ -3,30 +3,4 @@
 {% block title %} Furnivall Administration interface {%end%}
 {% block head %} <meta name="generator" value="Furnivall" /> {%end%}
 {% block body %}
-            {% researcher=researchers[user] %}
-            <h1> {{ researcher.name  }} </h1>
-            <div class="researcher">
-                <form action="#" onclick="$('#form.submit')" id="form">
-                    <label for="researcher_name"> Name: </label> <input type="text" name="researcher_name" value="{{ researcher.name }}" /><br/>
-                    <label for="researcher_id"> ID: </label> <span name="researcher_id" value="{{ researcher.id_ or False }} " />
-                </form>
-
-                <h3> Load plugin </h3>
-                <form action="/new/view">
-                    <label for="viewfile">File: </label><input type="text" name="viewfile" />
-                    <input type="hidden" name="researcher" value="{{ researcher }}" />
-                    <input type="submit"/>
-                </form>
-
-                <h3> Create new job from plugin </h3> 
-                {% for view in researcher.initialize_views %}
-                    <a href="/new/job?viewfile=\"{{researcher.initialize_views[view].name }}\"&researcher=\"{{researcher.name}}\"" > {{ researcher.initialize_views[view].description }} </a>
-                {% end %}
-
-                <h3> Create new workunit from job </h3>
-                {% for job in researcher.jobs %}
-                    <a href="/new/workunit?job=job.id"></a> <!-- TODO This wasnt like that, but I have to leave now, end it tomorrow !-->
-                {%end%}
-            {%end%}
-        </div>
 {%end%}       

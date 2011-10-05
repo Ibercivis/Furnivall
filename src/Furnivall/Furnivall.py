@@ -28,6 +28,18 @@ class ObjectManager(tornado.web.RequestHandler):
         NOTE: I see this awful now, refactor it if there's time
     """
 
+    def get_current_user(self):
+        """
+            Gets current user from cookie AND permissions (so this will do when user logged in)
+            This probably shouldnt go here, but it's used on all of its child classes
+        """
+        try: 
+            username = tornado.escape.json_decode(self.get_secure_cookie('user'))
+            auth = db.get("select permissions from auth where user='%s' " %(username))
+            return ( username, auth.permissions)
+        except Exception,e:
+            logging.info('User not allowed because of:%s' %e)
+            return ("None", "None")
     def assign_session_to_user(self, volunteer):
         """
             Creates a unique session id and assigns it to volunteer object.
@@ -78,7 +90,7 @@ class ObjectManager(tornado.web.RequestHandler):
         if "job" in slug: self.assign_job_to_researcher(viewfile, researcher)
         if "view" in slug: self.assign_view_to_researcher(viewfile, researcher) 
 
-        self.redirect(self.get_argument('next'), '/')
+        self.redirect(self.get_argument('next', '/'))
 
 class Scheduler(ObjectManager):
 
@@ -191,7 +203,8 @@ class Application(common.CommonFunctions, tornado.web.Application):
         self.researchers=self.InitializeResearchers()
         logging.info('Researchers initialized by default: %s' %self.researchers)
         urls=[
-                ("/view/([^/]+)", self.MainHandler),
+                ("/([^/]+)", self.MainHandler),
+                ("/", self.MainHandler),
                 ("/new/([^/]+)", ObjectManager),
                 ]
         """
@@ -235,15 +248,6 @@ class Application(common.CommonFunctions, tornado.web.Application):
 
         # Right now, db is only needed here.
 
-        def get_current_user(self):
-            """
-                Gets current user from cookie
-            """
-            try:
-                return tornado.escape.json_decode(self.get_secure_cookie('user'))
-            except:
-                return None
-
         def login(self):
             """
                 Checks out login against a database, given username and passwor as url params
@@ -251,56 +255,66 @@ class Application(common.CommonFunctions, tornado.web.Application):
             """
 
             username = self.get_argument("username", "")
-            password = self.get_argument("password", "")
-            auth = db.execute("select user, pass from auth where user=%s and pass=%s"
+            auth = db.get("select permissions from auth where user='%s' and pass='%s'"
                     %(username, self.get_argument('password','')))
-
-            if auth:
-               if username:
-                   self.set_secure_cookie("user", tornado.escape.json_encode(user))
-               else:
-                   self.clear_cookie("user")
-                   self.redirect(self.get_argument("next", u"/"))
-            else:
-                if username:
-                    error_msg = u"?error=" + tornado.escape.url_escape("Login incorrect.")
-                    self.redirect(u"/login" + error_msg)
-                else:
-                    self.clear_cookie('user')
-                    self.redirect(self.get_argument('next', u"/"))
-        
+            try: return auth.permissions
+            except: return
+ 
         def get(self, slug=False):
             """
                 Tornado RequestHandler get function, renders slug as called 
                 from tornado, passing jobs and slug as argument.
                 It also checks arguments to take actions when arguments are provided
             """
+            # Dirty hack, seems like passing a default to get_argument is not working
+            try:
+                self.get_argument('next')
+            except:
+                self.request.arguments['next']="/"
     
-            user_permissions="None" # Default user permissions is None
+            auth="None" # Default user permissions is None
 
             if not slug: # Default to landing if /view/ called. TODO: Do this as / too
+                logging.info('[DEBUG] Defining slug as default')
                 slug="Landing"
 
-            if slug is "Login": 
-                self.login() # Login...
-                user=self.get_current_user() # Get user after login (from cookie set in login process)
-
-
-                if user: # If login succeeded and we have a user on secure_cookie
-                    user_permissions=db.get("select permissions from auth where user=%s" %(user)) # Check for user permissions
-                    if user_permissions is 'root': # We're admins
-                        slug="Admin" # So render admin page
-                    else: # Ups, we're not but we're logged in, right now we can only be researchers
-                        slug="Researcher" # Se render researcher page 
-                elif self.get_argument('username',''): # Ok, if we tryed to login but we've no user set, we failed loggin in...
-                    errors=self.get_argument('error') # TODO Login failed here, do something more.
-
+            if "Login" in slug: 
+                auth=self.login()
+                try:
+                    username = self.get_argument("username", "")
+                except:
+                    username=""
+                if auth:
+                    if username:
+                        self.set_secure_cookie("user", tornado.escape.json_encode(username))
+                        if 'root' in auth: # We're admins
+                            slug="Admin" # So render admin page
+                        else:
+                            slug="Researcher"
+                    else:
+                        self.clear_cookie("user")
+                        slug="Login"
+                else:
+                    if username:
+                        error_msg = u"?error=" + tornado.escape.url_escape("Login incorrect.")
+                    else:
+                        self.clear_cookie('user')
+                        slug="Login"
+       
+                user, auth=self.get_current_user() # Get user after login (from cookie set in login process)
+                logging.info('Logging in for user: %s' %user)
+                    
             if slug is "Logout":
                 self.login()
                 slug="Login"
 
+            try:
+                researcher=self.application.researchers[self.get_current_user()] # This needs a hell of cleanup, I'm doing much similar stuff on two places here!
+            except:
+                researcher=""
             logging.info('[Debug] Rendering template %s' %slug)
-            self.render('%s' %(slug), user_permissions=user_permissions, views=self.application.views, jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
+            logging.info('User has %s permissions' %auth)
+            self.render('%s' %(slug), user=self.get_current_user(), researcher=researcher, user_permissions=auth, views=self.application.views, jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
     
             try:
                 if self.get_argument('get_task'):
