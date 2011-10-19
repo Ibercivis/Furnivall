@@ -5,6 +5,8 @@ Ibervicis Furnivall is an open source framework for distributed volunteer scienc
 It helps to organize batches of tasks, collect them form volunteers
 and it does all the related housekeeping.
 
+This branch is peculiar to an associative game
+
 Requeriments
 ------------
 
