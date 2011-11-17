@@ -1,25 +1,22 @@
 #!/usr/bin/env python
 from collections import deque
 from Assignment import *
-from tornado import tasks, options
+from tornado import tasks
+from tornado.options import options, define
 
-define('tasks_total', default=deque())
-define('tasks_failed', default=deque())
-define('tasks_ok', default=deque())
-define('results', default=deque())
+define('workunits_qeuque', default=deque())
 
 class workunit(object):
-    def __init__(self, job=False):
+    def __init__(self, job=0):
         """
             Simple job unit.
         """
-        self.job=job
+        self.job=options.jobs_qeuque[job]
         self.tasks=options.tasks
         self.tasks_ok=options.tasks_ok
         self.tasks_fail=options.tasks_failed
 
         self.expected=0 #TODO this should get workunit expected tasks to return.
-
         self.results=options.results
 
         logging.info('\t\tWorkunit %s (%s tasks)' %(self, job.initial_tasks))

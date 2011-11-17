@@ -3,8 +3,10 @@ from Core.common import *
 from WorkUnit import *
 from Assignment import *
 from collections import deque
-from tornado.options import options
+from tornado.options import options, define
 import logging
+
+define('jobs_qeuque', default=deque())
 
 class job(object, CommonFunctions):
     def __init__(self, viewObject, pluginObject):
@@ -12,13 +14,16 @@ class job(object, CommonFunctions):
             Returns a job object (workunits container)
             with plugin object and view object references.
         """
-        self.read_config()
-        self.description=viewObject.description
-        self.initial_tasks=self.conf('main', 'initial_tasks')
-        self.workunits=deque()
-        self.name="Default job name"
         self.viewObject=viewObject
         self.pluginObject=pluginObject
+
+        self.read_config()
+        self.initial_tasks=self.conf('main', 'initial_tasks')
+
+        self.description=self.viewObject.description
+        self.name="Default job name"
+
+        self.workunits=options.workunits_qeuque
 
         logging.info('Creating job %s' %(self))
         logging.info('\tProducing workunits... (%s) ' %self.viewObject.workunits)

@@ -7,7 +7,10 @@ from Core.Tests import testclass
 from tornado.options import options, define
 from sqlobject import *
 
-define('assignment_queue', default=deque() )
+define('tasks_total_queue', default=deque())
+define('tasks_failed_queue', default=deque())
+define('tasks_ok_queue', default=deque())
+define('results_queue', default=deque())
 
 class plugintest(testclass):
     def __init__(self):
@@ -28,9 +31,9 @@ class Assignment(object):
             >>> a=Assignment(Job(viewtest, plugintest),[],[])
             # Should not give response
         """
-        self.creator=options.assignment_queue[creator_id]
-        self.workunit=options.assignment_queue[workunit_id]
-        self.volunteer=options.assignment_queue[volunteer_id]
+        self.creator=options.job_queue[creator_id]
+        self.workunit=options.workunit_queue[workunit_id]
+        self.volunteer=options.volunteer_queue[volunteer_id]
 
     def append_to_creator(self, place, notification):
         """
@@ -139,7 +142,8 @@ class Result(Assignment):
         """
             Result object for a task.
 
-            >>> a=task(creatorTest(),[],[],"Task test")
+            >>> workunit=WorkUnit()
+            >>> a=task(creatorTest(),0,0,"Task test")
             >>> a.description
             'Task test'
             >>> b=Result(a,'result description')
@@ -170,7 +174,7 @@ class Result(Assignment):
 class ConsolidatedResult(Result):
     def __init__(self, data, plugin):
         """
-           consolidated Result, data property returns inittialized data.
+           Consolidated Result, data property returns inittialized data.
         """
         self.data=plugin.consolidate_result(data)
 

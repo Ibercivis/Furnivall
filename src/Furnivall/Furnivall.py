@@ -12,6 +12,7 @@ import Core.common as common
 import Plugins
 import Views
 import tornado.web
+from tornado.escape import json_decode
 import tornado.ioloop
 import tornado.httpserver
 import tornado.database
@@ -19,27 +20,35 @@ import uuid, os, logging
 from tornado.options import define, options
 
 define("port", default=8888, help="run on the given port", type=int)
-db = tornado.database.Connection("localhost", "tornado", user="root", password="root")
+define("db_host", default="localhost", help="database host")
+define("db_user", default="root", help="database username")
+define("db_db", default="furnivall", help="database name")
+define("db_password", default="root", help="database password")
+db = tornado.database.Connection(options.db_host, options.db_db ,options.db_user, options.password)
 
 class ObjectManager(tornado.web.RequestHandler):
     """
         Object manager, creation, delete and modify petitions should go here.
-        Right now, it's able to assign a session to a user, a job and a view to a researhcer. 
-        NOTE: I see this awful now, refactor it if there's time
+        Right now, it's able to assign a session to a user, a job and a view to
+        a researhcer. 
     """
 
     def get_current_user(self):
         """
-            Gets current user from cookie AND permissions (so this will do when user logged in)
-            This probably shouldnt go here, but it's used on all of its child classes
+            Gets current user from cookie AND permissions (so this will do
+            when user logged in) This probably shouldnt go here, but it's
+            used on all of its child classes
         """
+
         try: 
-            username = tornado.escape.json_decode(self.get_secure_cookie('user'))
-            auth = db.get("select permissions from auth where user='%s' " %(username))
+            username = json_decode(self.get_secure_cookie('user'))
+            auth = db.get("select permissions from auth where user='%s' "
+                    %(username))
             return ( username, auth.permissions)
         except Exception,e:
             logging.info('User not allowed because of:%s' %e)
             return ("None", "None")
+
     def assign_session_to_user(self, volunteer):
         """
             Creates a unique session id and assigns it to volunteer object.
@@ -47,7 +56,8 @@ class ObjectManager(tornado.web.RequestHandler):
         """
         auuid=uuid.uuid4()
         self.session.user_id=auuid # Assign user id to session.
-        logging.info("Creating user %s,%s,%s" %(auuid, self.session.host, self.session.user))
+        logging.info("Creating user %s,%s,%s",
+                auuid, self.session.host, self.session.user)
         return volunteer.set_data(self.session.host, self.session.user, auuid )
 
     def assign_job_to_researcher(self, viewfile, researcher):
@@ -55,28 +65,36 @@ class ObjectManager(tornado.web.RequestHandler):
             Having a the view filename (wich is used in views pool),
             create a jobs object with the view object from the views pool.
         """
-        view=researcher.initialize_views[viewfile]
-        if researcher: researcher.jobs.append(Jobs.job(view, getattr(getattr(Plugins, view.plugin), view.class_)()))
+
+        job=Jobs.job(researcher.initialize_views[viewfile],
+                getattr(getattr(Plugins, view.plugin), view.class_)())
+        if researcher: researcher.jobs.append(job)
 
     def assign_view_to_researcher(self, viewfile, researcher):
         """
-            This has to be called before adding a job to a researcher, in order to initialize the view.
-            This will start the view's main class and add the created objects to initialize_views object.
+            This has to be called before adding a job to a researcher, in order
+            to initialize the view. This will start the view's main class and
+            add the created objects to initialize_views object.
             Todo: Refactorize that awful name to initialized_views
         """
-        if researcher: researcher.initialize_views[viewfile]=getattr(getattr(Views, viewfile), self.application.conf('enabled_views', viewfile) )(self.application)
+        if researcher: 
+            envf=self.application.conf('enabled_views', viewfile)
+            researcher.initialize_views[viewfile]=\
+                getattr(getattr(Views, viewfile), envf)(self.application)
 
     def get(self, slug=False):
         """
-            Tornado RequestHandler get function, renders slug as called 
+            Tornado RequestHandler get function, renders slug as called
             from tornado, passing object id and slug as argument.
-            It also checks arguments to take actions when arguments are provided
+            It also checks arguments to take actions when arguments are given
         """
 
         logging.info("Creating new -%s-" %slug)
 
         if "researcher" in slug:
-            self.application.researchers[self.get_argument('re_name')]=Core.Personality.Researcher(user=self.get_argument('re_name'))
+            researcher_name=self.get_argument('re_name')
+            researcher_object=Core.Personality.Researcher(user=researcher_name)
+            self.application.researchers[researcher_name]=new_researcher_object
             logging.info(self.application.researchers)
 
         else: 
