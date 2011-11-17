@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 from collections import deque
 from Assignment import *
+from tornado import tasks, options
+
+define('tasks_total', default=deque())
+define('tasks_failed', default=deque())
+define('tasks_ok', default=deque())
+define('results', default=deque())
 
 class workunit(object):
     def __init__(self, job=False):
@@ -8,12 +14,16 @@ class workunit(object):
             Simple job unit.
         """
         self.job=job
-        self.tasks=deque()
-        self.tasks_ok=deque()
-        self.tasks_fail=deque()
+        self.tasks=options.tasks
+        self.tasks_ok=options.tasks_ok
+        self.tasks_fail=options.tasks_failed
+
         self.expected=0 #TODO this should get workunit expected tasks to return.
-        self.results=deque()
+
+        self.results=options.results
+
         logging.info('\t\tWorkunit %s (%s tasks)' %(self, job.initial_tasks))
+
         for i in range(0, int(job.initial_tasks)): self.new_task()
 
     def consolidate_result(self):

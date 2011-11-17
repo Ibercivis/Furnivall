@@ -4,6 +4,10 @@ from concurrent.futures import *
 from collections import deque
 from Personality import *
 from Core.Tests import testclass
+from tornado.options import options, define
+from sqlobject import *
+
+define('assignment_queue', default=deque() )
 
 class plugintest(testclass):
     def __init__(self):
@@ -16,7 +20,7 @@ class plugintest(testclass):
         return "foo" 
 
 class Assignment(object):
-    def __init__(self, creator, workunit, volunteer):
+    def __init__(self, creator_id, workunit_id, volunteer_id):
         """
             Superclass of task and Result, contains common properties
             for both.
@@ -24,11 +28,11 @@ class Assignment(object):
             >>> a=Assignment(Job(viewtest, plugintest),[],[])
             # Should not give response
         """
-        self.creator=creator
-        self.workunit=workunit
-        self.volunteer=volunteer
+        self.creator=options.assignment_queue[creator_id]
+        self.workunit=options.assignment_queue[workunit_id]
+        self.volunteer=options.assignment_queue[volunteer_id]
 
-    def notify_creator(self, place, notification):
+    def append_to_creator(self, place, notification):
         """
             Append notification to Assignment object's creator' list. 
 
@@ -38,7 +42,7 @@ class Assignment(object):
             Should not produce output.
 
             >>> a=Assignment(creatorTest(),[],[]) #doctest: +ELLIPSIS
-            >>> a.notify_creator('tasks','fooobar')
+            >>> a.append_to_creator('tasks','fooobar')
             >>> a.creator.tasks 
             >>> # should be empty, as tasks are not executed synchronously
             >>> # (except for the foobar we just notified) NOTE: As this is
@@ -58,6 +62,7 @@ class task(Assignment):
             and, when finished, it'll validate it.
 
             TODO: by default task's assigning a volunteer, empty, change it to FALSE.'
+            TODO: Right now this unit testing must be refactorished to use queues.
 
             >>> a=task(creatorTest(),[],[],"Task test")
             >>> a.description
@@ -78,7 +83,7 @@ class task(Assignment):
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor: # Async call 
             self.futureobject=executor.submit(self.launch) 
             self.futureobject.add_done_callback(self.task_validator) # We validate it once it's done.
-            self.notify_creator('tasks',[self, self.futureobject])
+            self.append_to_creator('tasks',[self, self.futureobject])
  
     def scoreMatch(self, volunteer): #surely not volunteer, but architecture or something so
         """
@@ -124,10 +129,10 @@ class task(Assignment):
         """
         passed=getattr(self.creator, "job").pluginObject.validate_task(self, futureObject)
         if passed:
-            self.notify_creator('tasks_ok', self)  
+            self.append_to_creator('tasks_ok', self)  
             # TODO: create a result here? Or from http service?
         else:
-            self.notify_creator('tasks_fail', self)  #quizas mejor self.creator.FailTask(self) ???
+            self.append_to_creator('tasks_fail', self)  #quizas mejor self.creator.FailTask(self) ???
 
 class Result(Assignment):
     def __init__(self, task, description):
@@ -144,7 +149,7 @@ class Result(Assignment):
             []
             >>> b.volunteer
             []
-            >>> b.notify_creator('tasks','fooobar')
+            >>> b.append_to_creator('tasks','fooobar')
             >>> b.creator.tasks #doctest: +ELLIPSIS
             [[<__main__.task object at 0x...>, <Future at 0x... state=finished returned NoneType>], 'fooobar']
 
@@ -159,7 +164,7 @@ class Result(Assignment):
             Then, call creator's consolidate_result function (wich probably will call this tasks's plugin
             consolidate_result function)
         """
-        self.notify_creator('results', self) # This adds to results deque in workunit this result object. 
+        self.append_to_creator('results', self) # This adds to results deque in workunit this result object. 
         self.creator.consolidate_result()
 
 class ConsolidatedResult(Result):
