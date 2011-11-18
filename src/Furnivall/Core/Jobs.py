@@ -48,9 +48,15 @@ class job(object, CommonFunctions):
         """
 
         for n in range(0, number): 
-            a=workunit(self) # We 
+            a=workunit(self) # We create a new workunit, passing this object as a parent
             self.workunits.append(a) # Append it to our workunits queuqe
-            if number is 1: return a #
+            if number is 1: return a # NOTICE: I dont like this, it's awful.
+            # This works only because the only place were we ask for unit
+            # production apart from mainline,
+            # only a workunit is needed, and we need it returned.
+            # This might be better acomplished by getting the index of the
+            # workunits queue where that one is and returning that. 
+            # In fact, I HAVE TODO it, as persistence will  not work otherwise.
 
 if __name__ == "__main__":
     """
