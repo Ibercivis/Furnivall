@@ -22,7 +22,7 @@ class plugintest(testclass):
     def main(self):
         return "foo" 
 
-class Assignment(object):
+class Assignment(Persistent):
     def __init__(self, creator_id, workunit_id, volunteer_id):
         """
             Superclass of task and Result, contains common properties
@@ -31,9 +31,15 @@ class Assignment(object):
             >>> a=Assignment(Job(viewtest, plugintest),[],[])
             # Should not give response
         """
-        self.creator=options.job_queue[creator_id]
-        self.workunit=options.workunit_queue[workunit_id]
-        self.volunteer=options.volunteer_queue[volunteer_id]
+        self.creator=creator_id 
+        self.workunit=workunit_id
+        self.volunteer=volunteer_id
+
+        # Making the following volatile, we want to keep only the IDs on the database.
+        # I have to check out if object persistence is nice enough to reference references.
+        self._v_creator_=options.job_queue[creator_id]
+        self._v_workunit_=options.workunit_queue[workunit_id]
+        self._v_volunteer_=options.volunteer_queue[volunteer_id]
 
     def append_to_creator(self, place, notification):
         """
@@ -86,7 +92,7 @@ class task(Assignment):
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor: # Async call 
             self.futureobject=executor.submit(self.launch) 
             self.futureobject.add_done_callback(self.task_validator) # We validate it once it's done.
-            self.append_to_creator('tasks',[self, self.futureobject])
+            self.append_to_creator('tasks',[self, self.futureobject]) # TODO: here we'll have, somehow to use ids too... Also, this futureobject must be checked out 
  
     def scoreMatch(self, volunteer): #surely not volunteer, but architecture or something so
         """
@@ -111,15 +117,12 @@ class task(Assignment):
 
             - Result needs the reference to task the task to notify its creator
 
-            *TODO*
-
-            - It might be more readable with self.creator.job.pluginObject.launch_task(self)
-            - It's a way to have each job with a different launch function (Result producer)
-
         """
-        logging.info('\t\t\t[Debug] Asynchronous init for task %s \n\t\t\t\t Parent %s \n\t\t\t\t Grandfather %s' %(self, self.workunit, self.creator.job))
-        return getattr(getattr(self.creator, "job"), self.pluginObject).launch_task(self) # This can be done like that in a futureObject
-
+        logging.info('\t\t\t[Debug] Asynchronous init for task %s\
+                \n\t\t\t\t Parent %s \n\t\t\t\t Grandfather %s'
+                %(self, self.workunit, self.creator.job))
+        pluginObject=getattr(getattr(self.creator, "job"), self.pluginObject)
+        pluginObject.launch_task(self) # This can be done like that in a futureObject
 
     def task_validator(self, futureObject): #this is a bad name, because in BOINC validation is a wider concep
         """
