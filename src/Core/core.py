@@ -279,16 +279,18 @@ class Application(common.CommonFunctions, tornado.web.Application):
                 logging.info('[DEBUG] Defining slug as default')
                 slug="Landing"
 
+            # This auth method is not clear at all.
             if "Login" in slug: 
                 auth=self.login()
                 try:
                     username = self.get_argument("username", "")
                 except:
                     username=""
+
                 if auth:
                     if username:
                         self.set_secure_cookie("user", tornado.escape.json_encode(username))
-                        if 'root' in auth: # We're admins
+                        if self.config.get('admin_users') in auth: # We're admins
                             slug="Admin" # So render admin page
                         else:
                             slug="Researcher"
@@ -310,12 +312,21 @@ class Application(common.CommonFunctions, tornado.web.Application):
                 slug="Login"
 
             try:
-                researcher=self.application.researchers[self.get_current_user()] # This needs a hell of cleanup, I'm doing much similar stuff on two places here!
+                researcher=self.application.researchers[self.get_current_user()]
             except:
                 researcher=""
+
             logging.info('[Debug] Rendering template %s' %slug)
             logging.info('User has %s permissions' %auth)
-            self.render('%s' %(slug), user=self.get_current_user(), researcher=researcher, user_permissions=auth, views=self.application.views, jobs=self.application.created_jobs, researchers=self.application.researchers, slug=slug )
+
+            self.render('%s' %(slug),
+                    user=user,
+                    researcher=researcher,
+                    user_permissions=auth,
+                    views=self.application.views,
+                    jobs=self.application.created_jobs,
+                    researchers=self.application.researchers,
+                    slug=slug )
     
             try:
                 if self.get_argument('get_task'):
