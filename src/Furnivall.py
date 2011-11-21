@@ -10,7 +10,6 @@ import tornado.httpserver
 import tornado.database
 import tornado.ioloop
 
-
 define("port", default=8888, help="run on the given port", type=int)
 define("db_host", default="localhost", help="database host")
 define("db_user", default="root", help="database username")

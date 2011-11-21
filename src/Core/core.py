@@ -1,5 +1,5 @@
 """
-
+    foo
 """
 import uuid, os, logging, common
 import Assignment, Workunit
@@ -10,11 +10,10 @@ from tornado import web
 from tornado.options import define, options
 from tornado.escape import json_decode 
 
-class ObjectManager(web.RequestHandler):
+class UserManager(object):
+
     """
-        Object manager, creation, delete and modify petitions should go here.
-        Right now, it's able to assign a session to a user, a job and a view to
-        a researhcer. 
+        Credential management.
     """
 
     def get_current_user(self):
@@ -22,22 +21,46 @@ class ObjectManager(web.RequestHandler):
             Gets current user from cookie AND permissions (so this will do
             when user logged in) 
         """
+        return (self.get_secure_cookie('user', self.get_secure_cookie('perms')
 
-        try: 
-            username=self.db.get("select username from auth where username='%s'\
-                    and password ='%s'" %(
-                        self.get_secure_cookie('user'),
-                        self.get_secure_cookie('pass')
-                        )
-                    )
-            if not username: return (None, None)
-            auth = self.db.get("select permissions from auth where user='%s' "
-                    %(username))
-            return ( username, auth.permissions )
+    def login(self):
+        """
+            Login and set up secure cookie credentials
+            Note: Right now, I'm using http basic auth, so this might not be used.
+            But it's ok if it's used anyway
+        """
+        try:
+            if not self.get_secure_cookie('user'):
+                return (None, None)
+            else:
+                return ( self.get_secure_cookie('user'),
+                    self.get_secure_cookie('perms') )
 
         except Exception,e:
             logging.debug('User not allowed because of:%s' %e)
             return ("None", "None")
+
+    def validate_user(self, user, password):
+        username=self.db.get("select user from auth where user='%s'\
+            and password ='%s'" %(
+                self.get_argument('user'),
+                self.get_argument('pass', '')
+                )
+            ).user
+        self.set_secure_cookie('user', username)
+        if not username: return (None, None)
+        auth = self.db.get("select permissions from auth where user='%s' "
+            %(username)).permissions
+         self.set_secure_cookie('perms', auth )
+
+        return (username, auth)
+
+class ObjectManager(web.RequestHandler, UserManager):
+    """
+        Object manager, creation, delete and modify petitions should go here.
+        Right now, it's able to assign a session to a user, a job and a view to
+        a researhcer. 
+    """
 
     def assign_session_to_user(self, volunteer):
         """
@@ -56,7 +79,7 @@ class ObjectManager(web.RequestHandler):
             create a jobs object with the view object from the views pool.
         """
 
-        job=Jobs.job(researcher.initialize_views[viewfile],
+        job=Jobs.job(researcher.initialized_views[viewfile],
                 getattr(getattr(Plugins, view.plugin), view.class_)())
         if researcher: researcher.jobs.append(job)
 
@@ -64,39 +87,40 @@ class ObjectManager(web.RequestHandler):
         """
             This has to be called before adding a job to a researcher, in order
             to initialize the view. This will start the view's main class and
-            add the created objects to initialize_views object.
-            Todo: Refactorize that awful name to initialized_views
+            add the created objects to initialized_views object.
         """
         if researcher: 
             enabled_vf=self.application.conf('enabled_views', viewfile)
             viewObject_=getattr(getattr(Views, viewfile), enabled_vf)
-            researcher.initialize_views[viewfile]=ViewOjbect_(self.application)
+            researcher.initialized_views[viewfile]=ViewOjbect_(self.application)
 
+    # We make it authed, should use self.get_current_user ... TODO: Check it, some people reports problems.
+    @require_basic_auth('Furnivall', self.validate_user)
     def get(self, slug=False):
         """
-            Tornado RequestHandler get function, renders slug as called
-            from tornado, passing object id and slug as argument.
-            It also checks arguments to take actions when arguments are given
+            Object manager get function.
+            Creates as requested jobs or views
+            TODO: make it create tasks too, in case it's needed, and according to job create tasks permissions.
         """
-
+        
+        user_id, permissions = self.get_current_user()
         logging.debug("Creating new -%s-" %slug)
 
-        if "researcher" in slug:
-            researcher_name=self.get_argument('re_name')
-            researcher_object=Core.Personality.Researcher(user=researcher_name)
-            self.application.researchers[researcher_name]=new_researcher_object
-            logging.debug(self.application.researchers)
+        try:
+            if researcher in permissions:
+                researcher=self.application.researchers[self.get_argument('user_id')]
 
-        else: 
-            try:
-                researcher=self.application.researchers[self.get_argument('researcher')]
-                viewfile=self.get_argument('viewfile')
-            except:
-                viewfile=False
-                researcher=False
+            viewfile=self.get_argument('viewfile')
 
-        if "job" in slug: self.assign_job_to_researcher(viewfile, researcher)
-        if "view" in slug: self.assign_view_to_researcher(viewfile, researcher) 
+            if "researcher" in permissions or :
+
+            if "job" in slug:
+                self.assign_job_to_researcher(viewfile, researcher)
+            if "view" in slug:
+                self.assign_view_to_researcher(viewfile, researcher) 
+        except:
+            viewfile=False
+            researcher=False
 
         self.redirect(self.get_argument('next', '/'))
 
@@ -192,10 +216,9 @@ class Scheduler(ObjectManager):
         """
             return tasks from tasks_ok and task_fail if they're from volunteer
         """
-        logging.debug('Getting all tasks for volunteer %s' %volunteer)
+        logging.debug('Getting all tasks for volunteer %s', volunteer)
         tasks_ok.extend(tasks_fail)
         return [ task for task in tasks_ok if task.volunteer is volunteer ]
-
 
 class Application(common.CommonFunctions, tornado.web.Application):
     def __init__(self):
@@ -204,34 +227,13 @@ class Application(common.CommonFunctions, tornado.web.Application):
             That might be done via web interface
             Then, setups the tornado web server, you will need a local mongodb installation for this.
         """
-        self.created_jobs=deque() # Don't delete, when views are created, they need a created_jobs argument in the creator. # TODO Make this use the queues
-        self.views=deque() # Make this use the queues
-        self.read_config()
 
-        logging.debug('Loading Furnival')
-        self.researchers=self.InitializeResearchers()
-        self.jobs={}
-        self.workunits={}
-        self.tasks={}
-        logging.debug('Researchers initialized by default: %s' %self.researchers)
+        self.read_config()
         urls=[
                 ("/([^/]+)", self.MainHandler),
                 ("/", self.MainHandler),
                 ("/new/([^/]+)", ObjectManager),
                 ]
-        """
-
-            >>> try:
-            >>>    urls=[ b for b in [ a[a.keys()[0]].viewObject.urls for a in self.created_jobs ]][0]
-            >>> except:
-            >>>    urls=[] 
-            
-            FIXME This should not happen should'nt it? Wepa, actually, it should, and it has to. 
-            We'll have to restart webserver to hotplug views, so this is nothing.'
-
-        """
-
-        logging.debug('Starting server with urls: %s' %urls)
 
         settings=dict(
                 #session_storage= 'mongodb:///tornado_sessions', # TODO Fix this.
@@ -241,6 +243,10 @@ class Application(common.CommonFunctions, tornado.web.Application):
                 cookie_secret="11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
         )
         
+        logging.info('Loading Furnival main application')
+        logging.debug('Researchers initialized from database: %s' %self.researchers)
+        logging.debug('Starting server with urls: %s' %urls)
+        self.researchers=self.InitializeResearchers() # Here we do the part on restoring from database.
         tornado.web.Application.__init__(self, urls, **settings)
 
     def InitializeResearchers(self):
@@ -249,6 +255,11 @@ class Application(common.CommonFunctions, tornado.web.Application):
             Actually, it's returning an empty set, as persistence is not implemented.
         """
         # Initially, this can be like this, as we've not implemented persistence yet'.
+        self.created_jobs=deque() # Don't delete, when views are created, they need a created_jobs argument in the creator. # TODO Make this use the queues
+        self.views=deque() # Make this use the queues
+        self.jobs={}
+        self.workunits={}
+        self.tasks={}
         return {}
 
     class MainHandler(Scheduler):

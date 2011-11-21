@@ -25,8 +25,6 @@ class creatorTest(testclass):
         """
             Fake consolidtaror that returns result itself as ConsolidatedResult
         """
-
-
         return result
 
 class viewtest(testclass):
