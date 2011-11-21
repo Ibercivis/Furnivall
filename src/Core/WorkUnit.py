@@ -73,7 +73,7 @@ class workunit(object):
 
         """
         description = False if not self.job else self.job.description
-        self.tasks.append([len(self.tasks), task(self, self, Volunteer(), description )]) #TODO Store volunteer data somewhere.
+        self.tasks.append([len(self.tasks), task(self, self, User(), description )]) #TODO User data should not be created here! Or should it? Tomorrow: CHeck this out
 
     @property
     def status(self, expected=False):

@@ -17,40 +17,20 @@ class Personality(object):
         self.user=user
         self.id_=id_
 
-class Researcher(Personality, Core.common.CommonFunctions):
-    def __init__(self,  host=False, user=False):
-        """
-            Researcher object.
-            *TODO: store everything about it in a datbase. Add auth to somewhere.*
-        """
-        super(self.__class__, self).__init__(user, host)
-        self.read_config()
-        self.current_tasks=collections.deque()
-        self.completed_tasks=collections.deque()
-        self.initialized_views={}
-        self.jobs=[]
-
-
-    def set_data(self, host, user, id_):
-        """
-            Returns host user and id from a researcher object.
-        """
-        self.host=host
-        self.user=user
-        self.id_=id_
-
-class Volunteer(Personality):
+class User(Personality):
     def __init__(self,  host=False, user=False):
         """
 
             Volunteer object.
-            TODO Change the method volunteers work. Should be individual volunteers, by sessions, not by-task volunteers. (ongoing)
-
+            TODO: Make this persistent
         """
-        super(Volunteer, self).__init__(user, host)
+        super(User, self).__init__(user, host)
         self.current_tasks=collections.deque()
         self.completed_tasks=collections.deque()
-        self.session_id=self.get_session_id()
+        self.initialized_views={}
+        self.jobs=collections.deque()
+        self.session_id=self.get_session_id() # Not removing this,
+        # might be needed in second phase (when re-implementing anonymous users)
 
     def get_session_id(self):
         """

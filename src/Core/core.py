@@ -55,23 +55,27 @@ class UserManager(object):
 
         return (username, auth)
 
-class ObjectManager(web.RequestHandler, UserManager):
-    """
-        Object manager, creation, delete and modify petitions should go here.
-        Right now, it's able to assign a session to a user, a job and a view to
-        a researhcer. 
-    """
-
-    def assign_session_to_user(self, volunteer):
+    def give_session_to_user(self, volunteer):
         """
             Creates a unique session id and assigns it to volunteer object.
             then, it returns the volunteer with host and user data.
+            TODO: Make this on login, now that I'm forcing users to login.
+            TODO: Make users able to be anymous. (But after making the opposite)
+            I know it sounds strange, but It should be a better way that the way
+            we started.
         """
         auuid=uuid.uuid4()
         self.session.user_id=auuid # Assign user id to session.
         logging.debug("Creating user %s,%s,%s",
                 auuid, self.session.host, self.session.user)
         return volunteer.set_data(self.session.host, self.session.user, auuid )
+
+class ObjectManager(web.RequestHandler, UserManager):
+    """
+        Object manager, creation, delete and modify petitions should go here.
+        Right now, it's able to assign a session to a user, a job and a view to
+        a researhcer. 
+    """
 
     def assign_job_to_researcher(self, viewfile, researcher):
         """
@@ -94,8 +98,18 @@ class ObjectManager(web.RequestHandler, UserManager):
             viewObject_=getattr(getattr(Views, viewfile), enabled_vf)
             researcher.initialized_views[viewfile]=ViewOjbect_(self.application)
 
+    def user_can_perform(self, user_perms, perms, check_for_all):
+        """
+            Check if a user can perform certain actions.
+        """
+        if check_for_all:
+            return [ i for i in user_perms if i not in perms ] == []
+        else:
+            return [ i for i in user_perms if i in perms ] != []
+
     # We make it authed, should use self.get_current_user ... 
     # TODO: Check it, some people reports problems.
+    # TODO: Add the auth module to tornado, from : https://github.com/bkjones/Tinman/commit/152301d68c86ac7524cf4391b1f98f68c59b2408#diff-1
     @require_basic_auth('Furnivall', self.validate_user)
     def get(self, slug=False):
         """
@@ -109,18 +123,18 @@ class ObjectManager(web.RequestHandler, UserManager):
         logging.debug("Creating new -%s-" %slug)
 
         try:
-            if researcher in permissions:
-                user_id=self.get_secure_cookie('user')
-                researcher=self.application.researchers[user_id]
-
+            user_id=self.get_secure_cookie('user')
+            user=self.application.users[user_id]
             viewfile=self.get_argument('viewfile')
 
-            if "researcher" in permissions or :
-
-            if "job" in slug:
+            if "job" in slug and self.user_can_perform(permissions,
+                    ['own_job'], False):
                 self.assign_job_to_researcher(viewfile, researcher)
-            if "view" in slug:
+
+            if "view" in slug and self.user_can_perform(permissions,
+                    ['assign_view'], 'view', False):
                 self.assign_view_to_researcher(viewfile, researcher) 
+
         except:
             viewfile=False
             researcher=False
@@ -162,10 +176,9 @@ class Scheduler(ObjectManager):
         # And it doesn't look nice. It isn't any problem, just not nice
         return job.produce_workunits()
 
-    def get_current_volunteer(self):
+    def get_current_user(self):
         """
-            Get current volunteer, by session id (session_id is
-            scheduler-specific, should be for each user)
+            Get current user. If user has not session_id (but it is authenticated)
             If no session_id, calls assign_session_to_user
         """
 
@@ -203,35 +216,21 @@ class Scheduler(ObjectManager):
                         else: return wk.new_task()
         return 
 
-    def get_done_tasks(self):
+    @property
+    def user_tasks(self, user=False, status=False):
         """
-            Return tasks in status "ok" and "failed" from a volunteer's tasks_fail and tasks_ok pools.
-        """
-        atasks=[]
-        volunteer=self.get_current_volunteer()
-        logging.debug('Getting done tasks for volunteer: %s' %volunteer)
-        for workunit in self.find_volunteer_workunits(volunteer):
-            atasks.extend([task in self.find_volunteer_tasks(volunteer, workunit.tasks_ok, workunit.tasks_fail)])
-        logging.debug('got %s' %atasks)
-        return atasks
+            Return tasks in status "ok" and "failed" from a volunteer
 
-    def find_volunteer_workunits(self, user):
         """
-            Generator returning volunteer workunits. Warning: this might be dangerous, as we've seen that
-            generators seem to not work Ok when removing elements from its object.
-        """
+        if not user:
+            user=self.get_current_volunteer()
 
-        logging.debug('Getting workunits for volunteer: %s' %volunteer)
-        for workunit in user.workunits:
-            yield workunit 
-
-    def find_volunteer_tasks(self, volunteer, tasks_ok, tasks_fail):
-        """
-            return tasks from tasks_ok and task_fail if they're from volunteer
-        """
-        logging.debug('Getting all tasks for volunteer %s', volunteer)
-        tasks_ok.extend(tasks_fail)
-        return [ task for task in tasks_ok if task.volunteer is volunteer ]
+        if not status:
+            tasks_finished=self.application.tasks_true[:]
+            tasks_finished.expand(self.application.tasks_false)
+            return [task for task in user.tasks if task in tasks_finished ]
+        else:
+            return user.tasks
 
 class Application(common.CommonFunctions, tornado.web.Application):
     def __init__(self):
