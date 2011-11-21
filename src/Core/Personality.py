@@ -27,7 +27,7 @@ class Researcher(Personality, Core.common.CommonFunctions):
         self.read_config()
         self.current_tasks=collections.deque()
         self.completed_tasks=collections.deque()
-        self.initialize_views={}
+        self.initialized_views={}
         self.jobs=[]
 
 

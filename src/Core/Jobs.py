@@ -6,8 +6,6 @@ from collections import deque
 from tornado.options import options, define
 import logging
 
-define('jobs_qeuque', default=deque())
-
 class job(object, CommonFunctions):
     def __init__(self, viewObject, pluginObject):
         """

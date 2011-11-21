@@ -7,28 +7,16 @@ from Core.Tests import testclass
 from tornado.options import options, define
 from sqlobject import *
 
-define('tasks_total_queue', default=deque())
-define('tasks_failed_queue', default=deque())
-define('tasks_ok_queue', default=deque())
-define('results_queue', default=deque())
-
-class plugintest(testclass):
-    def __init__(self):
-        self.workunits=10
-        self.pluginmodule=Tests
-        self.pluginclass="testclass"
-        self.description="foobar"
-
-    def main(self):
-        return "foo" 
-
 class Assignment(Persistent):
     def __init__(self, creator_id, workunit_id, volunteer_id):
         """
-            Superclass of task and Result, contains common properties
-            for both.
+            Superclass of task and Result.
+            @type creator_id: int
+            @param creator_id: Id of the parent of this assignment 
+            @type workunit_id: Id of the workunit this assignment was assigned to.
+            @param volunteer_id: Id of the volunteer that got this assignment.
+            @result: None.
 
-            >>> a=Assignment(Job(viewtest, plugintest),[],[])
             # Should not give response
         """
         self.creator=creator_id 
@@ -49,10 +37,15 @@ class Assignment(Persistent):
             notification.
 
             Should not produce output.
-
-            >>> a=Assignment(creatorTest(),[],[]) #doctest: +ELLIPSIS
+            @type place: string 
+            @param place: queue object in the parent where we'll be storing notification 
+            @type notification: string 
+            @param notification: Object we'll add to parent place.
+            @returns: None
+            >>> b=WorkUnit() # TODO Fix this tests.
+            >>> a=Assignment(creatorTest(),0,0) #doctest: +ELLIPSIS
             >>> a.append_to_creator('tasks','fooobar')
-            >>> a.creator.tasks 
+            >>> a.creator.tasks
             >>> # should be empty, as tasks are not executed synchronously
             >>> # (except for the foobar we just notified) NOTE: As this is
             >>> # not having control over the task time, MIGHT fail. )
