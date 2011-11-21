@@ -153,7 +153,7 @@ class Scheduler(ObjectManager):
                     is already doing that task, something failed!')
             return
         logging.debug('[Debug] Creating volunteer object. Giving it to a task')
-        assign_session_to_user(self.getfreetask(view).volunteer)
+        give_session_to_user(self.getfreetask(view).volunteer)
 
     def getworkunit(self, job):
         """
@@ -179,13 +179,13 @@ class Scheduler(ObjectManager):
     def get_current_user(self):
         """
             Get current user. If user has not session_id (but it is authenticated)
-            If no session_id, calls assign_session_to_user
+            If no session_id, calls give_session_to_user
         """
 
         session_id=self.get_secure_cookie('session_id')
 
         if not session_id:
-            return assign_session_to_user
+            return give_session_to_user
         else:
             logging.debug('Getting volunteer object for id: %s' %(session_id))
             return self.application.volunteers[session_id]
