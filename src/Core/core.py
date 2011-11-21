@@ -1,5 +1,5 @@
 """
-    foo
+    Furnivall core functions
 """
 import uuid, os, logging, common
 import Assignment, Workunit
@@ -94,13 +94,15 @@ class ObjectManager(web.RequestHandler, UserManager):
             viewObject_=getattr(getattr(Views, viewfile), enabled_vf)
             researcher.initialized_views[viewfile]=ViewOjbect_(self.application)
 
-    # We make it authed, should use self.get_current_user ... TODO: Check it, some people reports problems.
+    # We make it authed, should use self.get_current_user ... 
+    # TODO: Check it, some people reports problems.
     @require_basic_auth('Furnivall', self.validate_user)
     def get(self, slug=False):
         """
             Object manager get function.
             Creates as requested jobs or views
-            TODO: make it create tasks too, in case it's needed, and according to job create tasks permissions.
+            TODO: make it create tasks too, in case it's needed, and according 
+            to job create tasks permissions.
         """
         
         user_id, permissions = self.get_current_user()
@@ -108,7 +110,8 @@ class ObjectManager(web.RequestHandler, UserManager):
 
         try:
             if researcher in permissions:
-                researcher=self.application.researchers[self.get_argument('user_id')]
+                user_id=self.get_secure_cookie('user')
+                researcher=self.application.researchers[user_id]
 
             viewfile=self.get_argument('viewfile')
 
@@ -128,26 +131,35 @@ class Scheduler(ObjectManager):
 
     def assign_task(self, view):
         """
-            Get a free task, if volunteer is doing that task, return an error, otherwise 
+            Get a free task, if volunteer is doing that task, return an error
         """
         free_task=self.getfreetask()
         if get_current_volunteer() is free_task.volunteer: 
-            logging.debug('[Debug] Not creating user, not return task... User is already doing that task, something failed!')
+            logging.debug('[Debug] Not creating user, not return task... User\
+                    is already doing that task, something failed!')
             return
-        logging.debug('[Debug] Creating volunteer object and assigning it to a task.')
+        logging.debug('[Debug] Creating volunteer object. Giving it to a task')
         assign_session_to_user(self.getfreetask(view).volunteer)
 
     def getworkunit(self, job):
         """
-            Return a workunit object, a new one if no unnasigned workunits available
+            Return a workunit object, a new one if no unnasigned workunits
+            available
         """
         for wk in job.workunits:
-            logging.debug('Trying to return a free workunit. Currently processing %s' %(i))
+            logging.debug('Trying to return a free workunit.\
+                    Currently processing %s' %(wk))
             if not wk.status:
-                logging.debug('%s is free!' %i)
+                logging.debug('%s is free!' %wk)
                 return wk
+
         # No free workunits.
-        logging.debug("No free workunits. Creating new workunit object from %s" %(job))
+        logging.debug("No free workunits.\
+                Creating new workunit object from %s", job)
+
+        # FIXME: 
+        # This is what makes job.produce_workunits to need returning one...
+        # And it doesn't look nice. It isn't any problem, just not nice
         return job.produce_workunits()
 
     def get_current_volunteer(self):
@@ -156,11 +168,14 @@ class Scheduler(ObjectManager):
             scheduler-specific, should be for each user)
             If no session_id, calls assign_session_to_user
         """
-        if not self.session.session_id:
+
+        session_id=self.get_secure_cookie('session_id')
+
+        if not session_id:
             return assign_session_to_user
         else:
-            logging.debug('Getting volunteer object for id: %s' %(self.session.session_id))
-            return self.volunteers[self.session.session_id] # FIXME Make volunteers pool!!!
+            logging.debug('Getting volunteer object for id: %s' %(session_id))
+            return self.application.volunteers[session_id]
 
     def getfreetask(self, view):
         """
@@ -200,17 +215,15 @@ class Scheduler(ObjectManager):
         logging.debug('got %s' %atasks)
         return atasks
 
-    def find_volunteer_workunits(self, volunteer):
+    def find_volunteer_workunits(self, user):
         """
             Generator returning volunteer workunits. Warning: this might be dangerous, as we've seen that
             generators seem to not work Ok when removing elements from its object.
         """
+
         logging.debug('Getting workunits for volunteer: %s' %volunteer)
-        for researcher in self.application.researchers: # TODO Make researchers pool, and make it global! Then check everywhere when it's changed
-            for job in researcher.jobs:
-                for name, job in job:
-                    for workunit in job.workunits:
-                        if volunteer is workunit.volunteer: yield volunteer
+        for workunit in user.workunits:
+            yield workunit 
 
     def find_volunteer_tasks(self, volunteer, tasks_ok, tasks_fail):
         """
