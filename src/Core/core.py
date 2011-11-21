@@ -21,17 +21,23 @@ class ObjectManager(tornado.web.RequestHandler):
     def get_current_user(self):
         """
             Gets current user from cookie AND permissions (so this will do
-            when user logged in) This probably shouldnt go here, but it's
-            used on all of its child classes
+            when user logged in) 
         """
 
         try: 
-            username = json_decode(self.get_secure_cookie('user'))
-            auth = db.get("select permissions from auth where user='%s' "
+            username=self.db.get("select username from auth where username='%s'\
+                    and password ='%s'" %(
+                        self.get_secure_cookie('user'),
+                        self.get_secure_cookie('pass')
+                        )
+                    )
+            if not username: return (None, None)
+            auth = self.db.get("select permissions from auth where user='%s' "
                     %(username))
-            return ( username, auth.permissions)
+            return ( username, auth.permissions )
+
         except Exception,e:
-            logging.info('User not allowed because of:%s' %e)
+            logging.debug('User not allowed because of:%s' %e)
             return ("None", "None")
 
     def assign_session_to_user(self, volunteer):
@@ -41,7 +47,7 @@ class ObjectManager(tornado.web.RequestHandler):
         """
         auuid=uuid.uuid4()
         self.session.user_id=auuid # Assign user id to session.
-        logging.info("Creating user %s,%s,%s",
+        logging.debug("Creating user %s,%s,%s",
                 auuid, self.session.host, self.session.user)
         return volunteer.set_data(self.session.host, self.session.user, auuid )
 
@@ -63,9 +69,9 @@ class ObjectManager(tornado.web.RequestHandler):
             Todo: Refactorize that awful name to initialized_views
         """
         if researcher: 
-            envf=self.application.conf('enabled_views', viewfile)
-            researcher.initialize_views[viewfile]=\
-                getattr(getattr(Views, viewfile), envf)(self.application)
+            enabled_vf=self.application.conf('enabled_views', viewfile)
+            viewObject_=getattr(getattr(Views, viewfile), enabled_vf)
+            researcher.initialize_views[viewfile]=ViewOjbect_(self.application)
 
     def get(self, slug=False):
         """
@@ -74,13 +80,13 @@ class ObjectManager(tornado.web.RequestHandler):
             It also checks arguments to take actions when arguments are given
         """
 
-        logging.info("Creating new -%s-" %slug)
+        logging.debug("Creating new -%s-" %slug)
 
         if "researcher" in slug:
             researcher_name=self.get_argument('re_name')
             researcher_object=Core.Personality.Researcher(user=researcher_name)
             self.application.researchers[researcher_name]=new_researcher_object
-            logging.info(self.application.researchers)
+            logging.debug(self.application.researchers)
 
         else: 
             try:
@@ -103,22 +109,23 @@ class Scheduler(ObjectManager):
         """
         free_task=self.getfreetask()
         if get_current_volunteer() is free_task.volunteer: 
-            logging.info('[Debug] Not creating user, not return task... User is already doing that task, something failed!')
+            logging.debug('[Debug] Not creating user, not return task... User is already doing that task, something failed!')
             return
-        logging.info('[Debug] Creating volunteer object and assigning it to a task.')
+        logging.debug('[Debug] Creating volunteer object and assigning it to a task.')
         assign_session_to_user(self.getfreetask(view).volunteer)
 
-    def getworkunit(self):
+    def getworkunit(self, job):
         """
             Return a workunit object, a new one if no unnasigned workunits available
         """
-        for i in researcher.jobs.workunits:
-            logging.info('Trying to return a free workunit. Currently processing %s' %(i))
-            if not i.status:
-                logging.info('%s is free!' %i)
-                return i
-        logging.info("Creating new workunit object")
-        return researcher.jobs.produce_workunits()
+        for wk in job.workunits:
+            logging.debug('Trying to return a free workunit. Currently processing %s' %(i))
+            if not wk.status:
+                logging.debug('%s is free!' %i)
+                return wk
+        # No free workunits.
+        logging.debug("No free workunits. Creating new workunit object from %s" %(job))
+        return job.produce_workunits()
 
     def get_current_volunteer(self):
         """
@@ -129,7 +136,7 @@ class Scheduler(ObjectManager):
         if not self.session.session_id:
             return assign_session_to_user
         else:
-            logging.info('Getting volunteer object for id: %s' %(self.session.session_id))
+            logging.debug('Getting volunteer object for id: %s' %(self.session.session_id))
             return self.volunteers[self.session.session_id] # FIXME Make volunteers pool!!!
 
     def getfreetask(self, view):
@@ -145,14 +152,14 @@ class Scheduler(ObjectManager):
         """
         # TODO: change ScommonMatch in workunit to call the plugin/view's compatibility class. TODO: Make a view's compatibility class
         for researcher in self.application.researchers:
-            logging.info('Processing researcher %s' %researcher)
+            logging.debug('Processing researcher %s' %researcher)
             for job in researcher.jobs:
-                logging.info('Processing job %s' %job)
+                logging.debug('Processing job %s' %job)
                 for view, job in job:
-                    logging.info('Processing view and job %s %s' %(view, job))
+                    logging.debug('Processing view and job %s %s' %(view, job))
                     if job.viewObject.check_view(self.get_current_volunteer()):
-                        logging.info("View is supported by user (ViewOjbect: %s) (Volunteer: %s)" %(job.viewObject, self.get_current_volunteer()))
-                        wk=self.getworkunit()
+                        logging.debug("View is supported by user (ViewOjbect: %s) (Volunteer: %s)" %(job.viewObject, self.get_current_volunteer()))
+                        wk=self.getworkunit(job)
                         task=[sort(task, key=lambda t: t.ScommonMatch()) for task in wk.tasks if not task.volunteer.session_id ][0] # Get the best task ordered by ScommonMatch if it has not a volunteer assigned
                         if task: return task
                         else: return wk.new_task()
@@ -164,10 +171,10 @@ class Scheduler(ObjectManager):
         """
         atasks=[]
         volunteer=self.get_current_volunteer()
-        logging.info('Getting done tasks for volunteer: %s' %volunteer)
+        logging.debug('Getting done tasks for volunteer: %s' %volunteer)
         for workunit in self.find_volunteer_workunits(volunteer):
             atasks.extend([task in self.find_volunteer_tasks(volunteer, workunit.tasks_ok, workunit.tasks_fail)])
-        logging.info('got %s' %atasks)
+        logging.debug('got %s' %atasks)
         return atasks
 
     def find_volunteer_workunits(self, volunteer):
@@ -175,7 +182,7 @@ class Scheduler(ObjectManager):
             Generator returning volunteer workunits. Warning: this might be dangerous, as we've seen that
             generators seem to not work Ok when removing elements from its object.
         """
-        logging.info('Getting workunits for volunteer: %s' %volunteer)
+        logging.debug('Getting workunits for volunteer: %s' %volunteer)
         for researcher in self.application.researchers: # TODO Make researchers pool, and make it global! Then check everywhere when it's changed
             for job in researcher.jobs:
                 for name, job in job:
@@ -186,7 +193,7 @@ class Scheduler(ObjectManager):
         """
             return tasks from tasks_ok and task_fail if they're from volunteer
         """
-        logging.info('Getting all tasks for volunteer %s' %volunteer)
+        logging.debug('Getting all tasks for volunteer %s' %volunteer)
         tasks_ok.extend(tasks_fail)
         return [ task for task in tasks_ok if task.volunteer is volunteer ]
 
@@ -202,9 +209,12 @@ class Application(common.CommonFunctions, tornado.web.Application):
         self.views=deque() # Make this use the queues
         self.read_config()
 
-        logging.info('Loading Furnival')
+        logging.debug('Loading Furnival')
         self.researchers=self.InitializeResearchers()
-        logging.info('Researchers initialized by default: %s' %self.researchers)
+        self.jobs={}
+        self.workunits={}
+        self.tasks={}
+        logging.debug('Researchers initialized by default: %s' %self.researchers)
         urls=[
                 ("/([^/]+)", self.MainHandler),
                 ("/", self.MainHandler),
@@ -222,7 +232,7 @@ class Application(common.CommonFunctions, tornado.web.Application):
 
         """
 
-        logging.info('Starting server with urls: %s' %urls)
+        logging.debug('Starting server with urls: %s' %urls)
 
         settings=dict(
                 #session_storage= 'mongodb:///tornado_sessions', # TODO Fix this.
@@ -247,8 +257,6 @@ class Application(common.CommonFunctions, tornado.web.Application):
             MainHandler, inherits tornado's requesthandler and shows up display templastes
         """
 
-        # Right now, db is only needed here.
-
         def login(self):
             """
                 Checks out login against a database, given username and passwor as url params
@@ -256,9 +264,12 @@ class Application(common.CommonFunctions, tornado.web.Application):
             """
 
             username = self.get_argument("username", "")
+            password = self.get_argument("password", "")
             auth = db.get("select permissions from auth where user='%s' and pass='%s'"
-                    %(username, self.get_argument('password','')))
-            try: return auth.permissions
+                    %(username, password))
+            db_user = db.get("select id as id_ from auth where user='%s' and pass='%s'"
+                    %(username, password))
+            try: return ( db_user.id_, auth.permissions )
             except: return
  
         def get(self, slug=False):
@@ -276,52 +287,25 @@ class Application(common.CommonFunctions, tornado.web.Application):
             auth="None" # Default user permissions is None
 
             if not slug: # Default to landing if /view/ called. TODO: Do this as / too
-                logging.info('[DEBUG] Defining slug as default')
+                logging.debug('[DEBUG] Defining slug as default')
                 slug="Landing"
 
-            # This auth method is not clear at all.
             if "Login" in slug: 
-                auth=self.login()
-                try:
-                    username = self.get_argument("username", "")
-                except:
-                    username=""
-
-                if auth:
-                    if username:
-                        self.set_secure_cookie("user", tornado.escape.json_encode(username))
-                        if self.config.get('admin_users') in auth: # We're admins
-                            slug="Admin" # So render admin page
-                        else:
-                            slug="Researcher"
-                    else:
-                        self.clear_cookie("user")
-                        slug="Login"
-                else:
-                    if username:
-                        error_msg = u"?error=" + tornado.escape.url_escape("Login incorrect.")
-                    else:
-                        self.clear_cookie('user')
-                        slug="Login"
-       
+                user_id, auth=self.login()
+                self.set_secure_cookie('username', user_id)
                 user, auth=self.get_current_user() # Get user after login (from cookie set in login process)
-                logging.info('Logging in for user: %s' %user)
+                logging.debug('Logging in for user: %s' %user)
+                slug=special_login_slugs[
                     
             if slug is "Logout":
-                self.login()
+                self.clear_cookie('username')
+                self.clear_cookie('permissions')
                 slug="Login"
 
-            try:
-                researcher=self.application.researchers[self.get_current_user()]
-            except:
-                researcher=""
-
-            logging.info('[Debug] Rendering template %s' %slug)
-            logging.info('User has %s permissions' %auth)
+            logging.debug('[Debug] Rendering template %s' %slug)
+            logging.debug('User has %s permissions' %auth)
 
             self.render('%s' %(slug),
-                    user=user,
-                    researcher=researcher,
                     user_permissions=auth,
                     views=self.application.views,
                     jobs=self.application.created_jobs,

@@ -25,9 +25,11 @@ db = tornado.database.Connection(options.db_host, options.db_db ,options.db_user
     TODO: 
         All objects must be saved and reloaded from the database.
 """
-
-if __name__ == "__main__":
+def do_main_program(self):
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
+
+if __name__ == "__main__":
+    do_main_program
