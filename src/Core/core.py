@@ -107,16 +107,27 @@ class ObjectManager(web.RequestHandler, UserManager):
         else:
             return [ i for i in user_perms if i in perms ] != []
 
-    # We make it authed, should use self.get_current_user ... 
-    # TODO: Check it, some people reports problems.
     # TODO: Add the auth module to tornado, from : https://github.com/bkjones/Tinman/commit/152301d68c86ac7524cf4391b1f98f68c59b2408#diff-1
     @require_basic_auth('Furnivall', self.validate_user)
     def get(self, slug=False):
         """
             Object manager get function.
             Creates as requested jobs or views
-            TODO: make it create tasks too, in case it's needed, and according 
-            to job create tasks permissions.
+            TODO: Document user permissions for the ACL:
+                own_job
+                create_job
+                view_job
+                own_task 
+                create_task 
+                view_task
+                own_workunit 
+                create_workunit
+                view_workunit
+                root 
+
+                If we want a task to create another task, the assigned volunteer has to have own_task permissions!
+                Note: For a task to create another task, I'd prefer it to be done via the web interface.
+                We can do it at plugin level, but that would mean we wouldn't have such a nice access to authentication methods.
         """
         
         user_id, permissions = self.get_current_user()
@@ -270,7 +281,7 @@ class Application(common.CommonFunctions, tornado.web.Application):
             Actually, it's returning an empty set, as persistence is not implemented.
         """
         # Initially, this can be like this, as we've not implemented persistence yet'.
-        self.created_jobs=deque() # Don't delete, when views are created, they need a created_jobs argument in the creator. # TODO Make this use the queues
+        self.created_jobs={} # Don't delete, when views are created, they need a created_jobs argument in the creator. # TODO Make this use the queues
         self.views=deque() # Make this use the queues
         self.jobs={}
         self.workunits={}
