@@ -42,21 +42,6 @@ class UserManager(object):
         self.set_secure_cookie('perms', auth )
         return True
 
-    def give_session_to_user(self, volunteer):
-        """
-            Creates a unique session id and assigns it to volunteer object.
-            then, it returns the volunteer with host and user data.
-            TODO: Make this on login, now that I'm forcing users to login.
-            TODO: Make users able to be anymous. (But after making the opposite)
-            I know it sounds strange, but It should be a better way that the way
-            we started.
-        """
-        auuid=uuid.uuid4()
-        self.session.user_id=auuid # Assign user id to session.
-        logging.debug("Creating user %s,%s,%s",
-                auuid, self.session.host, self.session.user)
-        return volunteer.set_data(self.session.host, self.session.user, auuid )
-
 class ObjectManager(web.RequestHandler, UserManager):
     """
         Object manager, creation, delete and modify petitions should go here.
@@ -112,7 +97,7 @@ class ObjectManager(web.RequestHandler, UserManager):
                 view_workunit
                 root 
 
-                If we want a task to create another task, the assigned volunteer has to have own_task permissions!
+                If we want a task to create another task, the assigned user_ has to have own_task permissions!
                 Note: For a task to create another task, I'd prefer it to be done via the web interface.
                 We can do it at plugin level, but that would mean we wouldn't have such a nice access to authentication methods.
         """
@@ -143,15 +128,16 @@ class Scheduler(ObjectManager):
 
     def assign_task(self, view):
         """
-            Get a free task, if volunteer is doing that task, return an error
+            Get a free task, if user_ is doing that task, return an error
         """
         free_task=self.getfreetask()
-        if get_current_volunteer() is free_task.volunteer: 
+        if get_current_user()[0] is free_task.user_.id_: 
             logging.debug('[Debug] Not creating user, not return task... User\
                     is already doing that task, something failed!')
             return
-        logging.debug('[Debug] Creating volunteer object. Giving it to a task')
-        give_session_to_user(self.getfreetask(view).volunteer)
+        logging.debug('[Debug] Creating user_ object. Giving it to a task')
+
+        self.getfreetask(view).user_ = get_current_user()
 
     def getworkunit(self, job):
         """
@@ -193,10 +179,10 @@ class Scheduler(ObjectManager):
                 logging.debug('Processing job %s' %job)
                 for view, job in job:
                     logging.debug('Processing view and job %s %s' %(view, job))
-                    if job.viewObject.check_view(self.get_current_volunteer()):
-                        logging.debug("View is supported by user (ViewOjbect: %s) (Volunteer: %s)" %(job.viewObject, self.get_current_volunteer()))
+                    if job.viewObject.check_view(self.get_current_user()):
+                        logging.debug("View is supported by user (ViewOjbect: %s) (user_: %s)" %(job.viewObject, self.get_current_user()))
                         wk=self.getworkunit(job)
-                        task=[sort(task, key=lambda t: t.ScommonMatch()) for task in wk.tasks if not task.volunteer.session_id ][0] # Get the best task ordered by ScommonMatch if it has not a volunteer assigned
+                        task=[sort(task, key=lambda t: t.ScommonMatch()) for task in wk.tasks if not task.user_.session_id ][0] # Get the best task ordered by ScommonMatch if it has not a user_ assigned
                         if task: return task
                         else: return wk.new_task()
         return 
@@ -204,11 +190,11 @@ class Scheduler(ObjectManager):
     @property
     def user_tasks(self, user=False, status=False):
         """
-            Return tasks in status "ok" and "failed" from a volunteer
+            Return tasks in status "ok" and "failed" from a user_
 
         """
         if not user:
-            user=self.get_current_volunteer()
+            user, auth=self.get_current_user()
 
         if not status:
             tasks_finished=self.application.tasks_true[:]

@@ -21,7 +21,7 @@ class User(Personality):
     def __init__(self,  host=False, user=False):
         """
 
-            Volunteer object.
+            user_ object.
             TODO: Make this persistent
         """
         super(User, self).__init__(user, host)

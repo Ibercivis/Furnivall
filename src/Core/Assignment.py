@@ -5,29 +5,23 @@ from collections import deque
 from Personality import *
 from Core.Tests import testclass
 from tornado.options import options, define
-from sqlobject import *
+from sqlalchemy import Column, Integuer, String
+from sqlalchemy.ext.declarative import declarative_base
 
-class Assignment(Persistent):
-    def __init__(self, creator_id, workunit_id, volunteer_id):
+
+class Assignment()
+    def __init__(self, creator_id, workunit_id, user__id):
         """
             Superclass of task and Result.
             @type creator_id: int
             @param creator_id: Id of the parent of this assignment 
             @type workunit_id: Id of the workunit this assignment was assigned to.
-            @param volunteer_id: Id of the volunteer that got this assignment.
+            @param user__id: Id of the user_ that got this assignment.
             @result: None.
-
-            # Should not give response
         """
         self.creator=creator_id 
         self.workunit=workunit_id
-        self.volunteer=volunteer_id
-
-        # Making the following volatile, we want to keep only the IDs on the database.
-        # I have to check out if object persistence is nice enough to reference references.
-        self._v_creator_=options.job_queue[creator_id]
-        self._v_workunit_=options.workunit_queue[workunit_id]
-        self._v_volunteer_=options.volunteer_queue[volunteer_id]
+        self.user_=user__id
 
     def append_to_creator(self, place, notification):
         """
@@ -55,7 +49,7 @@ class Assignment(Persistent):
         getattr(self.creator, place).append(notification)
         
 class task(Assignment):
-    def __init__(self, creator, workunit, volunteer, description):
+    def __init__(self, creator, workunit, user_, description):
         """
             Will launch as executor the *launch* function, wich is actually a
             call to job.pluginobject.launch_task. That will call the plugin
@@ -63,7 +57,7 @@ class task(Assignment):
             When created, it'll notify its creator that's been created,
             and, when finished, it'll validate it.
 
-            TODO: by default task's assigning a volunteer, empty, change it to FALSE.'
+            TODO: by default task's assigning a user_, empty, change it to FALSE.'
             TODO: Right now this unit testing must be refactorished to use queues.
 
             >>> a=task(creatorTest(),[],[],"Task test")
@@ -73,13 +67,13 @@ class task(Assignment):
             <__main__.creatorTest object at 0x...>
             >>> a.workunit
             []
-            >>> a.volunteer
+            >>> a.user_
             []
             >>> a.creator.tasks #doctest: +ELLIPSIS
             [[<__main__.task object at 0x...>, <Future at 0x... state=finished returned NoneType>]]
 
         """
-        super(task, self).__init__(creator, workunit, volunteer) # Initialize superclass. 
+        super(task, self).__init__(creator, workunit, user_) # Initialize superclass. 
         self.description=description 
         MAX_WORKERS=20 # FIXME This has to be configurable!
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor: # Async call 
@@ -87,11 +81,11 @@ class task(Assignment):
             self.futureobject.add_done_callback(self.task_validator) # We validate it once it's done.
             self.append_to_creator('tasks',[self, self.futureobject]) # TODO: here we'll have, somehow to use ids too... Also, this futureobject must be checked out 
  
-    def scoreMatch(self, volunteer): #surely not volunteer, but architecture or something so
+    def scoreMatch(self, user_): #surely not user_, but architecture or something so
         """
-            Tells how adequate this task is for this volunteer.
+            Tells how adequate this task is for this user_.
 
-            Returns 0 if the task can not be executed by the volunteer's architecture. Else it returns
+            Returns 0 if the task can not be executed by the user_'s architecture. Else it returns
             a real between 0 and 1.
 
         """
@@ -147,7 +141,7 @@ class Result(Assignment):
             <__main__.creatorTest object at 0x...>
             >>> b.workunit
             []
-            >>> b.volunteer
+            >>> b.user_
             []
             >>> b.append_to_creator('tasks','fooobar')
             >>> b.creator.tasks #doctest: +ELLIPSIS
@@ -155,7 +149,7 @@ class Result(Assignment):
 
         """
         
-        super(Result, self).__init__(task.creator, task.workunit, task.volunteer)
+        super(Result, self).__init__(task.creator, task.workunit, task.user_)
         self.description=description 
 
     def Result_notification(self):

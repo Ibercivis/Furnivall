@@ -1,6 +1,6 @@
 """
-    Ibervicis Furnivall is an open source framework for distributed volunteer science.
-    It helps to organize batches of tasks, collect them form volunteers and do all the related housekeeping.
+    Ibervicis Furnivall is an open source framework for distributed user science.
+    It helps to organize batches of tasks, collect them form users and do all the related housekeeping.
 
 """
 import daemon, logging
