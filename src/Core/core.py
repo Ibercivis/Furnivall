@@ -235,9 +235,7 @@ class Scheduler(ObjectManager):
 class Application(common.CommonFunctions, tornado.web.Application):
     def __init__(self):
         """
-            Creates a list of researchers, wich SHOULD (todo) contain jobs.
-            That might be done via web interface
-            Then, setups the tornado web server, you will need a local mongodb installation for this.
+            Sets up the tornado web server
         """
 
         self.read_config()
@@ -248,12 +246,17 @@ class Application(common.CommonFunctions, tornado.web.Application):
                 ]
 
         settings=dict(
-                #session_storage= 'mongodb:///tornado_sessions', # TODO Fix this.
                 template_path=os.path.join(os.path.dirname(__file__), "templates"),
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
                 xsrf_cookies=True,
                 cookie_secret="11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
         )
+
+        special_login_slugs={
+                'root': '/Admin/',
+                'researcher': '/Admin/Researcher',
+                'user': '/User/Home'
+        }
         
         logging.info('Loading Furnival main application')
         logging.debug('Researchers initialized from database: %s' %self.researchers)
@@ -293,7 +296,12 @@ class Application(common.CommonFunctions, tornado.web.Application):
                     %(username, password))
             try: return ( db_user.id_, auth.permissions )
             except: return
- 
+
+        def get_higher_permission(self, permissions):
+            if "root" in permissions: return "root"
+            if "researcher" in permissions: return "researcher"
+            else: return "user"
+
         def get(self, slug=False):
             """
                 Tornado RequestHandler get function, renders slug as called 
@@ -317,7 +325,7 @@ class Application(common.CommonFunctions, tornado.web.Application):
                 self.set_secure_cookie('username', user_id)
                 user, auth=self.get_current_user() # Get user after login (from cookie set in login process)
                 logging.debug('Logging in for user: %s' %user)
-                slug=special_login_slugs[
+                slug=self.application.special_login_slugs[self.get_higher_permission(auth)]
                     
             if slug is "Logout":
                 self.clear_cookie('username')
