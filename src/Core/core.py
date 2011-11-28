@@ -21,24 +21,7 @@ class UserManager(object):
             Gets current user from cookie AND permissions (so this will do
             when user logged in) 
         """
-        return (self.get_secure_cookie('user', self.get_secure_cookie('perms')
-
-    def login(self):
-        """
-            Login and set up secure cookie credentials
-            Note: Right now, I'm using http basic auth, so this might not be used.
-            But it's ok if it's used anyway
-        """
-        try:
-            if not self.get_secure_cookie('user'):
-                return (None, None)
-            else:
-                return ( self.get_secure_cookie('user'),
-                    self.get_secure_cookie('perms') )
-
-        except Exception,e:
-            logging.debug('User not allowed because of:%s' %e)
-            return ("None", "None")
+        return (self.get_secure_cookie('user', self.get_secure_cookie('perms')))
 
     def validate_user(self, user, password):
         username=self.db.get("select user from auth where user='%s'\
@@ -48,12 +31,16 @@ class UserManager(object):
                 )
             ).user
         self.set_secure_cookie('user', username)
-        if not username: return (None, None)
+        if not username: return False 
+
+        if self.get_argument('user') == "anonymous":
+            self.set_secure_cookie('perms', 'view_task')
+            return True
+
         auth = self.db.get("select permissions from auth where user='%s' "
             %(username)).permissions
-         self.set_secure_cookie('perms', auth )
-
-        return (username, auth)
+        self.set_secure_cookie('perms', auth )
+        return True
 
     def give_session_to_user(self, volunteer):
         """
@@ -187,19 +174,6 @@ class Scheduler(ObjectManager):
         # And it doesn't look nice. It isn't any problem, just not nice
         return job.produce_workunits()
 
-    def get_current_user(self):
-        """
-            Get current user. If user has not session_id (but it is authenticated)
-            If no session_id, calls give_session_to_user
-        """
-
-        session_id=self.get_secure_cookie('session_id')
-
-        if not session_id:
-            return give_session_to_user
-        else:
-            logging.debug('Getting volunteer object for id: %s' %(session_id))
-            return self.application.volunteers[session_id]
 
     def getfreetask(self, view):
         """
