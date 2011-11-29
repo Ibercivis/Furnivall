@@ -3,12 +3,12 @@
 """
 import uuid, os, logging, common
 import Assignment, Workunit
-import Personality 
+import Personality
 import Plugins, Views
 
 from tornado import web
 from tornado.options import define, options
-from tornado.escape import json_decode 
+from tornado.escape import json_decode
 
 class UserManager(object):
 
@@ -19,7 +19,7 @@ class UserManager(object):
     def get_current_user(self):
         """
             Gets current user from cookie AND permissions (so this will do
-            when user logged in) 
+            when user logged in)
         """
         return (self.get_secure_cookie('user', self.get_secure_cookie('perms')))
 
@@ -31,7 +31,7 @@ class UserManager(object):
                 )
             ).user
         self.set_secure_cookie('user', username)
-        if not username: return False 
+        if not username: return False
 
         if self.get_argument('user') == "anonymous":
             self.set_secure_cookie('perms', 'view_task')
@@ -46,7 +46,7 @@ class ObjectManager(web.RequestHandler, UserManager):
     """
         Object manager, creation, delete and modify petitions should go here.
         Right now, it's able to assign a session to a user, a job and a view to
-        a researhcer. 
+        a researhcer.
     """
 
     def assign_job_to_researcher(self, viewfile, researcher):
@@ -65,7 +65,7 @@ class ObjectManager(web.RequestHandler, UserManager):
             to initialize the view. This will start the view's main class and
             add the created objects to initialized_views object.
         """
-        if researcher: 
+        if researcher:
             enabled_vf=self.application.conf('enabled_views', viewfile)
             viewObject_=getattr(getattr(Views, viewfile), enabled_vf)
             researcher.initialized_views[viewfile]=ViewOjbect_(self.application)
@@ -89,19 +89,19 @@ class ObjectManager(web.RequestHandler, UserManager):
                 own_job
                 create_job
                 view_job
-                own_task 
-                create_task 
+                own_task
+                create_task
                 view_task
-                own_workunit 
+                own_workunit
                 create_workunit
                 view_workunit
-                root 
+                root
 
                 If we want a task to create another task, the assigned user_ has to have own_task permissions!
                 Note: For a task to create another task, I'd prefer it to be done via the web interface.
                 We can do it at plugin level, but that would mean we wouldn't have such a nice access to authentication methods.
         """
-        
+
         user_id, permissions = self.get_current_user()
         logging.debug("Creating new -%s-" %slug)
 
@@ -116,7 +116,7 @@ class ObjectManager(web.RequestHandler, UserManager):
 
             if "view" in slug and self.user_can_perform(permissions,
                     ['assign_view'], 'view', False):
-                self.assign_view_to_researcher(viewfile, researcher) 
+                self.assign_view_to_researcher(viewfile, researcher)
 
         except:
             viewfile=False
@@ -131,7 +131,7 @@ class Scheduler(ObjectManager):
             Get a free task, if user_ is doing that task, return an error
         """
         free_task=self.getfreetask()
-        if get_current_user()[0] is free_task.user_.id_: 
+        if get_current_user()[0] is free_task.user_.id_:
             logging.debug('[Debug] Not creating user, not return task... User\
                     is already doing that task, something failed!')
             return
@@ -155,7 +155,7 @@ class Scheduler(ObjectManager):
         logging.debug("No free workunits.\
                 Creating new workunit object from %s", job)
 
-        # FIXME: 
+        # FIXME:
         # This is what makes job.produce_workunits to need returning one...
         # And it doesn't look nice. It isn't any problem, just not nice
         return job.produce_workunits()
@@ -166,11 +166,11 @@ class Scheduler(ObjectManager):
             If user is able to execute a determinated view task,
             get a workunit and return the task
             with better scommon, and with no session_id.
-            If user is able to execute the task, but no pre-created 
+            If user is able to execute the task, but no pre-created
             (and not assigned) tasks are available, return a new task.
-            Should iterate trough a researcher pool, getting jobs, then 
+            Should iterate trough a researcher pool, getting jobs, then
             split jobs in view, job, and check view's compatibility.
-            
+
         """
         # TODO: change ScommonMatch in workunit to call the plugin/view's compatibility class. TODO: Make a view's compatibility class
         for researcher in self.application.researchers:
@@ -185,7 +185,7 @@ class Scheduler(ObjectManager):
                         task=[sort(task, key=lambda t: t.ScommonMatch()) for task in wk.tasks if not task.user_.session_id ][0] # Get the best task ordered by ScommonMatch if it has not a user_ assigned
                         if task: return task
                         else: return wk.new_task()
-        return 
+        return
 
     @property
     def user_tasks(self, user=False, status=False):
@@ -228,7 +228,7 @@ class Application(common.CommonFunctions, tornado.web.Application):
                 'researcher': '/Admin/Researcher',
                 'user': '/User/Home'
         }
-        
+
         logging.info('Loading Furnival main application')
         logging.debug('Researchers initialized from database: %s' %self.researchers)
         logging.debug('Starting server with urls: %s' %urls)
@@ -275,7 +275,7 @@ class Application(common.CommonFunctions, tornado.web.Application):
 
         def get(self, slug=False):
             """
-                Tornado RequestHandler get function, renders slug as called 
+                Tornado RequestHandler get function, renders slug as called
                 from tornado, passing jobs and slug as argument.
                 It also checks arguments to take actions when arguments are provided
             """
@@ -284,20 +284,20 @@ class Application(common.CommonFunctions, tornado.web.Application):
                 self.get_argument('next')
             except:
                 self.request.arguments['next']="/"
-    
+
             auth="None" # Default user permissions is None
 
             if not slug: # Default to landing if /view/ called. TODO: Do this as / too
                 logging.debug('[DEBUG] Defining slug as default')
                 slug="Landing"
 
-            if "Login" in slug: 
+            if "Login" in slug:
                 user_id, auth=self.login()
                 self.set_secure_cookie('username', user_id)
                 user, auth=self.get_current_user() # Get user after login (from cookie set in login process)
                 logging.debug('Logging in for user: %s' %user)
                 slug=self.application.special_login_slugs[self.get_higher_permission(auth)]
-                    
+
             if slug is "Logout":
                 self.clear_cookie('username')
                 self.clear_cookie('permissions')
@@ -312,9 +312,9 @@ class Application(common.CommonFunctions, tornado.web.Application):
                     jobs=self.application.created_jobs,
                     researchers=self.application.researchers,
                     slug=slug )
-    
+
             try:
                 if self.get_argument('get_task'):
-                    self.assign_task(self.get_argument('view')) 
+                    self.assign_task(self.get_argument('view'))
             except:
                 pass

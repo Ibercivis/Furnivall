@@ -1,41 +1,48 @@
 #!/usr/bin/env python
 from collections import deque
-from Assignment import *
-from tornado import tasks
+import logging
+from Jobs import job
+from Personality import User
+from Assignment import ConsolidatedResult, task
 from tornado.options import options, define
 
 define('workunits_qeuque', default=deque())
 
 class workunit(object):
-    def __init__(self, job=0):
+    def __init__(self, job_id=0):
         """
             Simple job unit.
         """
-        self.job=options.jobs_qeuque[job]
-        self.tasks=options.tasks
-        self.tasks_ok=options.tasks_ok
-        self.tasks_fail=options.tasks_failed
+        self.ConsolidatedResult = ""
+        self.job = options.jobs_qeuque[job_id]
+        self.tasks = options.tasks
+        self.tasks_ok = options.tasks_ok
+        self.tasks_fail = options.tasks_failed
 
-        self.expected=0 #TODO this should get workunit expected tasks to return.
-        self.results=options.results
+        self.expected = 0 #TODO this should get workunit expected tasks to return.
+        self.results = options.results
 
-        logging.info('\t\tWorkunit %s (%s tasks)' %(self, job.initial_tasks))
+        logging.info('\t\tWorkunit %s (%s tasks)', self, job.initial_tasks)
 
-        for i in range(0, int(job.initial_tasks)): self.new_task()
+        for i in range(0, int(job.initial_tasks)):
+            logging.info("Creating task number %s", i)
+            self.new_task()
 
     def consolidate_result(self):
         """
 
-            If workunit.status is true, it will create a *ConsolidatedResult* object, 
+            If workunit.status is true, it will create a *ConsolidatedResult* object,
             passing self.results and job's viewObject
-            
-            ConsolidatedResult will then store into it's data property a consolidated result 
+
+            ConsolidatedResult will then store into it's data property a consolidated result
             got from self.job.viewObject.consolidate_result
 
         """
+
         if self.status:
-            self.ConsolidatedResult=ConsolidatedResult(self.results, self.job.pluginObject)
-        # What about making this one assignment's child too and notify "job" 
+            self.ConsolidatedResult = ConsolidatedResult(self.results,
+                    self.job.pluginObject)
+        # What about making this one assignment's child too and notify "job"
         # (creator) with notify_creator when it's got a consolidated result?
 
     def task_ok(self, task_id):
@@ -48,7 +55,7 @@ class workunit(object):
             deque(['123'])
         """
         self.tasks_ok.append(task_id)
-    
+
     def task_failed(self, task_id):
         """
             Append a task id to failed tasks queque
@@ -87,12 +94,10 @@ class workunit(object):
             False
         """
         if not expected:
-            expected=self.expected
+            expected = self.expected
         return not len(self.tasks_ok) - expected
 
 if __name__ == "__main__":
-    """
-        This should never be used as standalone but for unittests
-    """
+    # This should never be used as standalone but for unittests
     import doctest
     doctest.testmod()

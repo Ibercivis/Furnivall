@@ -8,32 +8,33 @@ from tornado.options import options, define
 from sqlalchemy import Column, Integuer, String
 from sqlalchemy.ext.declarative import declarative_base
 
+# Assignment data {{{
 
-class Assignment()
+class Assignment(object):
     def __init__(self, creator_id, workunit_id, user__id):
         """
             Superclass of task and Result.
             @type creator_id: int
-            @param creator_id: Id of the parent of this assignment 
+            @param creator_id: Id of the parent of this assignment
             @type workunit_id: Id of the workunit this assignment was assigned to.
             @param user__id: Id of the user_ that got this assignment.
             @result: None.
         """
-        self.creator=creator_id 
+        self.creator=creator_id
         self.workunit=workunit_id
         self.user_=user__id
 
     def append_to_creator(self, place, notification):
         """
-            Append notification to Assignment object's creator' list. 
+            Append notification to Assignment object's creator' list.
 
             Will get parent's list as specified in place argument and append
             notification.
 
             Should not produce output.
-            @type place: string 
-            @param place: queue object in the parent where we'll be storing notification 
-            @type notification: string 
+            @type place: string
+            @param place: queue object in the parent where we'll be storing notification
+            @type notification: string
             @param notification: Object we'll add to parent place.
             @returns: None
             >>> b=WorkUnit() # TODO Fix this tests.
@@ -44,10 +45,13 @@ class Assignment()
             >>> # (except for the foobar we just notified) NOTE: As this is
             >>> # not having control over the task time, MIGHT fail. )
             ['fooobar']
-        
+
         """
+
         getattr(self.creator, place).append(notification)
-        
+# }}}
+
+# Assignment {{{
 class task(Assignment):
     def __init__(self, creator, workunit, user_, description):
         """
@@ -73,14 +77,14 @@ class task(Assignment):
             [[<__main__.task object at 0x...>, <Future at 0x... state=finished returned NoneType>]]
 
         """
-        super(task, self).__init__(creator, workunit, user_) # Initialize superclass. 
-        self.description=description 
+        super(task, self).__init__(creator, workunit, user_) # Initialize superclass.
+        self.description=description
         MAX_WORKERS=20 # FIXME This has to be configurable!
-        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor: # Async call 
-            self.futureobject=executor.submit(self.launch) 
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor: # Async call
+            self.futureobject=executor.submit(self.launch)
             self.futureobject.add_done_callback(self.task_validator) # We validate it once it's done.
-            self.append_to_creator('tasks',[self, self.futureobject]) # TODO: here we'll have, somehow to use ids too... Also, this futureobject must be checked out 
- 
+            self.append_to_creator('tasks',[self, self.futureobject]) # TODO: here we'll have, somehow to use ids too... Also, this futureobject must be checked out
+
     def scoreMatch(self, user_): #surely not user_, but architecture or something so
         """
             Tells how adequate this task is for this user_.
@@ -115,18 +119,20 @@ class task(Assignment):
         """
             Validates the task, calling the pluginObject's validate_task function.
 
-            If task has passed, it'll append it to task_ok pool at it's creator, 
+            If task has passed, it'll append it to task_ok pool at it's creator,
             otherwise in tasks_fail
 
 
         """
         passed=getattr(self.creator, "job").pluginObject.validate_task(self, futureObject)
         if passed:
-            self.append_to_creator('tasks_ok', self)  
+            self.append_to_creator('tasks_ok', self)
             # TODO: create a result here? Or from http service?
         else:
             self.append_to_creator('tasks_fail', self)  #quizas mejor self.creator.FailTask(self) ???
+# }}}
 
+# Result {{{
 class Result(Assignment):
     def __init__(self, task, description):
         """
@@ -148,9 +154,9 @@ class Result(Assignment):
             [[<__main__.task object at 0x...>, <Future at 0x... state=finished returned NoneType>], 'fooobar']
 
         """
-        
+
         super(Result, self).__init__(task.creator, task.workunit, task.user_)
-        self.description=description 
+        self.description=description
 
     def Result_notification(self):
         """
@@ -158,9 +164,11 @@ class Result(Assignment):
             Then, call creator's consolidate_result function (wich probably will call this tasks's plugin
             consolidate_result function)
         """
-        self.append_to_creator('results', self) # This adds to results deque in workunit this result object. 
+        self.append_to_creator('results', self) # This adds to results deque in workunit this result object.
         self.creator.consolidate_result()
+# }}}
 
+# Consolidated result {{{
 class ConsolidatedResult(Result):
     def __init__(self, data, plugin):
         """
@@ -171,6 +179,7 @@ class ConsolidatedResult(Result):
     @property
     def data(self):
         return self.data
+# }}}
 
 if __name__ == "__main__":
     """

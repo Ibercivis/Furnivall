@@ -26,7 +26,7 @@ class job(object, CommonFunctions):
         logging.info('Creating job %s' %(self))
         logging.info('\tProducing workunits... (%s) ' %self.viewObject.workunits)
         self.produce_workunits(self.viewObject.workunits)
-    
+
     def produce_workunits(self, number=1):
         """
             Creates N new workunit objects, with this job as job and
@@ -45,10 +45,10 @@ class job(object, CommonFunctions):
             deque([[0, <Assignment.task object at 0x...>]])
         """
 
-        for n in range(0, number): 
+        for n in range(0, number):
             a=workunit(self) # We create a new workunit, passing this object as a parent
             self.workunits.append(a) # Append it to our workunits queuqe
-            if number is 1: return a 
+            if number is 1: return a
 
 if __name__ == "__main__":
     """
