@@ -1,12 +1,20 @@
 #!/usr/bin/env python
-import concurrent.futures.ThreadPoolExecutor, logging
+
+"""
+    Assignment object and sons.
+"""
+
+import concurrent.futures, logging
 #from sqlalchemy import Integuer, String
 #from sqlalchemy.ext.declarative import declarative_base
 
 # Assignment data {{{
 
 class Assignment(object):
-    def __init__(self, workunit_id, user_id):
+    """
+        Assigment object
+    """
+    def __init__(self, workunit_id, user_id, application):
         """
             Superclass of task and Result.
             @param workunit_id: Id of the parent workunit of this assignment
@@ -14,9 +22,11 @@ class Assignment(object):
             @param user_id: Id of the user_ that got this assignment.
             @result: None.
         """
+        self.application = application
         self.workunit = workunit_id
         self.user_ = user_id
         self.result = ""
+        self.id_ = 0
 
     def append_to_workunit(self, place, notification):
         """
@@ -36,11 +46,24 @@ class Assignment(object):
         """
 
         getattr(self.workunit, place).append(notification)
+
+    def globalize(self, id_, application):
+        """
+            Make this object part of the global queue, depending on the class
+        """
+        global_queue = getattr(application, self.__class__.__name__.lower())
+        global_queue[id_] = self # TODO Check this.
+
+
 # }}}
 
 # Assignment {{{
-class task(Assignment):
-    def __init__(self, workunit_, user_):
+class Task(Assignment):
+    """
+        Task object
+    """
+
+    def __init__(self, workunit_, user_, application):
         """
             @type workunit_: Core.Workunit object
             @param workunit_: Workunit directly responsible for this task.
@@ -59,27 +82,31 @@ class task(Assignment):
 
         """
 
-        super(task, self).__init__(workunit_, user_) # Initialize superclass.
+        # Initialize superclass.
+        super(Task, self).__init__(workunit_, user_, application)
 
         self.description = ""
         self.parent_job = getattr(self.workunit, "job")
         self.job_plugin = getattr(self.parent_job, 'pluginObject')
+        # FIXME URGENTLY : This has to be a real task id ¿Passed by args?
+        self.id_ = 0
+        # We might have a async problem here.
 
-        MAX_WORKERS = 20
-        with concurrent.futures.ThreadPoolExecutor(max_workers = MAX_WORKERS) as executor: # Async call
-            logging.debug('Creating executor for task: %s', self.id)
+        with concurrent.futures.ThreadPoolExecutor(max_workers = 20)\
+                as executor: # Async call
+            logging.debug('Creating executor for task: %s', self.id_)
             self.futureobject = executor.submit(self.launch)
             self.futureobject.add_done_callback(self.task_validator)
-            self.globalize(self.id, self)
-            self.append_to_creator('tasks', self.id)
+            self.globalize(self.application, self.id_)
+            self.append_to_workunit('tasks', self.id_)
 
-    def scoreMatch(self, user_):
+    def score_match(self, user_):
         """
 
             TODO: Should return a range between 0 and 10, but this is not yet defined.
             Tells how adequate this task is for this user_.
         """
-        if self.description:
+        if user_ and self.description:
             return 1 # Dummy, do the real stuff.
 
     def launch(self):
@@ -93,12 +120,13 @@ class task(Assignment):
 
         logging.debug( "Task %s belongs to job %s and plugin %s, \
                 executing task_executor for job's pluginobject",
-                self.id, self.parent_job, self.job_plugin.description)
+                self.id_, self.parent_job, self.job_plugin.description)
         self.result = self.job_plugin.task_executor(self, self.workunit)
 
         return Result(self, self.description)
 
-    def task_validator(self, result): #this is a bad name, because in BOINC validation is a wider concept
+    def task_validator(self, result):
+        #this is a bad name, because in BOINC validation is a wider concept
         """
             @type futureObject:
             @param futureObject: task
@@ -110,13 +138,18 @@ class task(Assignment):
 
         """
         if getattr(self.workunit, 'job').pluginObject.validate_task(result):
-            self.append_to_creator('tasks_ok', self.id) # TODO Fix this, it's not good on tasks_ok
+            self.append_to_workunit('tasks_ok', self.id_)
+            # TODO Fix this, it's not good on tasks_ok
         else:
-            self.append_to_creator('tasks_fail', self.id)  #quizas mejor self.creator.FailTask(self) ???
+            self.append_to_workunit('tasks_fail', self.id_)
+            #quiza mejor self.creator.FailTask(self) ???
 # }}}
 
 # Result {{{
 class Result(Assignment):
+    """
+        Result class. Creates a result object when a task is done
+    """
     def __init__(self, task_, description):
         """
             @type task_
@@ -136,12 +169,17 @@ class Result(Assignment):
             consolidate_result function)
         """
 
-        self.append_to_creator('results', self) # This adds to results deque in workunit this result object.
+        # This adds to results deque in workunit this result object.
+        self.append_to_workunit('results', self)
+
         self.result = ConsolidatedResult(self)
 # }}}
 
 # Consolidated result {{{
 class ConsolidatedResult(Result):
+    """
+        Consolidated result.
+    """
     def __init__(self, task_):
         """
            @param task_: Task to get result and creators

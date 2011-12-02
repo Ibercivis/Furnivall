@@ -5,7 +5,7 @@
 import logging
 import tornado.web
 from Core.UserHandler import ObjectManager
-from Core.common import get_highest_permission
+from Core.common import get_highest_permission, get_best_task
 
 class Scheduler(ObjectManager):
     """
@@ -68,7 +68,7 @@ class Scheduler(ObjectManager):
         """
         for job in self.researcher_jobs(view, owner):
             logging.info("View from job %s is supported by user", job)
-            return self.get_best_task(self.getworkunit(job))
+            return get_best_task(self.getworkunit(job))
         return
 
     def researcher_jobs(self, view=False, owner=False):
@@ -101,25 +101,6 @@ class Scheduler(ObjectManager):
                             continue
                         elif job.viewObject.check_view(user):
                             yield job
-
-    def get_best_task(self, work):
-        """
-            @param work: Workunit
-            @type work: WorkUnit.workunit
-            @returns: Assignment.task object
-            Get the best task ordered by ScommonMatch if it has not a user_ assigned
-            If no task available to return,
-            # TODO: change ScommonMatch in workunit to call the plugin/view's
-            # compatibility class. TODO: Make a view's compatibility class
-        """
-        try:
-            return [sorted(task, key = lambda t: t.ScommonMatch()) \
-                for task in work.tasks\
-                if not task.user_.session_id ][0]
-        except IndexError, exception:
-            logging.debug("Exception %s at get_best_task", exception)
-            return work.new_task
-
 
     def initialize_researchers(self):
         """
