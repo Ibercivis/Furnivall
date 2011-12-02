@@ -1,28 +1,39 @@
 #!/usr/bin/env python
-from Core.common import CommonFunctions
-from WorkUnit import workunit
+"""
+    Jobs
+"""
+
+from Core.common import commonClass
+from Core.WorkUnit import workunit
 import logging
 
-class job(CommonFunctions):
-    def __init__(self, viewObject, pluginObject):
+
+class Job(commonClass):
+    """
+        Job class
+    """
+    def __init__(self, view_object, plugin_object, application):
         """
             Returns a job object (workunits container)
             with plugin object and view object references.
         """
-        self.viewObject = viewObject
-        self.pluginObject = pluginObject
+        super(self.__class__, self).__init__()
+        self.application = application
+        self.view_object = view_object
+        self.plugin_object = plugin_object
 
         self.read_config()
         self.initial_tasks = self.conf('main', 'initial_tasks')
 
-        self.description = self.viewObject.description
+        self.description = self.view_object.description
         self.name = "Default job name"
 
         self.workunits = self.application.workunits
 
         logging.info('Creating job %s' , self)
-        logging.info('\tProducing workunits... (%s) ', self.viewObject.workunits)
-        self.produce_workunits(self.viewObject.workunits)
+        logging.info('\tProducing workunits... (%s) ',
+                self.view_object.workunits)
+        self.produce_workunits(self.view_object.workunits)
 
     def produce_workunits(self, number=1):
         """
@@ -44,7 +55,8 @@ class job(CommonFunctions):
 
         for current_wk in range(0, number):
             logging.debug("Making working %s of %s", current_wk, number)
-            a = workunit(self) # We create a new workunit, passing this object as a parent
-            self.workunits.append(a) # Append it to our workunits queuqe
+            # We create a new workunit, passing this object as a parent
+            work = workunit(self, self.application)
+            self.workunits.append(work) # Append it to our workunits queuqe
             if number is 1:
-                return a
+                return work

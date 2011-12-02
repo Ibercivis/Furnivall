@@ -1,52 +1,47 @@
 #!/usr/bin/env python
+
+"""
+    Previously personality objects, now I might need to merge
+    it with userhandler
+
+"""
+
 import uuid
 
-class Personality(object):
+class User(object):
     """
-        Personality object
+        User Object
     """
-    def __init__(self, user, host, id_=False):
-        """
-            Base class for all personality module classes
-            @param user: Username
-            @type user: string
-            @param host: host
-            @type host: string
-        """
-        self.host = host
-        self.user = user
-        self.id_ = id_
-
-class User(Personality):
-    def __init__(self,  host=False, user=False):
+    def __init__(self, application, user_object=False, id_=False):
         """
             user_ object.
             TODO: Make this persistent
         """
-        super(User, self).__init__(user, host)
 
-        self.workunits = {} # Woah, a user via a task might be able to create A WORKUNIT...
+        self.application = application
+        self.user = user_object
+        self.id_ = id_
+
+        # Woah, a user via a task might be able to create A WORKUNIT...
+        self.workunits = {}
         self.jobs = {}
         self.tasks = {}
-
         self.initialized_views = {}
-        self.session_id = self.get_session_id() # Not removing this,
-        # might be needed in second phase (when re-implementing anonymous users)
 
     def get_session_id(self):
         """
             Gets a *unique* session id.
         """
-        if not self.session_id:
+        if not self.id_:
             return uuid.uuid4()
         else:
-            return self.session_id
+            return self.id_
 
-    def set_data(self, host, user, id_):
+    def set_data(self, user, id_):
         """
            Returns user and host.
         """
-        self.host = host
+        self.id_ = id_
         self.user = user
 
     @property
@@ -55,7 +50,8 @@ class User(Personality):
             @returns: List of initialized task objects owned by this
                 user that are finished
         """
-        return [ task for task in self.tasks if self.application.tasks[task].done == True ]
+        return [ task for task in self.tasks\
+                if self.application.tasks[task].done == True ]
 
     @property
     def all_tasks(self):

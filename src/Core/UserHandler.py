@@ -54,8 +54,9 @@ class ObjectManager(UserManager):
             create a jobs object with the view object from the views pool.
         """
 
-        job = Jobs.job(researcher.initialized_views[viewfile],
-                getattr(getattr(Plugins, view.plugin), view.class_)())
+        job = Jobs.Job(researcher.initialized_views[viewfile],
+                getattr(getattr(Plugins, view.plugin), view.class_)(),
+                self.application)
         if researcher: researcher.jobs.append(job)
 
     def assign_view_to_researcher(self, viewfile, researcher):
@@ -68,7 +69,7 @@ class ObjectManager(UserManager):
         """
         if researcher:
             enabled_vf = self.application.conf('enabled_views', viewfile)
-            viewObject_ = getattr(getattr(Views, viewfile), enabled_vf)
+            view_object_ = getattr(getattr(Views, viewfile), enabled_vf)
             researcher.initialized_views[viewfile] = ViewOjbect_(self.application)
 
     def user_can_perform(self, user_perms, perms, check_for_all):

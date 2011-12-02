@@ -8,11 +8,12 @@ from tornado.options import options, define
 define('workunits_qeuque', default=deque())
 
 class workunit(object):
-    def __init__(self, job_id=0):
+    def __init__(self, job_id=0, application=False):
         """
             Simple job unit.
         """
         self.ConsolidatedResult = ""
+        self.application = application
         self.job = self.application.jobs[job_id]
         self.tasks = options.tasks
         self.tasks_ok = options.tasks_ok
@@ -31,16 +32,16 @@ class workunit(object):
         """
 
             If workunit.status is true, it will create a *ConsolidatedResult* object,
-            passing self.results and job's viewObject
+            passing self.results and job's view_object
 
             ConsolidatedResult will then store into it's data property a consolidated result
-            got from self.job.viewObject.consolidate_result
+            got from self.job.view_object.consolidate_result
 
         """
 
         if self.status:
             self.ConsolidatedResult = ConsolidatedResult(self.results,
-                    self.job.pluginObject)
+                    self.job.plugin_object)
         # What about making this one assignment's child too and notify "job"
         # (creator) with notify_creator when it's got a consolidated result?
 
@@ -79,7 +80,7 @@ class workunit(object):
 
         """
         description = False if not self.job else self.job.description
-        self.tasks.append([len(self.tasks), Task(self, self, User(), description )]) #TODO User data should not be created here! Or should it? Tomorrow: CHeck this out
+        self.tasks.append([len(self.tasks), Task(self, self, User(self.application), description )]) #TODO User data should not be created here! Or should it? Tomorrow: CHeck this out
 
     @property
     def status(self, expected=False):

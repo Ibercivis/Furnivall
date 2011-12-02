@@ -77,7 +77,7 @@ class Scheduler(ObjectManager):
             @param view: If provided, will filter the jobs with this view
             @type view: string
             @returns: [ Jobs.job ]
-            TODO Make it clear that viewObjects have to define a __repr__ method
+            TODO Make it clear that view_objects have to define a __repr__ method
             that makes it able to check it against a string!!! (DOC)
             TODO: Re-check that jobs are in the [view.name, job_object] format!
         """
@@ -89,17 +89,17 @@ class Scheduler(ObjectManager):
                 else:
                     for view, job in job:
                         user = self.get_current_user()
-                        if job.viewObject.view == view and\
-                                job.viewObject.check_view(user):
+                        if job.view_object.view == view and\
+                                job.view_object.check_view(user):
                             yield job
         else:
             for researcher in self.application.researchers:
                 for job in researcher.jobs:
                     for view, job in job:
                         user = self.get_current_user()
-                        if view and not job.viewObject.view == view:
+                        if view and not job.view_object.view == view:
                             continue
-                        elif job.viewObject.check_view(user):
+                        elif job.view_object.check_view(user):
                             yield job
 
     def initialize_researchers(self):

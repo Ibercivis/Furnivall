@@ -2,6 +2,8 @@
 
 """
     Assignment object and sons.
+    TODO: Ensure that when creating any assignment object we give
+    APPLICATION object to it!
 """
 
 import concurrent.futures, logging
@@ -74,7 +76,7 @@ class Task(Assignment):
             @returns: Appends to workunit, in the workunit's tasks
                 queue the result of launch_task from job's pluginobject.
 
-            Asynchronously calls workunit's job pluginObject launch_task function.
+            Asynchronously calls workunit's job plugin_object launch_task function.
             Set's up done_callback for task pointing to task.task_validator
             And appends this task to global tasks (as well as its id to parent ones)
 
@@ -87,7 +89,7 @@ class Task(Assignment):
 
         self.description = ""
         self.parent_job = getattr(self.workunit, "job")
-        self.job_plugin = getattr(self.parent_job, 'pluginObject')
+        self.job_plugin = getattr(self.parent_job, 'plugin_object')
         # FIXME URGENTLY : This has to be a real task id ¿Passed by args?
         self.id_ = 0
         # We might have a async problem here.
@@ -111,7 +113,7 @@ class Task(Assignment):
 
     def launch(self):
         """
-            Executes launch_task from workunit's job pluginObject.
+            Executes launch_task from workunit's job plugin_object.
             @returns: Assignment.Result object containing this task.
 
         """
@@ -131,13 +133,13 @@ class Task(Assignment):
             @type futureObject:
             @param futureObject: task
 
-            Validates the task, calling the pluginObject's validate_task function.
+            Validates the task, calling the plugin_object's validate_task function.
 
             If task has passed, it'll append it to task_ok pool at it's creator,
             otherwise in tasks_fail
 
         """
-        if getattr(self.workunit, 'job').pluginObject.validate_task(result):
+        if getattr(self.workunit, 'job').plugin_object.validate_task(result):
             self.append_to_workunit('tasks_ok', self.id_)
             # TODO Fix this, it's not good on tasks_ok
         else:
