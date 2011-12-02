@@ -56,7 +56,7 @@ class Job(commonClass):
         for current_wk in range(0, number):
             logging.debug("Making working %s of %s", current_wk, number)
             # We create a new workunit, passing this object as a parent
-            work = workunit(self, self.application)
+            work = Workunit(self, self.application)
             self.workunits.append(work) # Append it to our workunits queuqe
             if number is 1:
                 return work

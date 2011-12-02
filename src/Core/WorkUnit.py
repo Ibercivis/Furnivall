@@ -1,25 +1,33 @@
 #!/usr/bin/env python
+"""
+    Workunit
+"""
 from collections import deque
 import logging
-from Personality import User
-from Assignment import ConsolidatedResult, task
+from Core.Personality import User
+from Core.Assignment import ConsolidatedResult, Task
 from tornado.options import options, define
 
 define('workunits_qeuque', default=deque())
 
-class workunit(object):
+class Workunit(object):
+    """
+        Workunit
+    """
     def __init__(self, job_id=0, application=False):
         """
             Simple job unit.
         """
-        self.ConsolidatedResult = ""
+        self.consolidatedres = ""
         self.application = application
-        self.job = self.application.jobs[job_id]
-        self.tasks = options.tasks
-        self.tasks_ok = options.tasks_ok
-        self.tasks_fail = options.tasks_failed
+        if application:
+            self.job = self.application.jobs[job_id]
+        else:
+            raise(Exception('Failure getting application, this wk is lost'))
+        self.tasks = []
 
-        self.expected = 0 #TODO this should get workunit expected tasks to return.
+        #TODO this should get workunit expected tasks to return.
+        self.expected = 0
         self.results = options.results
 
         logging.info('\t\tWorkunit %s (%s tasks)', self, self.job.initial_tasks)
@@ -31,71 +39,50 @@ class workunit(object):
     def consolidate_result(self):
         """
 
-            If workunit.status is true, it will create a *ConsolidatedResult* object,
+            If workunit.status is true, it will create a *consolidatedres* object,
             passing self.results and job's view_object
 
-            ConsolidatedResult will then store into it's data property a consolidated result
+            consolidatedres will then store into it's data property a consolidated result
             got from self.job.view_object.consolidate_result
 
         """
 
         if self.status:
-            self.ConsolidatedResult = ConsolidatedResult(self.results,
+            self.consolidatedres = ConsolidatedResult(self.results,
                     self.job.plugin_object)
         # What about making this one assignment's child too and notify "job"
         # (creator) with notify_creator when it's got a consolidated result?
-
-    def task_ok(self, task_id):
-        """
-            Append a task id to correct tasks queque.
-
-            >>> a=workunit()
-            >>> a.task_ok('123')
-            >>> a.tasks_ok
-            deque(['123'])
-        """
-        self.tasks_ok.append(task_id)
-
-    def task_failed(self, task_id):
-        """
-            Append a task id to failed tasks queque
-
-            >>> a=workunit()
-            >>> a.task_failed('123')
-            >>> a.tasks_fail
-            deque(['123'])
-        """
-        self.tasks_fail.append(task_id)
 
     def new_task(self):
         """
             Create task object and append it to task list deque
 
-            >>> a=workunit()
-            >>> a.tasks #doctest: +ELLIPSIS
-            deque([[0, <Assignment.task object at 0x...>]])
-            >>> a.new_task()
-            >>> a.tasks #doctest: +ELLIPSIS
-            deque([[0, <Assignment.task object at 0x...>], [1, <Assignment.task object at 0x...>]])
-
         """
-        description = False if not self.job else self.job.description
-        self.tasks.append([len(self.tasks), Task(self, self, User(self.application), description )]) #TODO User data should not be created here! Or should it? Tomorrow: CHeck this out
+        description = False if not self.job\
+                else self.job.description
+        #TODO User data should not be created here!
+        # Or should it? Tomorrow: CHeck this out
+        id_ = Task(self, self, User(self.application), description,
+                application=self.application ).id_
+        self.tasks.append(id_)
 
     @property
     def status(self, expected=False):
         """
             Workunit.status: Boolean property displaying if there're enought ok tasks.
             If called as property, expected can't be specified, will be got from self.expected.
-
-            >>> workunit().status(0)
-            True
-            >>> workunit().status(1)
-            False
         """
         if not expected:
             expected = self.expected
         return not len(self.tasks_ok) - expected
+
+    @property
+    def tasks_ok(self):
+        """
+            Check all the tasks for this workunit with status true.
+        """
+        return [ task for task in self.tasks\
+                if self.application.tasks[task].status == True ]
 
 if __name__ == "__main__":
     # This should never be used as standalone but for unittests

@@ -2,12 +2,10 @@
     Furnivall user management
 """
 import logging
-import Core.Assignment, Core.WorkUnit, Core.Personality
+import Core.Assignment
 import Plugins
 
 from tornado import web
-from tornado.options import define, options
-from tornado.escape import json_decode
 
 class UserManager(web.RequestHandler):
 
@@ -23,12 +21,10 @@ class UserManager(web.RequestHandler):
         return (self.get_secure_cookie('user', self.get_secure_cookie('perms')))
 
     def validate_user(self, user, password):
-        username = self.db.get("select user from auth where user='%s'\
-            and password ='%s'" %(
-                self.get_argument('user'),
-                self.get_argument('pass', '')
-                )
-            ).user
+        username = self.application.db.get("select user from auth\
+            where user='%s' and password ='%s'"
+            %( self.get_argument('user'), self.get_argument('pass', ''))).user
+
         self.set_secure_cookie('user', username)
         if not username: return False
 
@@ -36,8 +32,8 @@ class UserManager(web.RequestHandler):
             self.set_secure_cookie('perms', 'view_task')
             return True
 
-        auth = self.db.get("select permissions from auth where user='%s' "
-            %(username)).permissions
+        auth = self.application.db.get("select permissions from\
+                auth where user='%s' " %(username)).permissions
         self.set_secure_cookie('perms', auth )
         return True
 
