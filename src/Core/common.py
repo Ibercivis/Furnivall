@@ -2,6 +2,18 @@
 """
     Common functions.
 """
+
+def get_highest_permission(self, permissions):
+    """:
+        Returns the higher permission between the given ones.
+    """
+    if "root" in permissions:
+        return "root"
+    if "researcher" in permissions:
+        return "researcher"
+    else:
+        return "user"
+
 class commonClass(object):
     """
         Common functions for all furnivall
