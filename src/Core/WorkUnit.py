@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from collections import deque
 import logging
-from Jobs import job
 from Personality import User
 from Assignment import ConsolidatedResult, task
 from tornado.options import options, define
@@ -14,7 +13,7 @@ class workunit(object):
             Simple job unit.
         """
         self.ConsolidatedResult = ""
-        self.job = options.jobs_qeuque[job_id]
+        self.job = self.application.jobs[job_id]
         self.tasks = options.tasks
         self.tasks_ok = options.tasks_ok
         self.tasks_fail = options.tasks_failed
@@ -22,9 +21,9 @@ class workunit(object):
         self.expected = 0 #TODO this should get workunit expected tasks to return.
         self.results = options.results
 
-        logging.info('\t\tWorkunit %s (%s tasks)', self, job.initial_tasks)
+        logging.info('\t\tWorkunit %s (%s tasks)', self, self.job.initial_tasks)
 
-        for i in range(0, int(job.initial_tasks)):
+        for i in range(0, int(self.job.initial_tasks)):
             logging.info("Creating task number %s", i)
             self.new_task()
 

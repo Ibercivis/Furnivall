@@ -1,35 +1,36 @@
 #!/usr/bin/env python
-import collections
-#import tornado.session
 import uuid
-import Core.common
-"""
-    Personality objects.
-"""
+
 class Personality(object):
+    """
+        Personality object
+    """
     def __init__(self, user, host, id_=False):
         """
-
-            Inherited by all personality-based objects
-
+            Base class for all personality module classes
+            @param user: Username
+            @type user: string
+            @param host: host
+            @type host: string
         """
-        self.host=host
-        self.user=user
-        self.id_=id_
+        self.host = host
+        self.user = user
+        self.id_ = id_
 
 class User(Personality):
     def __init__(self,  host=False, user=False):
         """
-
             user_ object.
             TODO: Make this persistent
         """
         super(User, self).__init__(user, host)
-        self.current_tasks=collections.deque()
-        self.completed_tasks=collections.deque()
-        self.initialized_views={}
-        self.jobs=collections.deque()
-        self.session_id=self.get_session_id() # Not removing this,
+
+        self.workunits = {} # Woah, a user via a task might be able to create A WORKUNIT...
+        self.jobs = {}
+        self.tasks = {}
+
+        self.initialized_views = {}
+        self.session_id = self.get_session_id() # Not removing this,
         # might be needed in second phase (when re-implementing anonymous users)
 
     def get_session_id(self):
@@ -45,5 +46,21 @@ class User(Personality):
         """
            Returns user and host.
         """
-        self.host=host
-        self.user=user
+        self.host = host
+        self.user = user
+
+    @property
+    def completed_tasks(self):
+        """
+            @returns: List of initialized task objects owned by this
+                user that are finished
+        """
+        return [ task for task in self.tasks if self.application.tasks[task].done == True ]
+
+    @property
+    def all_tasks(self):
+        """
+            @returns: List of initialized task objects owned by this user
+        """
+        return [ self.application.tasks[task] for task in self.tasks ]
+

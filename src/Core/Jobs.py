@@ -1,30 +1,27 @@
 #!/usr/bin/env python
-from Core.common import *
-from WorkUnit import *
-from Assignment import *
-from collections import deque
-from tornado.options import options, define
+from Core.common import CommonFunctions
+from WorkUnit import workunit
 import logging
 
-class job(object, CommonFunctions):
+class job(CommonFunctions):
     def __init__(self, viewObject, pluginObject):
         """
             Returns a job object (workunits container)
             with plugin object and view object references.
         """
-        self.viewObject=viewObject
-        self.pluginObject=pluginObject
+        self.viewObject = viewObject
+        self.pluginObject = pluginObject
 
         self.read_config()
-        self.initial_tasks=self.conf('main', 'initial_tasks')
+        self.initial_tasks = self.conf('main', 'initial_tasks')
 
-        self.description=self.viewObject.description
-        self.name="Default job name"
+        self.description = self.viewObject.description
+        self.name = "Default job name"
 
-        self.workunits=options.workunits_qeuque
+        self.workunits = self.application.workunits
 
-        logging.info('Creating job %s' %(self))
-        logging.info('\tProducing workunits... (%s) ' %self.viewObject.workunits)
+        logging.info('Creating job %s' , self)
+        logging.info('\tProducing workunits... (%s) ', self.viewObject.workunits)
         self.produce_workunits(self.viewObject.workunits)
 
     def produce_workunits(self, number=1):
@@ -45,16 +42,9 @@ class job(object, CommonFunctions):
             deque([[0, <Assignment.task object at 0x...>]])
         """
 
-        for n in range(0, number):
-            a=workunit(self) # We create a new workunit, passing this object as a parent
+        for current_wk in range(0, number):
+            logging.debug("Making working %s of %s", current_wk, number)
+            a = workunit(self) # We create a new workunit, passing this object as a parent
             self.workunits.append(a) # Append it to our workunits queuqe
-            if number is 1: return a
-
-if __name__ == "__main__":
-    """
-        This should never be used as standalone but for unittests
-    """
-    import doctest
-    from Tests import viewtest
-    import Tests
-    doctest.testmod()
+            if number is 1:
+                return a

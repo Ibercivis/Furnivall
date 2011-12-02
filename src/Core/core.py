@@ -1,16 +1,16 @@
 """
     Furnivall core functions
 """
-import uuid, os, logging, common
-import Assignment, Workunit
-import Personality
+import uuid, os, logging
+from Core.common import commonClass
+import Core.Assignment, Core.WorkUnit, Core.Personality
 import Plugins, Views
 
 from tornado import web
 from tornado.options import define, options
 from tornado.escape import json_decode
 
-class UserManager(object):
+class UserManager(web.RequestHandler):
 
     """
         Credential management.
@@ -24,7 +24,7 @@ class UserManager(object):
         return (self.get_secure_cookie('user', self.get_secure_cookie('perms')))
 
     def validate_user(self, user, password):
-        username=self.db.get("select user from auth where user='%s'\
+        username = self.db.get("select user from auth where user='%s'\
             and password ='%s'" %(
                 self.get_argument('user'),
                 self.get_argument('pass', '')
@@ -42,7 +42,7 @@ class UserManager(object):
         self.set_secure_cookie('perms', auth )
         return True
 
-class ObjectManager(web.RequestHandler, UserManager):
+class ObjectManager(UserManager):
     """
         Object manager, creation, delete and modify petitions should go here.
         Right now, it's able to assign a session to a user, a job and a view to
@@ -55,7 +55,7 @@ class ObjectManager(web.RequestHandler, UserManager):
             create a jobs object with the view object from the views pool.
         """
 
-        job=Jobs.job(researcher.initialized_views[viewfile],
+        job = Jobs.job(researcher.initialized_views[viewfile],
                 getattr(getattr(Plugins, view.plugin), view.class_)())
         if researcher: researcher.jobs.append(job)
 
@@ -64,11 +64,13 @@ class ObjectManager(web.RequestHandler, UserManager):
             This has to be called before adding a job to a researcher, in order
             to initialize the view. This will start the view's main class and
             add the created objects to initialized_views object.
+            TODO: This has to be wrong... it's impossible for it to work
+            But it was working three months ago.
         """
         if researcher:
-            enabled_vf=self.application.conf('enabled_views', viewfile)
-            viewObject_=getattr(getattr(Views, viewfile), enabled_vf)
-            researcher.initialized_views[viewfile]=ViewOjbect_(self.application)
+            enabled_vf = self.application.conf('enabled_views', viewfile)
+            viewObject_ = getattr(getattr(Views, viewfile), enabled_vf)
+            researcher.initialized_views[viewfile] = ViewOjbect_(self.application)
 
     def user_can_perform(self, user_perms, perms, check_for_all):
         """
@@ -79,7 +81,8 @@ class ObjectManager(web.RequestHandler, UserManager):
         else:
             return [ i for i in user_perms if i in perms ] != []
 
-    # TODO: Add the auth module to tornado, from : https://github.com/bkjones/Tinman/commit/152301d68c86ac7524cf4391b1f98f68c59b2408#diff-1
+    # TODO: Add the auth module to tornado, from :
+    # https://github.com/bkjones/Tinman/commit/152301d68c86ac7524cf4391b1f98f68c59b2408#diff-1
     @require_basic_auth('Furnivall', self.validate_user)
     def get(self, slug=False):
         """
@@ -106,9 +109,9 @@ class ObjectManager(web.RequestHandler, UserManager):
         logging.debug("Creating new -%s-" %slug)
 
         try:
-            user_id=self.get_secure_cookie('user')
-            user=self.application.users[user_id]
-            viewfile=self.get_argument('viewfile')
+            user_id = self.get_secure_cookie('user')
+            user = self.application.users[user_id]
+            viewfile = self.get_argument('viewfile')
 
             if "job" in slug and self.user_can_perform(permissions,
                     ['own_job'], False):
@@ -119,8 +122,8 @@ class ObjectManager(web.RequestHandler, UserManager):
                 self.assign_view_to_researcher(viewfile, researcher)
 
         except:
-            viewfile=False
-            researcher=False
+            viewfile = False
+            researcher = False
 
         self.redirect(self.get_argument('next', '/'))
 
@@ -130,7 +133,7 @@ class Scheduler(ObjectManager):
         """
             Get a free task, if user_ is doing that task, return an error
         """
-        free_task=self.getfreetask()
+        free_task = self.getfreetask()
         if get_current_user()[0] is free_task.user_.id_:
             logging.debug('[Debug] Not creating user, not return task... User\
                     is already doing that task, something failed!')
@@ -172,20 +175,42 @@ class Scheduler(ObjectManager):
             split jobs in view, job, and check view's compatibility.
 
         """
-        # TODO: change ScommonMatch in workunit to call the plugin/view's compatibility class. TODO: Make a view's compatibility class
-        for researcher in self.application.researchers:
-            logging.debug('Processing researcher %s' %researcher)
-            for job in researcher.jobs:
-                logging.debug('Processing job %s' %job)
-                for view, job in job:
-                    logging.debug('Processing view and job %s %s' %(view, job))
-                    if job.viewObject.check_view(self.get_current_user()):
-                        logging.debug("View is supported by user (ViewOjbect: %s) (user_: %s)" %(job.viewObject, self.get_current_user()))
-                        wk=self.getworkunit(job)
-                        task=[sort(task, key=lambda t: t.ScommonMatch()) for task in wk.tasks if not task.user_.session_id ][0] # Get the best task ordered by ScommonMatch if it has not a user_ assigned
-                        if task: return task
-                        else: return wk.new_task()
+
+        for job in researcher_jobs(view):
+            logging.info("View from job %s is supported by user", job)
+            return self.get_best_task(self.getworkunit(job))
         return
+
+    def researcher_jobs(self, view):
+        """
+            @param view: If provided, will filter the tasks by job's view.
+            @type view: string
+            Returns all jobs from all researchers.
+        """
+        for researcher in self.application.researchers:
+            for job in researcher.jobs:
+                for view, job in job:
+                    user=self.get_current_user()
+                    if job.viewObject.check_view(user):
+                        yield job
+
+    def get_best_task(self, wk):
+        """
+            @param wk: Workunit
+            @type wk: WorkUnit.workunit
+            @returns: Assignment.task object
+            Get the best task ordered by ScommonMatch if it has not a user_ assigned
+            If no task available to return,
+            # TODO: change ScommonMatch in workunit to call the plugin/view's
+            # compatibility class. TODO: Make a view's compatibility class
+        """
+        try:
+            return [sort(task, key=lambda t: t.ScommonMatch()) \
+                for task in wk.tasks\
+                if not task.user_.session_id ][0]
+        except:
+            return wk.new_task
+
 
     @property
     def user_tasks(self, user=False, status=False):
@@ -203,7 +228,7 @@ class Scheduler(ObjectManager):
         else:
             return user.tasks
 
-class Application(common.CommonFunctions, tornado.web.Application):
+class Application(Core.common.commonClass, tornado.web.Application):
     def __init__(self):
         """
             Sets up the tornado web server
