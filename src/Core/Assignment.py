@@ -2,8 +2,7 @@
 
 """
     Assignment object and sons.
-    TODO: Ensure that when creating any assignment object we give
-    APPLICATION object to it!
+
 """
 
 import concurrent.futures, logging
@@ -87,6 +86,7 @@ class Task(Assignment):
         # Initialize superclass.
         super(Task, self).__init__(workunit_, user_, application)
 
+        self.validated = -1
         self.description = ""
         self.parent_job = getattr(self.workunit, "job")
         self.job_plugin = getattr(self.parent_job, 'plugin_object')
@@ -105,11 +105,10 @@ class Task(Assignment):
     def score_match(self, user_):
         """
 
-            TODO: Should return a range between 0 and 10, but this is not yet defined.
             Tells how adequate this task is for this user_.
         """
         if user_ and self.description:
-            return 1 # Dummy, do the real stuff.
+            return getattr(self.workunit.job.plugin_object, 'score_match')(user_)
 
     def launch(self):
         """
@@ -125,26 +124,21 @@ class Task(Assignment):
                 self.id_, self.parent_job, self.job_plugin.description)
         self.result = self.job_plugin.task_executor(self, self.workunit)
 
-        return Result(self, self.description)
+        return Result(self, self.description, self.application)
 
     def task_validator(self, result):
-        #this is a bad name, because in BOINC validation is a wider concept
         """
             @type futureObject:
             @param futureObject: task
 
             Validates the task, calling the plugin_object's validate_task function.
 
-            If task has passed, it'll append it to task_ok pool at it's creator,
-            otherwise in tasks_fail
+            If task has passed, lets self.validated to true, otherwise it sets it to false.
+            self.validated has to be -1 if task_validator has not yet been executed
 
         """
-        if getattr(self.workunit, 'job').plugin_object.validate_task(result):
-            self.append_to_workunit('tasks_ok', self.id_)
-            # TODO Fix this, it's not good on tasks_ok
-        else:
-            self.append_to_workunit('tasks_fail', self.id_)
-            #quiza mejor self.creator.FailTask(self) ???
+        plugin = self.workunit.job.plugin_object
+        self.validated = getattr(plugin, 'validate_task')(result)
 # }}}
 
 # Result {{{
