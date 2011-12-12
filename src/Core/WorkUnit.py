@@ -24,7 +24,8 @@ class Workunit(object):
             self.job = self.application.jobs[job_id]
         else:
             raise(Exception('Failure getting application, this wk is lost'))
-        self.tasks = []
+        self.task = {}
+        self.result = {}
 
         #TODO this should get workunit expected tasks to return.
         self.expected = 0
@@ -56,14 +57,13 @@ class Workunit(object):
     def new_task(self):
         """
             Create task object and append it to task list deque
-
+            User is empty at this point, it has to be assigned later.
+            On task creation it globalizes itself, adding the task
+            object to global tasks queue. Then returns the ID for it to
+            be appended to local tasks queue.
+            TODO: Check user assignation
         """
-        description = False if not self.job\
-                else self.job.description
-        #TODO User data should not be created here!
-        # Or should it? Tomorrow: CHeck this out
-        id_ = Task(self, self, User(self.application), description,
-                application=self.application ).id_
+        id_ = Task(self, False, self.application ).id_
         self.tasks.append(id_)
 
     @property
@@ -80,6 +80,7 @@ class Workunit(object):
     def tasks_ok(self):
         """
             Check all the tasks for this workunit with status true.
+            Wich means they're finished and possitive in validation.
         """
         return [ task for task in self.tasks\
                 if self.application.tasks[task].status == True ]

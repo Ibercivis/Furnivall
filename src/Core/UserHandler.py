@@ -7,11 +7,14 @@ import Plugins
 
 from tornado import web
 
-class UserManager(web.RequestHandler):
 
+class ObjectManager(web.RequestHandler):
     """
-        Credential management.
+        Object manager, creation, delete and modify petitions should go here.
+        Right now, it's able to assign a session to a user, a job and a view to
+        a researhcer.
     """
+
 
     def get_current_user(self):
         """
@@ -36,13 +39,6 @@ class UserManager(web.RequestHandler):
                 auth where user='%s' " %(username)).permissions
         self.set_secure_cookie('perms', auth )
         return True
-
-class ObjectManager(UserManager):
-    """
-        Object manager, creation, delete and modify petitions should go here.
-        Right now, it's able to assign a session to a user, a job and a view to
-        a researhcer.
-    """
 
     def assign_job_to_researcher(self, viewfile, researcher):
         """
@@ -79,7 +75,6 @@ class ObjectManager(UserManager):
 
     # TODO: Add the auth module to tornado, from :
     # https://github.com/bkjones/Tinman/commit/152301d68c86ac7524cf4391b1f98f68c59b2408#diff-1
-    @require_basic_auth('Furnivall', self.validate_user)
     def get(self, slug=False):
         """
             Object manager get function.

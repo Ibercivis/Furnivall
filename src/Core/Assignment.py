@@ -28,6 +28,7 @@ class Assignment(object):
         self.user_ = user_id
         self.result = ""
         self.id_ = 0
+        self.status = -1
 
     def append_to_workunit(self, place, notification):
         """
@@ -51,6 +52,9 @@ class Assignment(object):
     def globalize(self, id_, application):
         """
             Make this object part of the global queue, depending on the class
+            This has a lot of magic... it gets the main class and appends the
+            object to the list named as the  main class + 's', so we get results
+            and tasks in parent.result and parent.task classes.
         """
         global_queue = getattr(application, self.__class__.__name__.lower())
         global_queue[id_] = self # TODO Check this.
@@ -83,14 +87,14 @@ class Task(Assignment):
 
         """
 
-        # Initialize superclass.
         super(Task, self).__init__(workunit_, user_, application)
 
-        self.validated = -1
         self.description = ""
         self.parent_job = getattr(self.workunit, "job")
         self.job_plugin = getattr(self.parent_job, 'plugin_object')
-        # FIXME URGENTLY : This has to be a real task id ¿Passed by args?
+
+        # FIXME URGENTLY : This has to be a real task id, Passed by args?
+
         self.id_ = 0
         # We might have a async problem here.
 
@@ -102,13 +106,13 @@ class Task(Assignment):
             self.globalize(self.application, self.id_)
             self.append_to_workunit('tasks', self.id_)
 
-    def score_match(self, user_):
+    def score_match(self):
         """
 
             Tells how adequate this task is for this user_.
         """
-        if user_ and self.description:
-            return getattr(self.workunit.job.plugin_object, 'score_match')(user_)
+        if self.user_ and self.description:
+            return getattr(self.workunit.job.plugin_object, 'score_match')(self.user_)
 
     def launch(self):
         """
@@ -138,7 +142,7 @@ class Task(Assignment):
 
         """
         plugin = self.workunit.job.plugin_object
-        self.validated = getattr(plugin, 'validate_task')(result)
+        self.status = getattr(plugin, 'validate_task')(result)
 # }}}
 
 # Result {{{

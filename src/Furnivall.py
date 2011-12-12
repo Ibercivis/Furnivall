@@ -3,21 +3,22 @@
     It helps to organize batches of tasks, collect them form users and do all the related housekeeping.
 
 """
-import daemon, logging, os
+import logging, os, daemon, lockfile
+
 from Core.common import commonClass as commonClass
 from Core.UserHandler import ObjectManager
-from tornado.options import define, options
-import tornado.httpserver
-import tornado.web as web
 from Core.Handlers import MainHandler
 
-import tornado.ioloop
-import lockfile
+from tornado.options import define, options
+import tornado.httpserver, tornado.database, tornado.ioloop
+import tornado.web as web
+
 
 define("port", default=8888, help="run on the given port", type=int)
 define("db_host", default="localhost", help="database host")
 define("db_user", default="root", help="database username")
 define("db_db", default="furnivall", help="database name")
+define("daemonize", default=False, help="Run as daemon")
 define("db_password", default="root", help="database password")
 
 
@@ -28,7 +29,8 @@ class Application(commonClass, web.Application):
         """
 
 
-        self.db  = tornado.database.Connection(options.db_host, options.db_db, options.db_user, options.password)
+        self.db  = tornado.database.Connection(options.db_host, \
+                options.db_db, options.db_user, options.db_password)
         self.read_config()
         urls = [
                 ("/([^/]+)", MainHandler),
@@ -51,29 +53,35 @@ class Application(commonClass, web.Application):
                 'user': '/User/Home'
         }
 
-        self.researchers = self.initialize_researchers()
 
-        logging.info('Loading Furnival main application')
-        logging.debug('Researchers initialized from database: %s',
-                self.researchers)
+        logging.info('Loading Furnival main application with logins:%s',
+                special_login_slugs)
         logging.debug('Starting server with urls: %s', urls)
 
         web.Application.__init__(self, urls, **settings)
 
-def do_main_program(self):
+def do_main_program():
     """
         DO: All objects must be saved and reloaded from the database.
     """
-    tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
 
+
+
 if __name__ == "__main__":
-    with daemon.DaemonContext(
-        working_directory='/var/lib/furnivall',
-        umask=0o002,
-        pidfile=lockfile.FileLock('/var/run/furnivall.pid'),
-    ):
-        logging.info("Starting daemon")
+    tornado.options.parse_command_line()
+    if options.daemonize:
+        log_file = 'furnivall.%s.log' % options.port
+        log = open(os.path.join('/var/log', log_file), 'a+')
+        with daemon.DaemonContext(
+            working_directory='/var/lib/furnivall',
+            umask=0o002,
+            pidfile=lockfile.FileLock('/var/run/furnivall.pid'),
+            stdout=log,
+            stderr=log
+        ):
+            do_main_program()
+    else:
         do_main_program()

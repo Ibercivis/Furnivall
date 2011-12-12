@@ -12,13 +12,14 @@ class Scheduler(ObjectManager):
         Furnivall scheduler
     """
 
-    def __init__(self):
-        super(Scheduler, self).__init__()
-        self.created_jobs = {}
-        self.views = {}
-        self.jobs = {}
-        self.workunits = {}
-        self.tasks = {}
+    def __init__(self, application, request, **kwargs):
+        super(Scheduler, self).__init__(application, request, **kwargs)
+        self.application.created_jobs = {}
+        self.application.views = {}
+        self.application.jobs = {}
+        self.application.workunits = {}
+        self.application.tasks = {}
+        self.application.researchers = self.initialize_researchers()
 
     def assign_task(self, view=False, owner=False):
         """
@@ -107,27 +108,17 @@ class Scheduler(ObjectManager):
             Initialize researchers, foreach researcher stored in database,
             recreate it
         """
-        # TODO
-        return {'foo' : self.application.db.get("select * from users where\
-                permissions = '%s' ", 'researcher')}
+        researchers = self.application.db.get("select * from auth where\
+                permissions = 'reseacher' ")
+        logging.debug("Researchers: %s", researchers)
+        return researchers
 
 
-class MainHandler(Scheduler, tornado.web.RequestHandler):
+class MainHandler(Scheduler):
     """
         MainHandler, inherits tornado's requesthandler and shows up display
         templastes
     """
-
-    def __init__(self, application, request, **kwargs):
-        """
-            Overloading tornado's default class to be able to
-            execute Scheduler __init__
-            to set default queues here for clarity.
-            I may regret this later...
-        """
-        tornado.web.RequestHandler.__init__(self, application,
-                request, **kwargs)
-        super(self.__class__, self).__init__()
 
     def login(self):
         """
