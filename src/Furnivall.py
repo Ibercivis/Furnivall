@@ -12,7 +12,8 @@ from Core.Handlers import MainHandler
 from tornado.options import define, options
 import tornado.httpserver, tornado.database, tornado.ioloop
 import tornado.web as web
-
+from ZODB.DB import DB
+from ZODB.FileStorage import FileStorage
 
 define("port", default=8888, help="run on the given port", type=int)
 define("db_host", default="localhost", help="database host")
@@ -27,10 +28,8 @@ class Application(commonClass, web.Application):
         """
             Sets up the tornado web server and loads needed data from db
         """
-
-
-        self.db  = tornado.database.Connection(options.db_host, \
-                options.db_db, options.db_user, options.db_password)
+        conn = DB(FileStorage('Data.fs')).open()
+        self.db  = conn.root()
         self.read_config()
         urls = [
                 ("/([^/]+)", MainHandler),
@@ -67,8 +66,6 @@ def do_main_program():
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
-
-
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()

@@ -19,7 +19,8 @@ class Scheduler(ObjectManager):
         self.application.jobs = {}
         self.application.workunits = {}
         self.application.tasks = {}
-        self.application.researchers = self.initialize_researchers()
+        self.application.researchers = self.db.researchers # With ZODB\
+                # is THIS simple
 
     def assign_task(self, view=False, owner=False):
         """
@@ -102,17 +103,6 @@ class Scheduler(ObjectManager):
                             continue
                         elif job.view_object.check_view(user):
                             yield job
-
-    def initialize_researchers(self):
-        """
-            Initialize researchers, foreach researcher stored in database,
-            recreate it
-        """
-        researchers = self.application.db.get("select * from auth where\
-                permissions = 'reseacher' ")
-        logging.debug("Researchers: %s", researchers)
-        return researchers
-
 
 class MainHandler(Scheduler):
     """
