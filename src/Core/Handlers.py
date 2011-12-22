@@ -19,8 +19,13 @@ class Scheduler(ObjectManager):
         self.application.jobs = {}
         self.application.workunits = {}
         self.application.tasks = {}
-        self.application.researchers = self.db.researchers # With ZODB\
-                # is THIS simple
+        try:
+            self.application.researchers = self.application.db['researchers']
+        except KeyError, err:
+            self.application.db['researchers']=[]
+            self.application.researchers = self.application.db['researchers']
+            logging.debug("Could not get researchers, they are not yet\
+                    created: %s", err)
 
     def assign_task(self, view=False, owner=False):
         """
@@ -38,6 +43,7 @@ class Scheduler(ObjectManager):
 
         logging.debug('[Debug] Creating user_ object. Giving it to a task')
         free_task.user_ = self.get_current_user()
+        return free_task.id_
 
     def getworkunit(self, job):
         """
@@ -104,11 +110,22 @@ class Scheduler(ObjectManager):
                         elif job.view_object.check_view(user):
                             yield job
 
-class MainHandler(Scheduler):
-    """
-        MainHandler, inherits tornado's requesthandler and shows up display
-        templastes
-    """
+class LoginHandler(tornado.web.RequestHandler):
+    def get(self, slug="auth"):
+        if slug == "auth":
+            user_id = self.get_secure_cookie('username', False)
+            if not user_id:
+                self.set_secure_cookie('username', user.id_)
+            auth = user.permissions
+            high_perm = get_highest_permission(auth)
+            slug = self.application.special_login_slugs[high_perm]
+
+        if slug == "out":
+            self.clear_cookie('username')
+            self.clear_cookie('auth')
+            slug = "Login"
+
+
 
     def login(self):
         """
@@ -117,50 +134,49 @@ class MainHandler(Scheduler):
         """
         username = self.get_argument("username", "")
         password = self.get_argument("password", "")
+        try:
+            user = self.application.db['users'][username]
+            if user.password == password:
+                return username
+            else:
+                return False
+        except KeyError:
+            return False
 
-        auth = self.application.db.get("select permissions from auth where\
-                user='%s' and pass='%s'" %(username, password))
-        db_user = self.application.db.get("select id as id_ from auth\
-                where user='%s' and pass='%s'"  %(username, password))
+class MainHandler(Scheduler):
+    """
+        MainHandler, inherits tornado's requesthandler and shows up display
+        templastes
+    """
 
-        return ( db_user.id_, auth.permissions )
 
-    def get(self, slug=False):
+    def get(self, slug="Landing"):
         """
             Tornado RequestHandler get function, renders slug as called
             from tornado, passing jobs and slug as argument.
             It also checks arguments to take actions when arguments are
             provided
         """
+        user = False
+        auth = [ "None" ]
 
-        auth = "None" # Default user permissions is None
+        try:
+            user_id = self.get_secure_cookie('username', 0) # If noone tryed to auth user anon user
+            if not user_id:
+                user_id = 0
+            try:
+                user = self.application.db['users'][user_id]
 
-        # Default to landing if /view/ called.
-        # TODO: Do this as / too
-        if not slug:
-            logging.debug('[DEBUG] Defining slug as default')
-            slug = "Landing"
+            except KeyError, error:
+                logging.debug("Bad user id. User might be trying something strange %s %s " %(user_id, user))
 
-        if "Login" in slug:
-            user_id, auth = self.login()
-            self.set_secure_cookie('username', user_id)
+        except Exception, err:
+            logging.info(err)
 
-            # Get user after login (from cookie set in login process)
-            user, auth = self.get_current_user()
-            if not auth:
-                auth = ""
-
-            logging.debug('Logging in for user: %s', user)
-            high_perm = get_highest_permission(auth)
-            slug = self.application.special_login_slugs[high_perm]
-
-        if slug is "Logout":
-            self.clear_cookie('username')
-            self.clear_cookie('permissions')
-            slug = "Login"
+        if user_id != 0 and not user: # TODO Insert anon user as first user in db. Pass will be empty.
+            self.redirect('/Login')
 
         logging.debug('[Debug] Rendering template %s', slug)
-        logging.debug('User has %s permissions', auth)
 
         self.render('%s' %(slug),
                 user_permissions = auth,
@@ -170,4 +186,5 @@ class MainHandler(Scheduler):
                 slug = slug )
 
         if self.get_argument('get_task', False):
-            self.assign_task(view=self.get_argument('view'))
+            task = self.assign_task(view=self.get_argument('view'))
+            self.render_task(task)

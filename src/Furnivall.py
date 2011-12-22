@@ -30,6 +30,7 @@ class Application(commonClass, web.Application):
         """
         conn = DB(FileStorage('Data.fs')).open()
         self.db  = conn.root()
+        self.initialize_db()
         self.read_config()
         urls = [
                 ("/([^/]+)", MainHandler),
@@ -46,18 +47,24 @@ class Application(commonClass, web.Application):
                 cookie_secret = "11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
         )
 
-        special_login_slugs = {
+        self.special_login_slugs = {
                 'root': '/Admin/',
                 'researcher': '/Admin/Researcher',
                 'user': '/User/Home'
         }
 
-
-        logging.info('Loading Furnival main application with logins:%s',
-                special_login_slugs)
         logging.debug('Starting server with urls: %s', urls)
 
         web.Application.__init__(self, urls, **settings)
+
+    def initialize_db(self):
+        try:
+            self.db['users']
+        except KeyError:
+            from Core.Personality import User
+            self.db['users'] = [
+                    User(self)
+                    ]
 
 def do_main_program():
     """

@@ -6,9 +6,9 @@
 from Core.common import commonClass
 from Core.WorkUnit import workunit
 import logging
+import persistent
 
-
-class Job(commonClass):
+class Job(commonClass, persistent.Persistent):
     """
         Job class
     """
@@ -28,7 +28,7 @@ class Job(commonClass):
         self.description = self.view_object.description
         self.name = "Default job name"
 
-        self.workunits = self.application.workunits
+        self.workunits = []
 
         logging.info('Creating job %s' , self)
         logging.info('\tProducing workunits... (%s) ',
@@ -54,9 +54,10 @@ class Job(commonClass):
         """
 
         for current_wk in range(0, number):
-            logging.debug("Making working %s of %s", current_wk, number)
+            logging.debug("Making workunit %s of %s", current_wk, number)
             # We create a new workunit, passing this object as a parent
-            work = Workunit(self, self.application)
+            work = Workunit(self, self.id_, self.application)
             self.workunits.append(work) # Append it to our workunits queuqe
             if number is 1:
                 return work
+

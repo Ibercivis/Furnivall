@@ -7,10 +7,9 @@ import logging
 from Core.Personality import User
 from Core.Assignment import ConsolidatedResult, Task
 from tornado.options import options, define
+import persistent
 
-define('workunits_qeuque', default=deque())
-
-class Workunit(object):
+class Workunit(persistent.Persistent):
     """
         Workunit
     """

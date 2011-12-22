@@ -7,21 +7,20 @@
 """
 
 import uuid
+import persistent
 
-class User(object):
+class User(persistent.Persistent):
     """
         User Object
-    """
-    def __init__(self, application, user_object=False, id_=False):
+ t  """
+    def __init__(self, application):
         """
             user_ object.
             TODO: Make this persistent
         """
 
         self.application = application
-        self.user = user_object
-        self.id_ = id_
-
+        self.permissions = ['None'] # TODO: make a system to grant a user permissions.
         # Woah, a user via a task might be able to create A WORKUNIT...
         self.workunits = {}
         self.jobs = {}
@@ -37,12 +36,11 @@ class User(object):
         else:
             return self.id_
 
-    def set_data(self, user, id_):
+    def set_data(self, id_):
         """
            Returns user and host.
         """
         self.id_ = id_
-        self.user = user
 
     @property
     def completed_tasks(self):

@@ -15,14 +15,6 @@ class ObjectManager(web.RequestHandler):
         a researhcer.
     """
 
-
-    def get_current_user(self):
-        """
-            Gets current user from cookie AND permissions (so this will do
-            when user logged in)
-        """
-        return (self.get_secure_cookie('user', self.get_secure_cookie('perms')))
-
     def validate_user(self, user, password):
         username = self.application.db.get("select user from auth\
             where user='%s' and password ='%s'"
@@ -40,31 +32,28 @@ class ObjectManager(web.RequestHandler):
         self.set_secure_cookie('perms', auth )
         return True
 
-    def assign_job_to_researcher(self, viewfile, researcher):
+    def assign_job_to_user(self, viewfile, researcher):
         """
             Having a the view filename (wich is used in views pool),
             create a jobs object with the view object from the views pool.
         """
 
-        job = Jobs.Job(researcher.initialized_views[viewfile],
+        job = Jobs.Job(user.initialized_views[viewfile],
                 getattr(getattr(Plugins, view.plugin), view.class_)(),
                 self.application)
-        if researcher: researcher.jobs.append(job)
+        user.jobs.append(job)
 
-    def assign_view_to_researcher(self, viewfile, researcher):
+    def assign_view_to_user(self, viewfile, user):
         """
             This has to be called before adding a job to a researcher, in order
             to initialize the view. This will start the view's main class and
             add the created objects to initialized_views object.
-            TODO: This has to be wrong... it's impossible for it to work
-            But it was working three months ago.
         """
-        if researcher:
-            enabled_vf = self.application.conf('enabled_views', viewfile)
-            view_object_ = getattr(getattr(Views, viewfile), enabled_vf)
-            researcher.initialized_views[viewfile] = ViewOjbect_(self.application)
+        enabled_vf = self.application.conf('enabled_views', viewfile)
+        user.initialized_views[viewfile] = getattr(getattr(Views, viewfile),
+            enabled_vf)(self.application)
 
-    def user_can_perform(self, user_perms, perms, check_for_all):
+    def check_perms(self, user_perms, perms, check_for_all):
         """
             Check if a user can perform certain actions.
         """
@@ -96,24 +85,25 @@ class ObjectManager(web.RequestHandler):
                 We can do it at plugin level, but that would mean we wouldn't have such a nice access to authentication methods.
         """
 
-        user_id, permissions = self.get_current_user()
-        logging.debug("Creating new -%s-" %slug)
+
 
         try:
             user_id = self.get_secure_cookie('user')
-            user = self.application.users[user_id]
             viewfile = self.get_argument('viewfile')
+            user = self.application.db['users'][user_id]
+            perms = user.permissions
 
-            if "job" in slug and self.user_can_perform(permissions,
-                    ['own_job'], False):
-                self.assign_job_to_researcher(viewfile, researcher)
+            logging.debug("Creating new -%s-" %slug)
 
-            if "view" in slug and self.user_can_perform(permissions,
-                    ['assign_view'], 'view', False):
-                self.assign_view_to_researcher(viewfile, researcher)
+            if "job" == slug and self.check_perms(perms, ['own_job'], False):
+                self.assign_job_to_user(viewfile, user)
+
+            if "view" == slug and self.check_perms(perms,
+                    ['assign_view'], False):
+                self.assign_view_to_user(viewfile, user)
 
         except:
             viewfile = False
-            researcher = False
+            user = False
 
         self.redirect(self.get_argument('next', '/'))

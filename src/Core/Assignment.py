@@ -15,7 +15,7 @@ class Assignment(object):
     """
         Assigment object
     """
-    def __init__(self, workunit_id, user_id, application):
+    def __init__(self, workunit_id, user, application):
         """
             Superclass of task and Result.
             @param workunit_id: Id of the parent workunit of this assignment
@@ -25,7 +25,7 @@ class Assignment(object):
         """
         self.application = application
         self.workunit = workunit_id
-        self.user_ = user_id
+        self.user_ = user
         self.result = ""
         self.id_ = 0
         self.status = -1
@@ -92,6 +92,8 @@ class Task(Assignment):
         self.description = ""
         self.parent_job = getattr(self.workunit, "job")
         self.job_plugin = getattr(self.parent_job, 'plugin_object')
+        self.db = self.application.db[self.job_plugin.unique_name +\
+                "_" + user_.id_ ]
 
         # FIXME URGENTLY : This has to be a real task id, Passed by args?
 
