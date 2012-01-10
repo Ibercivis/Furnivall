@@ -1,10 +1,27 @@
 {% extends "base.html" %}
 {%block head%}
-    <
-{%endblock%}
+{%end%}
+
+{%block header%}
+    <h1> Furnivall </h1>
+        <h2><span>Crowdsourcing</span> platform</h2>
+{%end%}
+
 {% block body %}
     <div class="login">
-    <a href="/Login?next=/Admin"> Administration page </a> 
-    <a href="/Login=next=/Research"> Researcher profile </a>
+        <ul style="list-style:none">
+            <li> <a href="{% if user_name == "anonymous" %}/Login?next=/Admin{% else %}/Admin{% end %}"> Administration page </a> </li>
+            <li><a href="{% if user_name == "anonymous" %}/Login=next=/Research{% else %}/Researcher{% end %}"> Researcher profile </a> </li>
+        </ul>
+    </div>
+    <div class="user"> 
+        {% if user_name != "anonymous" %} 
+            <p> Welcome {{ user_name }} <a href="/Login/logout"> Logout </a></p>
+        {% else %}
+            <a href="/Login"> Log-in </a>
+        {%end%}
+ </div>
+    
+
 {%end%}
 

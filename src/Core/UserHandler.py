@@ -7,8 +7,34 @@ import Plugins
 
 from tornado import web
 
+class UserManager(web.RequestHandler):
+    def get_current_user(self):
+        request_username = self.get_argument('username', False)
+        cookie_username = self.get_secure_cookie('username')
+        if not cookie_username and request_username:
+            return self.login() # If there is no cookie set but there's
+        elif cookie_username:
+            return self.application.db['users'][cookie_username]
 
-class ObjectManager(web.RequestHandler):
+    def login(self):
+        """
+            Checks out login against a database, given username and password
+            as args and sets out a cookie.
+        """
+        try:
+            username = self.get_argument("username", False)
+            password = self.get_argument("password", False)
+            assert username and password
+            if self.application.db['users'][username].password == password:
+                self.set_secure_cookie('username', username)
+                return self.application.db['users'][username]
+        except KeyError:
+            logging.info("Bad auth for %s", username)
+        except AssertionError:
+            logging.info("Someone tried to login with empty username or password")
+        return False
+
+class ObjectManager(UserManager):
     """
         Object manager, creation, delete and modify petitions should go here.
         Right now, it's able to assign a session to a user, a job and a view to

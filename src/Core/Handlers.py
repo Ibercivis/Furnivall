@@ -4,7 +4,7 @@
 
 import logging
 import tornado.web
-from Core.UserHandler import ObjectManager
+from Core.UserHandler import ObjectManager, UserManager
 from Core.common import get_highest_permission, get_best_task
 
 class Scheduler(ObjectManager):
@@ -103,83 +103,54 @@ class Scheduler(ObjectManager):
                         elif job.view_object.check_view(user):
                             yield job
 
-class LoginHandler(tornado.web.RequestHandler):
-    def get(self, slug="auth"):
-        logging.debug("Handling login")
-        if slug == "auth":
-            if not self.get_secure_cookie('username', False):
-                self.set_secure_cookie('username', self.login())
+class LoginHandler(UserManager):
+    def get(self, action="auth"):
+        if action == "auth":
+            if self.get_current_user():
+                self.redirect('/')
             else:
-                logging.debug("Trying to auth without de-authing")
-        if slug == "out":
+                self.redirect('/Login?login_failed=true')
+        if action == "logout":
             self.clear_cookie('username')
-            slug = "Login"
-
-    def login(self):
-        """
-            Checks out login against a database, given username and passwor
-            as url params  and sets out a cookie.
-        """
-        username = self.get_argument("username", "")
-        password = self.get_argument("password", "")
-        try:
-            if self.application.db['users'][username].password == password:
-                return username
-        except KeyError:
-            logging.info("Username %s does not exists", username)
-        return False
+            self.redirect('/')
 
 class MainHandler(Scheduler):
     """
         MainHandler, inherits tornado's requesthandler and shows up display
-        templastes
+        templates
     """
 
-    def get(self, slug="Landing"):
+    def get(self, what="Landing"):
         """
             Tornado RequestHandler get function, renders slug as called
             from tornado, passing jobs and slug as argument.
             It also checks arguments to take actions when arguments are
             provided
         """
-        user = False
-        auth = [ "None" ]
+        # Set user defaults if no user defined (anonymous with no permissions)
+        # If this is well set in db this might not be necesary, but I rather force
+        # it into the application than relying on db permissions, anonymous should
+        # never be allowed to do everything.
+        username = self.get_secure_cookie('username')
+        user = self.get_current_user()
+        high_perm = get_highest_permission(user.permissions) if user else [ "None" ]
+        logging.info(high_perm)
+        perms = user.permissions if user else high_perm
+        username = username if username else "anonymous"
+        user = user if user else self.application.db["users"][username]
 
-        try:
-            user_id = self.get_secure_cookie('username') # If noone tryed to auth user anon user
-            high_perm = "None"
-            if not user_id:
-                user_id = "anonymous"
-            logging.info("Got %s secure id", user_id)
+        if what == "home":
+            what = self.application.special_login_slugs[high_perm]
 
-            try:
-                logging.debug("User is %s", user_id)
-                user = self.application.db['users'][user_id]
-
-                auth = user.permissions
-                logging.debug("Perm is %s", auth)
-                high_perm = get_highest_permission(user.permissions)
-                if slug == "home":
-                    slug = self.application.special_login_slugs[high_perm]
-
-            except KeyError, error:
-                logging.debug("Bad user id. User might be trying something strange %s %s " %(user_id, user))
-
-        except Exception, err:
-            logging.debug(err)
-
-        logging.debug('[Debug] Rendering template %s', slug)
-        logging.debug('With perms %s', high_perm)
-        logging.debug(self.application.researchers)
-        self.render('%s' %(slug),
+        self.render('%s' %(what),
                 user = user,
-                user_name = user_id,
-                user_permissions = auth,
+                user_name = username,
+                user_permissions = perms,
                 is_root = high_perm == "root",
                 views = self.application.views,
                 jobs = self.application.created_jobs,
                 researchers = self.application.researchers,
-                slug = slug )
+                slug = what )
 
         if self.get_argument('get_task', False):
             task = self.assign_task(view=self.get_argument('view'))
