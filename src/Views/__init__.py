@@ -1,2 +1,2 @@
-__all__=['sample']
-import sample
+__all__=['sample', 'Genealogy']
+import sample, Genealogy

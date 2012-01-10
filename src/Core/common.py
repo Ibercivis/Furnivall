@@ -23,13 +23,15 @@ def get_best_task(self, work=False):
         logging.debug("Exception %s at get_best_task", exception)
         return work.new_task
 
-def get_highest_permission(self, permissions=""):
+def get_highest_permission(perm):
     """:
         Returns the higher permission between the given ones.
     """
-    if "root" in permissions:
+    import logging
+    logging.debug("Getting higher permission from %s", perm)
+    if "root" in perm:
         return "root"
-    if "researcher" in permissions:
+    if "researcher" in perm:
         return "researcher"
     else:
         return "user"

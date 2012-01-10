@@ -25,6 +25,7 @@ class User(persistent.Persistent):
         self.workunits = {}
         self.jobs = {}
         self.tasks = {}
+        self.password = ""
         self.initialized_views = {}
 
     def get_session_id(self):
@@ -41,6 +42,12 @@ class User(persistent.Persistent):
            Returns user and host.
         """
         self.id_ = id_
+
+    def set_password(self, password):
+        self.password = password
+
+    def grant_permission(self, permission):
+        self.permissions.append(permission)
 
     @property
     def completed_tasks(self):

@@ -19,13 +19,6 @@ class Scheduler(ObjectManager):
         self.application.jobs = {}
         self.application.workunits = {}
         self.application.tasks = {}
-        try:
-            self.application.researchers = self.application.db['researchers']
-        except KeyError, err:
-            self.application.db['researchers']=[]
-            self.application.researchers = self.application.db['researchers']
-            logging.debug("Could not get researchers, they are not yet\
-                    created: %s", err)
 
     def assign_task(self, view=False, owner=False):
         """
@@ -112,20 +105,15 @@ class Scheduler(ObjectManager):
 
 class LoginHandler(tornado.web.RequestHandler):
     def get(self, slug="auth"):
+        logging.debug("Handling login")
         if slug == "auth":
-            user_id = self.get_secure_cookie('username', False)
-            if not user_id:
-                self.set_secure_cookie('username', user.id_)
-            auth = user.permissions
-            high_perm = get_highest_permission(auth)
-            slug = self.application.special_login_slugs[high_perm]
-
+            if not self.get_secure_cookie('username', False):
+                self.set_secure_cookie('username', self.login())
+            else:
+                logging.debug("Trying to auth without de-authing")
         if slug == "out":
             self.clear_cookie('username')
-            self.clear_cookie('auth')
             slug = "Login"
-
-
 
     def login(self):
         """
@@ -135,20 +123,17 @@ class LoginHandler(tornado.web.RequestHandler):
         username = self.get_argument("username", "")
         password = self.get_argument("password", "")
         try:
-            user = self.application.db['users'][username]
-            if user.password == password:
+            if self.application.db['users'][username].password == password:
                 return username
-            else:
-                return False
         except KeyError:
-            return False
+            logging.info("Username %s does not exists", username)
+        return False
 
 class MainHandler(Scheduler):
     """
         MainHandler, inherits tornado's requesthandler and shows up display
         templastes
     """
-
 
     def get(self, slug="Landing"):
         """
@@ -161,25 +146,36 @@ class MainHandler(Scheduler):
         auth = [ "None" ]
 
         try:
-            user_id = self.get_secure_cookie('username', 0) # If noone tryed to auth user anon user
+            user_id = self.get_secure_cookie('username') # If noone tryed to auth user anon user
+            high_perm = "None"
             if not user_id:
-                user_id = 0
+                user_id = "anonymous"
+            logging.info("Got %s secure id", user_id)
+
             try:
+                logging.debug("User is %s", user_id)
                 user = self.application.db['users'][user_id]
+
+                auth = user.permissions
+                logging.debug("Perm is %s", auth)
+                high_perm = get_highest_permission(user.permissions)
+                if slug == "home":
+                    slug = self.application.special_login_slugs[high_perm]
 
             except KeyError, error:
                 logging.debug("Bad user id. User might be trying something strange %s %s " %(user_id, user))
 
         except Exception, err:
-            logging.info(err)
-
-        if user_id != 0 and not user: # TODO Insert anon user as first user in db. Pass will be empty.
-            self.redirect('/Login')
+            logging.debug(err)
 
         logging.debug('[Debug] Rendering template %s', slug)
-
+        logging.debug('With perms %s', high_perm)
+        logging.debug(self.application.researchers)
         self.render('%s' %(slug),
+                user = user,
+                user_name = user_id,
                 user_permissions = auth,
+                is_root = high_perm == "root",
                 views = self.application.views,
                 jobs = self.application.created_jobs,
                 researchers = self.application.researchers,

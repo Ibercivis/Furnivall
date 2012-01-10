@@ -7,7 +7,7 @@ import logging, os, daemon, lockfile
 
 from Core.common import commonClass as commonClass
 from Core.UserHandler import ObjectManager
-from Core.Handlers import MainHandler
+from Core.Handlers import MainHandler, LoginHandler
 
 from tornado.options import define, options
 import tornado.httpserver, tornado.database, tornado.ioloop
@@ -31,11 +31,13 @@ class Application(commonClass, web.Application):
         conn = DB(FileStorage('Data.fs')).open()
         self.db  = conn.root()
         self.initialize_db()
+        self.researchers = self.db['users']
         self.read_config()
         urls = [
                 ("/([^/]+)", MainHandler),
                 ("/", MainHandler),
                 ("/new/([^/]+)", ObjectManager),
+                ("/Login/([^/]+)", LoginHandler),
                 ]
 
         settings = dict(
@@ -62,9 +64,13 @@ class Application(commonClass, web.Application):
             self.db['users']
         except KeyError:
             from Core.Personality import User
-            self.db['users'] = [
-                    User(self)
-                    ]
+            self.db['users'] = {
+                    'anonymous' : User(self),
+                    'root' : User(self)
+                    }
+            self.db['users']['anonymous'].set_password("anonymous")
+            self.db['users']['root'].set_password("root")
+            self.db['users']['root'].grant_permission('root')
 
 def do_main_program():
     """

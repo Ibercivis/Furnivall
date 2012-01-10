@@ -31,5 +31,5 @@ class SampleView(object):
             """
                 Web requests will be made here, we can use get_argument to process data.
             """
-            self.render('../Templates/ExternalView.html')
+            self.render('../templates/ExternalView.html')
 

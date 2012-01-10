@@ -45,6 +45,7 @@ class Assignment(object):
             @param notification: Object we'll add to parent place.
             @returns: None
 
+w
         """
 
         getattr(self.workunit, place).append(notification)
@@ -92,7 +93,11 @@ class Task(Assignment):
         self.description = ""
         self.parent_job = getattr(self.workunit, "job")
         self.job_plugin = getattr(self.parent_job, 'plugin_object')
-        self.db = self.application.db[self.job_plugin.unique_name +\
+        try:
+            self.db = self.application.db[self.job_plugin.unique_name +\
+                "_" + user_.id_ ]
+        except KeyError:
+            self.db = self.application.db[self.job_plugin.unique_name +\
                 "_" + user_.id_ ]
 
         # FIXME URGENTLY : This has to be a real task id, Passed by args?

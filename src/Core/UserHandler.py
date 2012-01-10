@@ -86,9 +86,10 @@ class ObjectManager(web.RequestHandler):
         """
 
 
-
+        import logging
         try:
-            user_id = self.get_secure_cookie('user')
+
+            user_id = self.get_secure_cookie('username')
             viewfile = self.get_argument('viewfile')
             user = self.application.db['users'][user_id]
             perms = user.permissions
@@ -100,9 +101,11 @@ class ObjectManager(web.RequestHandler):
 
             if "view" == slug and self.check_perms(perms,
                     ['assign_view'], False):
+                logging.debug("Assigning %s to %s", viewfile, user)
                 self.assign_view_to_user(viewfile, user)
 
-        except:
+        except Exception, error:
+            logging.debug(error)
             viewfile = False
             user = False
 
