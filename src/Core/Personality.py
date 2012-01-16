@@ -7,9 +7,9 @@
 """
 
 import uuid
-import persistent
+from Core.common import FurnivallPersistent
 
-class User(persistent.Persistent):
+class User(FurnivallPersistent):
     """
         User Object
  t  """
@@ -33,7 +33,7 @@ class User(persistent.Persistent):
             Gets a *unique* session id.
         """
         if not self.id_:
-            return uuid.uuid4()
+            return uuid.uuid4().__str__()
         else:
             return self.id_
 

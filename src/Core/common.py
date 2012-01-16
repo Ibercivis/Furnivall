@@ -3,6 +3,8 @@
     Common functions.
 """
 
+from persistent import Persistent
+
 def get_best_task(self, work=False):
 
     """
@@ -21,7 +23,7 @@ def get_best_task(self, work=False):
             if not task.user_.session_id ][0]
     except IndexError, exception:
         logging.debug("Exception %s at get_best_task", exception)
-        return work.new_task
+        return work.create_tasks(1)
 
 def get_highest_permission(perm):
     """:
@@ -36,7 +38,7 @@ def get_highest_permission(perm):
     else:
         return "user"
 
-class commonClass(object):
+class FurnivallPersistent(Persistent):
     """
         Common functions for all furnivall
         Right now, only config management is defined here.

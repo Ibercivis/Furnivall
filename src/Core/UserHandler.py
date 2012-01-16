@@ -1,9 +1,7 @@
 """
     Furnivall user management
 """
-import logging
-import Core.Assignment
-import Plugins
+import Plugins, Views, logging, Core.Assignment, Jobs, uuid
 
 from tornado import web
 
@@ -24,7 +22,7 @@ class UserManager(web.RequestHandler):
         try:
             username = self.get_argument("username", False)
             password = self.get_argument("password", False)
-            assert username and password
+            assert username and password # Umm... nice.
             if self.application.db['users'][username].password == password:
                 self.set_secure_cookie('username', username)
                 return self.application.db['users'][username]
@@ -40,6 +38,9 @@ class ObjectManager(UserManager):
         Right now, it's able to assign a session to a user, a job and a view to
         a researhcer.
     """
+
+    def get_views_list(self):
+        return Views.ViewClasses.keys()
 
     def validate_user(self, user, password):
         username = self.application.db.get("select user from auth\
@@ -58,16 +59,21 @@ class ObjectManager(UserManager):
         self.set_secure_cookie('perms', auth )
         return True
 
-    def assign_job_to_user(self, viewfile, researcher):
+    def assign_job_to_user(self, viewfile, user):
         """
             Having a the view filename (wich is used in views pool),
             create a jobs object with the view object from the views pool.
         """
-
-        job = Jobs.Job(user.initialized_views[viewfile],
-                getattr(getattr(Plugins, view.plugin), view.class_)(),
-                self.application)
-        user.jobs.append(job)
+        view = self.application.db['users'][user].initialized_views[viewfile]
+        plugin = getattr(getattr(Plugins, view.plugin), view.class_)()
+        parent_uuid = uuid.uuid4().__str__()
+        try:
+            self.application.db['users'][user].jobs[parent_uuid] = ""
+        except Exception, error:
+            logging.error("Error resetting uuid in db")
+        self.application.db['users'][user].jobs[parent_uuid] =\
+            Jobs.Job(view, plugin, self, parent_uuid, user)
+        self.application.db['users'][user].jobs[parent_uuid].produce_initial_workunits()
 
     def assign_view_to_user(self, viewfile, user):
         """
@@ -75,22 +81,38 @@ class ObjectManager(UserManager):
             to initialize the view. This will start the view's main class and
             add the created objects to initialized_views object.
         """
-        enabled_vf = self.application.conf('enabled_views', viewfile)
-        user.initialized_views[viewfile] = getattr(getattr(Views, viewfile),
-            enabled_vf)(self.application)
+        user = self.application.db['users'][user]
+        for viewclass in Views.ViewClasses[viewfile]:
+            user.initialized_views[viewfile] = getattr(getattr(Views,
+                 viewfile), viewclass)(self.application)
+
+    def assign_task_to_user(self, viewfile, user):
+        work = self.get_argument("workunit")
+        job = self.get_argument("job")
+        number = self.get_argument('number')
+        try:
+            job = self.application.db['users'][user].jobs[job]
+            job.workunits[work].create_tasks(number, self.application.db['users'][user])
+        except Exception, error:  
+            logging.debug("Could not create tasks %s", error)
 
     def check_perms(self, user_perms, perms, check_for_all):
         """
             Check if a user can perform certain actions.
         """
+        if "root" in perms:
+            logging.info("Of course")
+            return True
+
         if check_for_all:
             return [ i for i in user_perms if i not in perms ] == []
         else:
             return [ i for i in user_perms if i in perms ] != []
 
+
     # TODO: Add the auth module to tornado, from :
     # https://github.com/bkjones/Tinman/commit/152301d68c86ac7524cf4391b1f98f68c59b2408#diff-1
-    def get(self, slug=False):
+    def do_management(self, slug):
         """
             Object manager get function.
             Creates as requested jobs or views
@@ -111,28 +133,29 @@ class ObjectManager(UserManager):
                 We can do it at plugin level, but that would mean we wouldn't have such a nice access to authentication methods.
         """
 
-
-        import logging
-        try:
-
-            user_id = self.get_secure_cookie('username')
-            viewfile = self.get_argument('viewfile')
+        action = "assign" if "view" == slug else "own"
+        user_id = self.get_secure_cookie('username')
+        viewfile = self.get_argument('viewfile', False)
+        if user_id == "root" and self.get_argument('researcher', False):
+            user = self.application.db['users'][self.get_argument('researcher')]
+            perms = [ 'root' ]
+        else:
             user = self.application.db['users'][user_id]
             perms = user.permissions
 
-            logging.debug("Creating new -%s-" %slug)
+        if not self.check_perms(action + "_" + slug, perms, False):
+            self.write("Not allowed")
 
-            if "job" == slug and self.check_perms(perms, ['own_job'], False):
-                self.assign_job_to_user(viewfile, user)
-
-            if "view" == slug and self.check_perms(perms,
-                    ['assign_view'], False):
-                logging.debug("Assigning %s to %s", viewfile, user)
-                self.assign_view_to_user(viewfile, user)
-
+        try:
+            a = getattr(self, "assign_%s_to_user" %(slug))(viewfile, user_id)
         except Exception, error:
-            logging.debug(error)
-            viewfile = False
-            user = False
+            logging.info(error)
+            self.write("Could not create %s: %s" %(slug, error))
 
-        self.redirect(self.get_argument('next', '/'))
+        self.redirect('/home')
+
+    def get(self, slug=False):
+        return self.do_management(slug)
+
+    def post(self, slug=False):
+        return self.do_management(slug)

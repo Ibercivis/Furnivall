@@ -5,15 +5,16 @@
 
 """
 
-import concurrent.futures, logging
+import concurrent.futures, logging, uuid
+from Core.common import FurnivallPersistent
+
 #from sqlalchemy import Integuer, String
 #from sqlalchemy.ext.declarative import declarative_base
-
 # Assignment data {{{
 
-class Assignment(object):
+class Assignment(FurnivallPersistent):
     """
-        Assigment object
+        Assignment object
     """
     def __init__(self, workunit_id, user, application):
         """
@@ -47,8 +48,7 @@ class Assignment(object):
 
 w
         """
-
-        getattr(self.workunit, place).append(notification)
+        getattr(self.workunit, place)[self.id_] = notification
 
     def globalize(self, id_, application):
         """
@@ -57,7 +57,7 @@ w
             object to the list named as the  main class + 's', so we get results
             and tasks in parent.result and parent.task classes.
         """
-        global_queue = getattr(application, self.__class__.__name__.lower())
+        global_queue = getattr(application, self.__class__.__name__.lower()) # Jajajaja, funny. No, too much not-documented magic. FIXME: make it documented magic, don't ever forget the spellbook
         global_queue[id_] = self # TODO Check this.
 
 
@@ -80,38 +80,24 @@ class Task(Assignment):
             @returns: Appends to workunit, in the workunit's tasks
                 queue the result of launch_task from job's pluginobject.
 
-            Asynchronously calls workunit's job plugin_object launch_task function.
-            Set's up done_callback for task pointing to task.task_validator
-            And appends this task to global tasks (as well as its id to parent ones)
-
-            TODO: by default task's assigning a user_, empty, change it to FALSE.'
-
         """
 
         super(Task, self).__init__(workunit_, user_, application)
-
-        self.description = ""
         self.parent_job = getattr(self.workunit, "job")
         self.job_plugin = getattr(self.parent_job, 'plugin_object')
+        self.description = self.job_plugin.description
+        self.id_ = uuid.uuid4().__str__()
+
         try:
             self.db = self.application.db[self.job_plugin.unique_name +\
-                "_" + user_.id_ ]
+                "_" + self.user_ ]
         except KeyError:
+            self.application.db[self.job_plugin.unique_name +\
+                "_" + self.user_ ] = {}
             self.db = self.application.db[self.job_plugin.unique_name +\
-                "_" + user_.id_ ]
+                "_" + self.user_ ]
 
-        # FIXME URGENTLY : This has to be a real task id, Passed by args?
-
-        self.id_ = 0
-        # We might have a async problem here.
-
-        with concurrent.futures.ThreadPoolExecutor(max_workers = 20)\
-                as executor: # Async call
-            logging.debug('Creating executor for task: %s', self.id_)
-            self.futureobject = executor.submit(self.launch)
-            self.futureobject.add_done_callback(self.task_validator)
-            self.globalize(self.application, self.id_)
-            self.append_to_workunit('tasks', self.id_)
+        self.append_to_workunit('tasks', self)
 
     def score_match(self):
         """
@@ -121,20 +107,20 @@ class Task(Assignment):
         if self.user_ and self.description:
             return getattr(self.workunit.job.plugin_object, 'score_match')(self.user_)
 
-    def launch(self):
+    def __call__(self):
         """
             Executes launch_task from workunit's job plugin_object.
             @returns: Assignment.Result object containing this task.
 
         """
 
-        self.description = self.job_plugin.description
+        logging.debug("Task %s belongs to job %s and workunit %s",
+            self.id_, self.parent_job, self.workunit)
+        logging.debug("Plugin is %s with descpription %s",
+            self.job_plugin, self.job_plugin.description)
 
-        logging.debug( "Task %s belongs to job %s and plugin %s, \
-                executing task_executor for job's pluginobject",
-                self.id_, self.parent_job, self.job_plugin.description)
-        self.result = self.job_plugin.task_executor(self, self.workunit)
-
+        self.result = self.job_plugin.task_executor(self)
+        logging.info(self.result)
         return Result(self, self.description, self.application)
 
     def task_validator(self, result):

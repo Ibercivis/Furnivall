@@ -13,51 +13,36 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
   <title>{% block title %}{% end %}</title>
-
-  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Framework CSS -->
+  <link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection">
+  <link rel="stylesheet" href="/static/css/blueprint/print.css" type="text/css" media="print">
+  <!--[if lt IE 8]><link rel="stylesheet" href="../../blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+  <link rel="stylesheet" href="/static/css/blueprint/plugins/fancy-type/screen.css" type="text/css" media="screen, projection">
+  <link rel="stylesheet" href="/static/css/blueprint/plugins/buttons/screen.css" type="text/css" media="screen, projection">
   <script src="/static/js/libs/modernizr-2.0.6.min.js"></script>
   {% block head %}{% end %}
-
 </head>
 
 <body>
-
   <div id="container">
-    <header>
-      {% block header %}{% end %}
-      {% block alerts %}{% end %}
-    </header>
-    <div id="main" role="main">
-      {% block body %}{% end %}
-    </div>
-    <footer>
-
-    </footer>
-  </div> <!--! end of #container -->
-
+    <header> {% block header %}{% end %}{% block alerts %}{% end %} </header>
+    <div id="main" role="main">{% block body %}{% end %}</div>
+    <footer></footer>
+  </div>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="/static/js/libs/jquery-1.6.2.min.js"><\/script>')</script>
-
-
-  <!-- scripts concatenated and minified via ant build script-->
   <script defer src="/static/js/plugins.js"></script>
   <script defer src="/static/js/script.js"></script>
-  <!-- end scripts-->
-
-
   <script> // Change UA-XXXXX-X to be your site's ID
     window._gaq = [['_setAccount','UAXXXXXXXX1'],['_trackPageview'],['_trackPageLoadTime']];
     Modernizr.load({
       load: ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js'
     });
   </script>
-
-
   <!--[if lt IE 7 ]>
     <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
     <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
   <![endif]-->
-  
 </body>
 </html>

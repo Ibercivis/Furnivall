@@ -1,2 +1,3 @@
-__all__=['sample']
+__all__=['sample', 'GenealogyPlugin']
 import sample
+import GenealogyPlugin

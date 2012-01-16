@@ -4,26 +4,21 @@
 
 """
 import logging, os, daemon, lockfile
+from Core.Handlers import MainHandler, LoginHandler, ObjectManager
+import tornado.httpserver, tornado.database, tornado.ioloop, tornado.web
 
-from Core.common import commonClass as commonClass
-from Core.UserHandler import ObjectManager
-from Core.Handlers import MainHandler, LoginHandler
-
-from tornado.options import define, options
-import tornado.httpserver, tornado.database, tornado.ioloop
-import tornado.web as web
 from ZODB.DB import DB
 from ZODB.FileStorage import FileStorage
 
+from tornado.options import define, options
 define("port", default=8888, help="run on the given port", type=int)
-define("db_host", default="localhost", help="database host")
-define("db_user", default="root", help="database username")
-define("db_db", default="furnivall", help="database name")
 define("daemonize", default=False, help="Run as daemon")
-define("db_password", default="root", help="database password")
 
+class DynamicUrlHandler(tornado.web.RequestHandler):
+    def get(self):
+        return
 
-class Application(commonClass, web.Application):
+class Application(tornado.web.Application):
     def __init__(self):
         """
             Sets up the tornado web server and loads needed data from db
@@ -32,12 +27,12 @@ class Application(commonClass, web.Application):
         self.db  = conn.root()
         self.initialize_db()
         self.researchers = self.db['users']
-        self.read_config()
         urls = [
-                ("/([^/]+)", MainHandler),
-                ("/", MainHandler),
-                ("/new/([^/]+)", ObjectManager),
-                ("/Login/([^/]+)", LoginHandler),
+                ('/', MainHandler),
+                ('/([^/]+)', MainHandler),
+                ('/new/([^/]+)', ObjectManager),
+                ('/Login/([^/]+)', LoginHandler),
+                ('/View/([^/]+)', DynamicUrlHandler),
                 ]
 
         settings = dict(
@@ -50,14 +45,14 @@ class Application(commonClass, web.Application):
         )
 
         self.special_login_slugs = {
-                'root': '/Admin/',
+                'root': '/Admin',
                 'researcher': '/Admin/Researcher',
                 'user': '/User/Home'
         }
 
         logging.debug('Starting server with urls: %s', urls)
 
-        web.Application.__init__(self, urls, **settings)
+        tornado.web.Application.__init__(self, urls, **settings)
 
     def initialize_db(self):
         try:

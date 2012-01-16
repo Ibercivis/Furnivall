@@ -3,36 +3,38 @@
     Jobs
 """
 
-from Core.common import commonClass
-from Core.WorkUnit import workunit
-import logging
-import persistent
+from Core.common import FurnivallPersistent
+from Core.WorkUnit import Workunit
+import logging, uuid
 
-class Job(commonClass, persistent.Persistent):
+class Job(FurnivallPersistent):
     """
         Job class
     """
-    def __init__(self, view_object, plugin_object, application):
+    def __init__(self, view_object, plugin_object, request, id_, user):
         """
             Returns a job object (workunits container)
             with plugin object and view object references.
         """
         super(self.__class__, self).__init__()
-        self.application = application
+        self.application = request.application
+        self.id_ = id_
         self.view_object = view_object
         self.plugin_object = plugin_object
-
+        self.user = user
         self.read_config()
         self.initial_tasks = self.conf('main', 'initial_tasks')
 
         self.description = self.view_object.description
         self.name = "Default job name"
 
-        self.workunits = []
+        self.workunits = {}
 
         logging.info('Creating job %s' , self)
         logging.info('\tProducing workunits... (%s) ',
                 self.view_object.workunits)
+
+    def produce_initial_workunits(self):
         self.produce_workunits(self.view_object.workunits)
 
     def produce_workunits(self, number=1):
@@ -56,8 +58,15 @@ class Job(commonClass, persistent.Persistent):
         for current_wk in range(0, number):
             logging.debug("Making workunit %s of %s", current_wk, number)
             # We create a new workunit, passing this object as a parent
-            work = Workunit(self, self.id_, self.application)
-            self.workunits.append(work) # Append it to our workunits queuqe
-            if number is 1:
-                return work
+            uuid_ = uuid.uuid4().__str__()
+            logging.debug("We're going to create workunit %s" %(uuid_))
+            try:
+                work = Workunit(self.id_, self.user, uuid_, self.application)
+                self.workunits[uuid_] = work # Append it to our workunits queuqe
+                work.self_db = self.application.db['users'][self.user].jobs[self.id_].workunits[uuid_]
+                work.do_initial_tasks()
+                if number is 1:
+                    return work
+            except Exception, error:
+                logging.info("Error: %s" %error)
 

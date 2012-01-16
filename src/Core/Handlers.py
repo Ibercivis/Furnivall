@@ -141,17 +141,22 @@ class MainHandler(Scheduler):
 
         if what == "home":
             what = self.application.special_login_slugs[high_perm]
+            return self.redirect(what)
 
-        self.render('%s' %(what),
+        if self.get_argument('get_task', False):
+            task = self.assign_task(view=self.get_argument('view'), user=self.user)
+            self.render_task(task)
+        else:
+            self.render('%s' %(what),
                 user = user,
                 user_name = username,
+                avail_views = self.get_views_list(),
                 user_permissions = perms,
+                xsrf = self.xsrf_token,
                 is_root = high_perm == "root",
-                views = self.application.views,
                 jobs = self.application.created_jobs,
                 researchers = self.application.researchers,
                 slug = what )
 
-        if self.get_argument('get_task', False):
-            task = self.assign_task(view=self.get_argument('view'))
-            self.render_task(task)
+    def render_task(self, task):
+        return        

@@ -1,5 +1,7 @@
 import tornado.web
 
+classes_to_append = [ "SampleView" ]
+
 class SampleView(object):
     def __init__(self, creator):
         """
