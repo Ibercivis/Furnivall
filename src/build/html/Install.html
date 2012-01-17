@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; Furnivall v0.1 documentation</title>
+    <title>Installation instructions &mdash; Furnivall v0.1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Furnivall v0.1 documentation" href="index.html" />
-    <link rel="next" title="&lt;no title&gt;" href="tutorial.html" />
+    <link rel="next" title="Inheritance diagrams" href="inheritance.html" />
     <link rel="prev" title="Introduction" href="intro.html" /> 
   </head>
   <body>
@@ -34,7 +34,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="tutorial.html" title="&lt;no title&gt;"
+          <a href="inheritance.html" title="Inheritance diagrams"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="intro.html" title="Introduction"
@@ -48,22 +48,71 @@
         <div class="bodywrapper">
           <div class="body">
             
-  
+  <div class="section" id="installation-instructions">
+<h1>Installation instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dependences">
+<h2>Dependences<a class="headerlink" href="#dependences" title="Permalink to this headline">¶</a></h2>
+<p>tornado-sessions
+mongodb
+python mongodb support ( python-pymongo package on debian )</p>
+<p>Currently, furnivall only depends on tornado-sessions web server, the tornado
+fork by milancemark wich adds sessions to tornado, mongodb to store the
+sessions and its python libs.</p>
+</div>
+<div class="section" id="installing-deps">
+<h2>Installing deps<a class="headerlink" href="#installing-deps" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><pre>easy_install tornado</pre>
+</div>
+<p>You should carefully consider installing David Francos&#8217; branch at <a class="reference external" href="http://www.github.com/XayOn/tornado">http://www.github.com/XayOn/tornado</a></p>
+</div>
+<div class="section" id="installing-furnivall">
+<h2>Installing Furnivall<a class="headerlink" href="#installing-furnivall" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><pre>python setup.py install</pre>
+</div>
+</div>
+<div class="section" id="launching-furnivall">
+<h2>Launching Furnivall<a class="headerlink" href="#launching-furnivall" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><pre>python Furnivall.py --port=80</pre>
+</div>
+</div>
+<div class="section" id="todo">
+<h2>TODO<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
+<p>This will setup a init script in /etc/init.d called &#8220;furnivall&#8221;, so, we&#8217;ll
+start furnivall with:</p>
+<div class="highlight-python"><pre>invoke-rc.d furnivall start
+# or
+service furnivall start</pre>
+</div>
+</div>
+</div>
+
 
           </div>
         </div>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation instructions</a><ul>
+<li><a class="reference internal" href="#dependences">Dependences</a></li>
+<li><a class="reference internal" href="#installing-deps">Installing deps</a></li>
+<li><a class="reference internal" href="#installing-furnivall">Installing Furnivall</a></li>
+<li><a class="reference internal" href="#launching-furnivall">Launching Furnivall</a></li>
+<li><a class="reference internal" href="#todo">TODO</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="intro.html"
                         title="previous chapter">Introduction</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="tutorial.html"
-                        title="next chapter">&lt;no title&gt;</a></p>
+  <p class="topless"><a href="inheritance.html"
+                        title="next chapter">Inheritance diagrams</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/install.txt"
+    <li><a href="_sources/Install.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -90,7 +139,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="tutorial.html" title="&lt;no title&gt;"
+          <a href="inheritance.html" title="Inheritance diagrams"
              >next</a> |</li>
         <li class="right" >
           <a href="intro.html" title="Introduction"

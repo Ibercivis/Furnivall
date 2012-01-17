@@ -12,8 +12,8 @@ Contents:
    :maxdepth: 2
 
    intro
-   install
-   tutorial
+   Install
+   Readme
    inheritance
    Workflow
    API
