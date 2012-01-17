@@ -4,6 +4,10 @@ class SamplePlugin(object):
             Sample plugin, containing validation and consolidation functions
         """
         self.description="Test plugin"
+        self.user = ""
+
+    def task_executor(self, parent):
+        parent.user_ = self.user # YUJU!
 
 
     def validate_task(self, result, async):

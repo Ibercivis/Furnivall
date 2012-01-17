@@ -10,13 +10,12 @@ import uuid
 from Core.common import FurnivallPersistent
 
 class User(FurnivallPersistent):
-    """
-        User Object
- t  """
     def __init__(self, application):
         """
-            user_ object.
+
+            user object
             TODO: Make this persistent
+
         """
 
         self.application = application
@@ -30,7 +29,9 @@ class User(FurnivallPersistent):
 
     def get_session_id(self):
         """
+
             Gets a *unique* session id.
+
         """
         if not self.id_:
             return uuid.uuid4().__str__()

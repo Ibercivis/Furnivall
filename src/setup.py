@@ -42,7 +42,7 @@ setup(name='Furnivall',
       console = [{"script": "Furnivall.py" }],
       author_email='xayon@xayon.net',
       url='http://github.com/Ibercivis/Furnivall',
-      packages=['Core'],
+      packages=['Core', 'Plugins', 'Views'],
       scripts=scripts,
       options=opts,
      )

@@ -101,8 +101,7 @@ class Task(Assignment):
 
     def score_match(self):
         """
-
-            Tells how adequate this task is for this user_.
+            Tells how adequate this task is for this user
         """
         if self.user_ and self.description:
             return getattr(self.workunit.job.plugin_object, 'score_match')(self.user_)

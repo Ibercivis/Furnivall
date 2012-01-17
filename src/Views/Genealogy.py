@@ -25,13 +25,4 @@ class GenealogyView(object):
         self.name = "Genealogy_View"
         self.description = "Genealogy View"
         self.workunits = 1 
-        self.templates = ['GenealogyView'] 
-        # self.urls=[( '/sample/', plugin.MainHandler ), ('/error', self.render_sample_view_external)] # Only scheduler can manage created jobs!
-
-    class render_sample_view_external(tornado.web.RequestHandler):
-        def get(self):
-            """
-                Web requests will be made here, we can use get_argument to process data.
-            """
-            self.render('../templates/ExternalView.html')
-
+        self.templates = {'Genealogy': 'GenealogyView'}

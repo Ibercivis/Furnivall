@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
     Ibervicis Furnivall is an open source framework for distributed user science.
     It helps to organize batches of tasks, collect them form users and do all the related housekeeping.
@@ -15,8 +16,11 @@ define("port", default=8888, help="run on the given port", type=int)
 define("daemonize", default=False, help="Run as daemon")
 
 class DynamicUrlHandler(tornado.web.RequestHandler):
-    def get(self):
-        return
+    """
+        Manages views' urls.
+    """
+    def get(self, view, askfor):
+        return self.render(Views[view].viewplugin.urls[askfor])
 
 class Application(tornado.web.Application):
     def __init__(self):

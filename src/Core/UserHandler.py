@@ -1,12 +1,20 @@
 """
     Furnivall user management
 """
-import Plugins, Views, logging, Core.Assignment, Jobs, uuid
+
+import logging, Core.Assignment, Jobs, uuid, Plugins, Views
 
 from tornado import web
 
 class UserManager(web.RequestHandler):
+    """
+        Handle login, and when asked for return current user object from database.
+    """
     def get_current_user(self):
+        """
+            Gets user set in "username" cookie from database.
+            If not present, tries to log-in.
+        """
         request_username = self.get_argument('username', False)
         cookie_username = self.get_secure_cookie('username')
         if not cookie_username and request_username:
@@ -40,24 +48,11 @@ class ObjectManager(UserManager):
     """
 
     def get_views_list(self):
+        """
+            Returns a list of all views (wich are initialized
+            on server restart) available in Views module.
+        """
         return Views.ViewClasses.keys()
-
-    def validate_user(self, user, password):
-        username = self.application.db.get("select user from auth\
-            where user='%s' and password ='%s'"
-            %( self.get_argument('user'), self.get_argument('pass', ''))).user
-
-        self.set_secure_cookie('user', username)
-        if not username: return False
-
-        if self.get_argument('user') == "anonymous":
-            self.set_secure_cookie('perms', 'view_task')
-            return True
-
-        auth = self.application.db.get("select permissions from\
-                auth where user='%s' " %(username)).permissions
-        self.set_secure_cookie('perms', auth )
-        return True
 
     def assign_job_to_user(self, viewfile, user):
         """
@@ -87,6 +82,11 @@ class ObjectManager(UserManager):
                  viewfile), viewclass)(self.application)
 
     def assign_task_to_user(self, viewfile, user):
+        """
+            Creates a task assigned to the logged-in researcher.
+            You can modify it later from the plug-in with
+            assign
+        """
         work = self.get_argument("workunit")
         job = self.get_argument("job")
         number = self.get_argument('number')
@@ -116,7 +116,7 @@ class ObjectManager(UserManager):
         """
             Object manager get function.
             Creates as requested jobs or views
-            TODO: Document user permissions for the ACL:
+            Implement this user permissions on the ACL:
                 own_job
                 create_job
                 view_job

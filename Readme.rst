@@ -4,6 +4,13 @@ Furnivall
 Ibervicis Furnivall is an open source framework for distributed volunteer science.
 It helps to organize batches of tasks, collect them form volunteers
 and it does all the related housekeeping.
+A popular similar work is Bossa. Also, Furnivall is heavily inspired in BOINC.
+
+The name
+---------
+Dr Frederick James Furnivall organized a team of distributed volunteer work
+to build the Oxford dictionary. Incidentally, he was also the founder of the
+Furnivall Sculling Club.
 
 Requeriments
 ------------
@@ -37,65 +44,44 @@ At this moment:
 - Go to the wiki area, https://github.com/Ibercivis/Furnivall/wiki for more info
 - Use the https://github.com/Ibercivis/Furnivall/issues?sort=created&direction=desc&state=open&page=1 issue tracker for ideas, discuss, etc or to offer yourself for some work
 
-Use case howto
----------------
-
-Let's say we want to start developing one of the previously exposed ideas, we'd had to go trought the following steps:
-
-- Create a plugin/view with the later described properties
-- Add a researcher via the administration page (if it doesn't exist)
-- Assign a plugin/view to a job (can be multiple jobs) 
-- TODO: Maybe in a future we can make some plugin/view stuff in the web interface
-
-Plugin / views structure
-........................
-A view must have:
-
-- The view class name specified in config or web interface wich contains:
-- At constructor:
-    + The view's associated plugin filename (see later)
-    + The view's plugin class, description and name
-    + Number of workunits it should produce by Default
-    + View template 
-    + View urls, wich will be later parsed by tornado.
 
 
-::
+Expected output
+----------------
 
-    class SampleView(object):
-        def __init__(self, creator):
-            self.plugin="sample"
-            self.class_="SamplePlugin"
-            self.name="Sample_View"
-            self.description="Sample View"
-            self.workunits=3
-            self.templates=['SampleView']
-            self.urls=[( '/sample/', creator.Scheduler ),] # Only scheduler can manage created jobs!
+Furnivall will have:
 
-And about the plugin:
+* A system of plugins separated from the core, to allow both for expansions and for customisations
+* A way to distribute the core system across sites, allowing for high availability
+* Whatever you want. Simply ask a Issue to the tracker, under milestone Improvements.
 
-- It must have a validate_task and consolidate_result class. 
+Development Plan
+------------------
 
-::
+1. Ability to Run single site, with Asociative Paths.
+2. Ability to Run single site, with Vivienda and Sentimiento. 
+3. Multiple Site, redundancy, ...
+4. Pluggable. Apps para mapeo de enfermedades (deteccion via twitter?), para migraciones de pájaros, para mapas de ermitas, ....
 
-    class SamplePlugin(object):
-        def __init__(self):
-            """
-                Sample plugin, containing validation and consolidation functions
-            """
-            self.description="Test plugin"
+Work method
+------------
 
+* A public activity page is to be at http://ibercivis.github.com/Furnivall/  Yes, it is edited in the gh-pages branch. 
+* Github issue tracker https://github.com/Ibercivis/Furnivall/issues  is to be used for main discussions, up to the level of user histories
+* The core development will use PivotalTracker https://www.pivotaltracker.com/projects/274169 for finer work. 
+* * Ideally, a Discuss issue (and most others) should move to "Assigned" only when its implications have been translated to the IceBox of Pivotal. Then the Assigned person should be reponsible for the closing in Pivotal and eventually the Closing in Github issue tracker.
+* * Pivotal esta enlazado con github de forma que los commit se pueden marcar para que muevan tareas en el pivotal.
+* Documentation, if not in the source code, goes here
 
-        def validate_task(self, result, async):
-            """
-                Validate task.
-            """
-            return True
+Proposals for organization of the system
+-------------------------------------------
 
-        def consolidate_result(self, results):
-            """
-                Make results consolidation for a workunit here.
-            """
-            return results
+.. image:: http://yuml.me/diagram/scruffy/class/73e07696.png
+.. image:: http://yuml.me/diagram/scruffy;/class/%23%20Cool%20Class%20Diagram,%20%5BCore%7CAPI%20Exporter%5D%20%3C%20-%20Extends%20%20%5BPlugins%7CAPI%20Exporter;%20Task%20Manager;%20Administration%5D,%20%5BCore%5D%20%3C%20-%20%3E%20%5BViews%5D,%20%5BPlugins%5D%3C%20Extends%20via%20API%20-%20API%20%3E%20%5BExternal%20Plugins%7CAPI%20Exporter%5D.png
+ 
+Interaction between objects
+----------------------------
+
+If not marked otherwise, the objects are Instances. Not to be confused with modules nor class objects.
 
 
