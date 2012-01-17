@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Core.Assignment &mdash; Furnivall v0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Furnivall v0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../index.html">Furnivall v0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for Core.Assignment</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Assignment object and sons.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">concurrent.futures</span><span class="o">,</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">Core.common</span> <span class="kn">import</span> <span class="n">FurnivallPersistent</span>
+
+<span class="c">#from sqlalchemy import Integuer, String</span>
+<span class="c">#from sqlalchemy.ext.declarative import declarative_base</span>
+<span class="c"># Assignment data {{{</span>
+
+<span class="k">class</span> <span class="nc">Assignment</span><span class="p">(</span><span class="n">FurnivallPersistent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Assignment"><a class="viewcode-back" href="../../API.html#Core.Assignment.Assignment">[docs]</a><span class="sd">        Assignment object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workunit_id</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">application</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Superclass of task and Result.</span>
+<span class="sd">            @param workunit_id: Id of the parent workunit of this assignment</span>
+<span class="sd">            @type workunit_id: int</span>
+<span class="sd">            @param user_id: Id of the user_ that got this assignment.</span>
+<span class="sd">            @result: None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="n">application</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workunit</span> <span class="o">=</span> <span class="n">workunit_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">append_to_workunit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">place</span><span class="p">,</span> <span class="n">notification</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Assignment.append_to_workunit"><a class="viewcode-back" href="../../API.html#Core.Assignment.Assignment.append_to_workunit">[docs]</a><span class="sd">            Append notification to Assignment object&#39;s creator&#39; list.</span>
+
+<span class="sd">            Will get parent&#39;s list as specified in place argument and append</span>
+<span class="sd">            notification.</span>
+
+<span class="sd">            Should not produce output.</span>
+
+<span class="sd">            @type place: string</span>
+<span class="sd">            @param place: queue object in the parent where we&#39;ll be storing notification</span>
+<span class="sd">            @type notification: string</span>
+<span class="sd">            @param notification: Object we&#39;ll add to parent place.</span>
+<span class="sd">            @returns: None</span>
+
+<span class="sd">w</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workunit</span><span class="p">,</span> <span class="n">place</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">id_</span><span class="p">]</span> <span class="o">=</span> <span class="n">notification</span>
+
+    <span class="k">def</span> <span class="nf">globalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">,</span> <span class="n">application</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="Assignment.globalize"><a class="viewcode-back" href="../../API.html#Core.Assignment.Assignment.globalize">[docs]</a><span class="sd">            Make this object part of the global queue, depending on the class</span>
+<span class="sd">            This has a lot of magic... it gets the main class and appends the</span>
+<span class="sd">            object to the list named as the  main class + &#39;s&#39;, so we get results</span>
+<span class="sd">            and tasks in parent.result and parent.task classes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">global_queue</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span> <span class="c"># Jajajaja, funny. No, too much not-documented magic. FIXME: make it documented magic, don&#39;t ever forget the spellbook</span>
+        <span class="n">global_queue</span><span class="p">[</span><span class="n">id_</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span> <span class="c"># TODO Check this.</span>
+
+
+<span class="c"># }}}</span>
+
+<span class="c"># Assignment {{{</span>
+<span class="k">class</span> <span class="nc">Task</span><span class="p">(</span><span class="n">Assignment</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span></div></div>
+<div class="viewcode-block" id="Task"><a class="viewcode-back" href="../../API.html#Core.Assignment.Task">[docs]</a><span class="sd">        Task object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workunit_</span><span class="p">,</span> <span class="n">user_</span><span class="p">,</span> <span class="n">application</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            @type workunit_: Core.Workunit object</span>
+<span class="sd">            @param workunit_: Workunit directly responsible for this task.</span>
+
+<span class="sd">            @type user: Personality.User object</span>
+<span class="sd">            @param user: User directly responsible for this task</span>
+
+<span class="sd">            @returns: Appends to workunit, in the workunit&#39;s tasks</span>
+<span class="sd">                queue the result of launch_task from job&#39;s pluginobject.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">workunit_</span><span class="p">,</span> <span class="n">user_</span><span class="p">,</span> <span class="n">application</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_job</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workunit</span><span class="p">,</span> <span class="s">&quot;job&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job_plugin</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_job</span><span class="p">,</span> <span class="s">&#39;plugin_object&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">job_plugin</span><span class="o">.</span><span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">job_plugin</span><span class="o">.</span><span class="n">unique_name</span> <span class="o">+</span>\
+                <span class="s">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_</span> <span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">job_plugin</span><span class="o">.</span><span class="n">unique_name</span> <span class="o">+</span>\
+                <span class="s">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_</span> <span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">job_plugin</span><span class="o">.</span><span class="n">unique_name</span> <span class="o">+</span>\
+                <span class="s">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_</span> <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_to_workunit</span><span class="p">(</span><span class="s">&#39;tasks&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">score_match</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Task.score_match"><a class="viewcode-back" href="../../API.html#Core.Assignment.Task.score_match">[docs]</a><span class="sd">            Tells how adequate this task is for this user</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workunit</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">plugin_object</span><span class="p">,</span> <span class="s">&#39;score_match&#39;</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span></div>
+<span class="sd">            Executes launch_task from workunit&#39;s job plugin_object.</span>
+<span class="sd">            @returns: Assignment.Result object containing this task.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Task </span><span class="si">%s</span><span class="s"> belongs to job </span><span class="si">%s</span><span class="s"> and workunit </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_job</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workunit</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Plugin is </span><span class="si">%s</span><span class="s"> with descpription </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">job_plugin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">job_plugin</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">job_plugin</span><span class="o">.</span><span class="n">task_executor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">task_validator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Task.task_validator"><a class="viewcode-back" href="../../API.html#Core.Assignment.Task.task_validator">[docs]</a><span class="sd">            @type futureObject:</span>
+<span class="sd">            @param futureObject: task</span>
+
+<span class="sd">            Validates the task, calling the plugin_object&#39;s validate_task function.</span>
+
+<span class="sd">            If task has passed, lets self.validated to true, otherwise it sets it to false.</span>
+<span class="sd">            self.validated has to be -1 if task_validator has not yet been executed</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plugin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workunit</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">plugin_object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span> <span class="s">&#39;validate_task&#39;</span><span class="p">)(</span><span class="n">result</span><span class="p">)</span>
+<span class="c"># }}}</span>
+
+<span class="c"># Result {{{</span>
+<span class="k">class</span> <span class="nc">Result</span><span class="p">(</span><span class="n">Assignment</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span></div></div>
+<div class="viewcode-block" id="Result"><a class="viewcode-back" href="../../API.html#Core.Assignment.Result">[docs]</a><span class="sd">        Result class. Creates a result object when a task is done</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            @type task_</span>
+<span class="sd">            @params task_</span>
+<span class="sd">            @returns none</span>
+<span class="sd">            Result object for a task.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">Result</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">task_</span><span class="o">.</span><span class="n">workunit</span><span class="p">,</span> <span class="n">task_</span><span class="o">.</span><span class="n">user_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+
+    <span class="k">def</span> <span class="nf">consolidate_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Result.consolidate_result"><a class="viewcode-back" href="../../API.html#Core.Assignment.Result.consolidate_result">[docs]</a><span class="sd">            Notify task&#39;s creator itself to result (this will be called when task is finished).</span>
+<span class="sd">            Then, call creator&#39;s consolidate_result function (wich probably will call this tasks&#39;s plugin</span>
+<span class="sd">            consolidate_result function)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c"># This adds to results deque in workunit this result object.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_to_workunit</span><span class="p">(</span><span class="s">&#39;results&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">ConsolidatedResult</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<span class="c"># }}}</span>
+
+<span class="c"># Consolidated result {{{</span>
+<span class="k">class</span> <span class="nc">ConsolidatedResult</span><span class="p">(</span><span class="n">Result</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span></div></div>
+<div class="viewcode-block" id="ConsolidatedResult"><a class="viewcode-back" href="../../API.html#Core.Assignment.ConsolidatedResult">[docs]</a><span class="sd">        Consolidated result.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">           @param task_: Task to get result and creators</span>
+<span class="sd">           @type task_: Assignment.task</span>
+<span class="sd">           Consolidated Result, data property returns inittialized data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConsolidatedResult</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">task_</span><span class="o">.</span><span class="n">workunit</span><span class="p">,</span> <span class="n">task_</span><span class="o">.</span><span class="n">user_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">task_</span><span class="o">.</span><span class="n">job_plugin</span><span class="o">.</span><span class="n">consolidate_result</span><span class="p">(</span><span class="n">task_</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+<span class="c"># }}}</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../index.html">Furnivall v0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Ibercivis.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+    </div>
+  </body>
+</html>

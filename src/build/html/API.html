@@ -1,0 +1,603 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Core API &mdash; Furnivall v0.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Furnivall v0.1 documentation" href="index.html" />
+    <link rel="next" title="Views API" href="Views.html" />
+    <link rel="prev" title="Usage workflow" href="Workflow.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Views.html" title="Views API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Workflow.html" title="Usage workflow"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Furnivall v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="core-api">
+<h1>Core API<a class="headerlink" href="#core-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="Core.UserHandler.UserManager">
+<em class="property">class </em><tt class="descclassname">Core.UserHandler.</tt><tt class="descname">UserManager</tt><big>(</big><em>application</em>, <em>request</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#UserManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.UserManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle login, and when asked for return current user object from database.</p>
+<dl class="method">
+<dt id="Core.UserHandler.UserManager.get_current_user">
+<tt class="descname">get_current_user</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#UserManager.get_current_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.UserManager.get_current_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets user set in &#8220;username&#8221; cookie from database.
+If not present, tries to log-in.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.UserHandler.UserManager.login">
+<tt class="descname">login</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#UserManager.login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.UserManager.login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks out login against a database, given username and password
+as args and sets out a cookie.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Core.UserHandler.ObjectManager">
+<em class="property">class </em><tt class="descclassname">Core.UserHandler.</tt><tt class="descname">ObjectManager</tt><big>(</big><em>application</em>, <em>request</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#ObjectManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.ObjectManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object manager, creation, delete and modify petitions should go here.
+Right now, it&#8217;s able to assign a session to a user, a job and a view to
+a researhcer.</p>
+<dl class="method">
+<dt id="Core.UserHandler.ObjectManager.assign_job_to_user">
+<tt class="descname">assign_job_to_user</tt><big>(</big><em>viewfile</em>, <em>user</em><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#ObjectManager.assign_job_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.ObjectManager.assign_job_to_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Having a the view filename (wich is used in views pool),
+create a jobs object with the view object from the views pool.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.UserHandler.ObjectManager.assign_task_to_user">
+<tt class="descname">assign_task_to_user</tt><big>(</big><em>viewfile</em>, <em>user</em><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#ObjectManager.assign_task_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.ObjectManager.assign_task_to_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a task assigned to the logged-in researcher.
+You can modify it later from the plug-in with
+assign</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.UserHandler.ObjectManager.assign_view_to_user">
+<tt class="descname">assign_view_to_user</tt><big>(</big><em>viewfile</em>, <em>user</em><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#ObjectManager.assign_view_to_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.ObjectManager.assign_view_to_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>This has to be called before adding a job to a researcher, in order
+to initialize the view. This will start the view&#8217;s main class and
+add the created objects to initialized_views object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.UserHandler.ObjectManager.check_perms">
+<tt class="descname">check_perms</tt><big>(</big><em>user_perms</em>, <em>perms</em>, <em>check_for_all</em><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#ObjectManager.check_perms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.ObjectManager.check_perms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a user can perform certain actions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.UserHandler.ObjectManager.do_management">
+<tt class="descname">do_management</tt><big>(</big><em>slug</em><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#ObjectManager.do_management"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.ObjectManager.do_management" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object manager get function.
+Creates as requested jobs or views
+Implement this user permissions on the ACL:</p>
+<blockquote>
+<div><p>own_job
+create_job
+view_job
+own_task
+create_task
+view_task
+own_workunit
+create_workunit
+view_workunit
+root</p>
+<p>If we want a task to create another task, the assigned <a href="#id1"><span class="problematic" id="id2">user_</span></a> has to have own_task permissions!
+Note: For a task to create another task, I&#8217;d prefer it to be done via the web interface.
+We can do it at plugin level, but that would mean we wouldn&#8217;t have such a nice access to authentication methods.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.UserHandler.ObjectManager.get">
+<tt class="descname">get</tt><big>(</big><em>slug=False</em><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#ObjectManager.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.ObjectManager.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Core.UserHandler.ObjectManager.get_views_list">
+<tt class="descname">get_views_list</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#ObjectManager.get_views_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.ObjectManager.get_views_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of all views (wich are initialized
+on server restart) available in Views module.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.UserHandler.ObjectManager.post">
+<tt class="descname">post</tt><big>(</big><em>slug=False</em><big>)</big><a class="reference internal" href="_modules/Core/UserHandler.html#ObjectManager.post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.UserHandler.ObjectManager.post" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Core.Assignment.Assignment">
+<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">Assignment</tt><big>(</big><em>workunit_id</em>, <em>user</em>, <em>application</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Assignment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Assignment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assignment object</p>
+<dl class="method">
+<dt id="Core.Assignment.Assignment.append_to_workunit">
+<tt class="descname">append_to_workunit</tt><big>(</big><em>place</em>, <em>notification</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Assignment.append_to_workunit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Assignment.append_to_workunit" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Append notification to Assignment object&#8217;s creator&#8217; list.</p>
+<p>Will get parent&#8217;s list as specified in place argument and append
+notification.</p>
+<p>Should not produce output.</p>
+<p>&#64;type place: string
+&#64;param place: queue object in the parent where we&#8217;ll be storing notification
+&#64;type notification: string
+&#64;param notification: Object we&#8217;ll add to parent place.
+&#64;returns: None</p>
+</div></blockquote>
+<p>w</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Assignment.conf">
+<tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#Core.Assignment.Assignment.conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom function to read conf in two steps instead of three (..).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Assignment.globalize">
+<tt class="descname">globalize</tt><big>(</big><em>id_</em>, <em>application</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Assignment.globalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Assignment.globalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make this object part of the global queue, depending on the class
+This has a lot of magic... it gets the main class and appends the
+object to the list named as the  main class + &#8216;s&#8217;, so we get results
+and tasks in parent.result and parent.task classes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Assignment.read_config">
+<tt class="descname">read_config</tt><big>(</big><big>)</big><a class="headerlink" href="#Core.Assignment.Assignment.read_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads default furnivall config from ./furnivall.conf ~/.furnivall.conf and /etc/furnivall.ConfigPars
+Stores it in self.conf and returns it.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Core.Assignment.Task">
+<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">Task</tt><big>(</big><em>workunit_</em>, <em>user_</em>, <em>application</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Task object</p>
+<dl class="method">
+<dt id="Core.Assignment.Task.append_to_workunit">
+<tt class="descname">append_to_workunit</tt><big>(</big><em>place</em>, <em>notification</em><big>)</big><a class="headerlink" href="#Core.Assignment.Task.append_to_workunit" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Append notification to Assignment object&#8217;s creator&#8217; list.</p>
+<p>Will get parent&#8217;s list as specified in place argument and append
+notification.</p>
+<p>Should not produce output.</p>
+<p>&#64;type place: string
+&#64;param place: queue object in the parent where we&#8217;ll be storing notification
+&#64;type notification: string
+&#64;param notification: Object we&#8217;ll add to parent place.
+&#64;returns: None</p>
+</div></blockquote>
+<p>w</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Task.conf">
+<tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#Core.Assignment.Task.conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom function to read conf in two steps instead of three (..).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Task.globalize">
+<tt class="descname">globalize</tt><big>(</big><em>id_</em>, <em>application</em><big>)</big><a class="headerlink" href="#Core.Assignment.Task.globalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make this object part of the global queue, depending on the class
+This has a lot of magic... it gets the main class and appends the
+object to the list named as the  main class + &#8216;s&#8217;, so we get results
+and tasks in parent.result and parent.task classes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Task.read_config">
+<tt class="descname">read_config</tt><big>(</big><big>)</big><a class="headerlink" href="#Core.Assignment.Task.read_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads default furnivall config from ./furnivall.conf ~/.furnivall.conf and /etc/furnivall.ConfigPars
+Stores it in self.conf and returns it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Task.score_match">
+<tt class="descname">score_match</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Task.score_match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Task.score_match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells how adequate this task is for this user</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Task.task_validator">
+<tt class="descname">task_validator</tt><big>(</big><em>result</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Task.task_validator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Task.task_validator" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;type futureObject:
+&#64;param futureObject: task</p>
+<p>Validates the task, calling the plugin_object&#8217;s validate_task function.</p>
+<p>If task has passed, lets self.validated to true, otherwise it sets it to false.
+self.validated has to be -1 if task_validator has not yet been executed</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Core.Assignment.Result">
+<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">Result</tt><big>(</big><em>task_</em>, <em>description</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Result class. Creates a result object when a task is done</p>
+<dl class="method">
+<dt id="Core.Assignment.Result.append_to_workunit">
+<tt class="descname">append_to_workunit</tt><big>(</big><em>place</em>, <em>notification</em><big>)</big><a class="headerlink" href="#Core.Assignment.Result.append_to_workunit" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Append notification to Assignment object&#8217;s creator&#8217; list.</p>
+<p>Will get parent&#8217;s list as specified in place argument and append
+notification.</p>
+<p>Should not produce output.</p>
+<p>&#64;type place: string
+&#64;param place: queue object in the parent where we&#8217;ll be storing notification
+&#64;type notification: string
+&#64;param notification: Object we&#8217;ll add to parent place.
+&#64;returns: None</p>
+</div></blockquote>
+<p>w</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Result.conf">
+<tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#Core.Assignment.Result.conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom function to read conf in two steps instead of three (..).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Result.consolidate_result">
+<tt class="descname">consolidate_result</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#Result.consolidate_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.Result.consolidate_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notify task&#8217;s creator itself to result (this will be called when task is finished).
+Then, call creator&#8217;s consolidate_result function (wich probably will call this tasks&#8217;s plugin
+consolidate_result function)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Result.globalize">
+<tt class="descname">globalize</tt><big>(</big><em>id_</em>, <em>application</em><big>)</big><a class="headerlink" href="#Core.Assignment.Result.globalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make this object part of the global queue, depending on the class
+This has a lot of magic... it gets the main class and appends the
+object to the list named as the  main class + &#8216;s&#8217;, so we get results
+and tasks in parent.result and parent.task classes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.Result.read_config">
+<tt class="descname">read_config</tt><big>(</big><big>)</big><a class="headerlink" href="#Core.Assignment.Result.read_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads default furnivall config from ./furnivall.conf ~/.furnivall.conf and /etc/furnivall.ConfigPars
+Stores it in self.conf and returns it.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Core.Assignment.ConsolidatedResult">
+<em class="property">class </em><tt class="descclassname">Core.Assignment.</tt><tt class="descname">ConsolidatedResult</tt><big>(</big><em>task_</em><big>)</big><a class="reference internal" href="_modules/Core/Assignment.html#ConsolidatedResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Assignment.ConsolidatedResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Consolidated result.</p>
+<dl class="method">
+<dt id="Core.Assignment.ConsolidatedResult.append_to_workunit">
+<tt class="descname">append_to_workunit</tt><big>(</big><em>place</em>, <em>notification</em><big>)</big><a class="headerlink" href="#Core.Assignment.ConsolidatedResult.append_to_workunit" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Append notification to Assignment object&#8217;s creator&#8217; list.</p>
+<p>Will get parent&#8217;s list as specified in place argument and append
+notification.</p>
+<p>Should not produce output.</p>
+<p>&#64;type place: string
+&#64;param place: queue object in the parent where we&#8217;ll be storing notification
+&#64;type notification: string
+&#64;param notification: Object we&#8217;ll add to parent place.
+&#64;returns: None</p>
+</div></blockquote>
+<p>w</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.ConsolidatedResult.conf">
+<tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#Core.Assignment.ConsolidatedResult.conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom function to read conf in two steps instead of three (..).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.ConsolidatedResult.consolidate_result">
+<tt class="descname">consolidate_result</tt><big>(</big><big>)</big><a class="headerlink" href="#Core.Assignment.ConsolidatedResult.consolidate_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notify task&#8217;s creator itself to result (this will be called when task is finished).
+Then, call creator&#8217;s consolidate_result function (wich probably will call this tasks&#8217;s plugin
+consolidate_result function)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.ConsolidatedResult.globalize">
+<tt class="descname">globalize</tt><big>(</big><em>id_</em>, <em>application</em><big>)</big><a class="headerlink" href="#Core.Assignment.ConsolidatedResult.globalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make this object part of the global queue, depending on the class
+This has a lot of magic... it gets the main class and appends the
+object to the list named as the  main class + &#8216;s&#8217;, so we get results
+and tasks in parent.result and parent.task classes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Assignment.ConsolidatedResult.read_config">
+<tt class="descname">read_config</tt><big>(</big><big>)</big><a class="headerlink" href="#Core.Assignment.ConsolidatedResult.read_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads default furnivall config from ./furnivall.conf ~/.furnivall.conf and /etc/furnivall.ConfigPars
+Stores it in self.conf and returns it.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Core.Jobs.Job">
+<em class="property">class </em><tt class="descclassname">Core.Jobs.</tt><tt class="descname">Job</tt><big>(</big><em>view_object</em>, <em>plugin_object</em>, <em>request</em>, <em>id_</em>, <em>user</em><big>)</big><a class="reference internal" href="_modules/Core/Jobs.html#Job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Jobs.Job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Job class</p>
+<dl class="method">
+<dt id="Core.Jobs.Job.conf">
+<tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#Core.Jobs.Job.conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom function to read conf in two steps instead of three (..).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Jobs.Job.produce_initial_workunits">
+<tt class="descname">produce_initial_workunits</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/Jobs.html#Job.produce_initial_workunits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Jobs.Job.produce_initial_workunits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Core.Jobs.Job.produce_workunits">
+<tt class="descname">produce_workunits</tt><big>(</big><em>number=1</em><big>)</big><a class="reference internal" href="_modules/Core/Jobs.html#Job.produce_workunits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Jobs.Job.produce_workunits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates N new workunit objects, with this job as job and
+appends them to our workunits queque.
+If N is 1, it will also return the created workunit.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">=</span><span class="n">job</span><span class="p">(</span><span class="n">viewtest</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">workunits</span><span class="p">)</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">produce_workunits</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">workunits</span><span class="p">)</span>
+<span class="go">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">a</span><span class="o">.</span><span class="n">workunits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> 
+<span class="go">&lt;WorkUnit.workunit object at 0x...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">a</span><span class="o">.</span><span class="n">workunits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tasks</span> 
+<span class="go">deque([[0, &lt;Assignment.task object at 0x...&gt;]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Jobs.Job.read_config">
+<tt class="descname">read_config</tt><big>(</big><big>)</big><a class="headerlink" href="#Core.Jobs.Job.read_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads default furnivall config from ./furnivall.conf ~/.furnivall.conf and /etc/furnivall.ConfigPars
+Stores it in self.conf and returns it.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Core.common.FurnivallPersistent">
+<em class="property">class </em><tt class="descclassname">Core.common.</tt><tt class="descname">FurnivallPersistent</tt><a class="reference internal" href="_modules/Core/common.html#FurnivallPersistent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.common.FurnivallPersistent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common functions for all furnivall
+Right now, only config management is defined here.</p>
+<dl class="method">
+<dt id="Core.common.FurnivallPersistent.conf">
+<tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="reference internal" href="_modules/Core/common.html#FurnivallPersistent.conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.common.FurnivallPersistent.conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom function to read conf in two steps instead of three (..).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.common.FurnivallPersistent.read_config">
+<tt class="descname">read_config</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/common.html#FurnivallPersistent.read_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.common.FurnivallPersistent.read_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads default furnivall config from ./furnivall.conf ~/.furnivall.conf and /etc/furnivall.ConfigPars
+Stores it in self.conf and returns it.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Core.Personality.User">
+<em class="property">class </em><tt class="descclassname">Core.Personality.</tt><tt class="descname">User</tt><big>(</big><em>application</em><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.User" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="Core.Personality.User.all_tasks">
+<tt class="descname">all_tasks</tt><a class="reference internal" href="_modules/Core/Personality.html#User.all_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.User.all_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;returns: List of initialized task objects owned by this user</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Core.Personality.User.completed_tasks">
+<tt class="descname">completed_tasks</tt><a class="reference internal" href="_modules/Core/Personality.html#User.completed_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.User.completed_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>&#64;returns: List of initialized task objects owned by this</dt>
+<dd>user that are finished</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Personality.User.conf">
+<tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#Core.Personality.User.conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom function to read conf in two steps instead of three (..).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Personality.User.get_session_id">
+<tt class="descname">get_session_id</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#User.get_session_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.User.get_session_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a <em>unique</em> session id.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Personality.User.grant_permission">
+<tt class="descname">grant_permission</tt><big>(</big><em>permission</em><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#User.grant_permission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.User.grant_permission" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Core.Personality.User.read_config">
+<tt class="descname">read_config</tt><big>(</big><big>)</big><a class="headerlink" href="#Core.Personality.User.read_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads default furnivall config from ./furnivall.conf ~/.furnivall.conf and /etc/furnivall.ConfigPars
+Stores it in self.conf and returns it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Personality.User.set_data">
+<tt class="descname">set_data</tt><big>(</big><em>id_</em><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#User.set_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.User.set_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns user and host.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.Personality.User.set_password">
+<tt class="descname">set_password</tt><big>(</big><em>password</em><big>)</big><a class="reference internal" href="_modules/Core/Personality.html#User.set_password"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.Personality.User.set_password" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Core.WorkUnit.Workunit">
+<em class="property">class </em><tt class="descclassname">Core.WorkUnit.</tt><tt class="descname">Workunit</tt><big>(</big><em>job_id</em>, <em>user</em>, <em>workunit</em>, <em>application=False</em><big>)</big><a class="reference internal" href="_modules/Core/WorkUnit.html#Workunit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.Workunit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Workunit</p>
+<dl class="method">
+<dt id="Core.WorkUnit.Workunit.conf">
+<tt class="descname">conf</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#Core.WorkUnit.Workunit.conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom function to read conf in two steps instead of three (..).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.WorkUnit.Workunit.consolidate_result">
+<tt class="descname">consolidate_result</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/WorkUnit.html#Workunit.consolidate_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.Workunit.consolidate_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>If workunit.status is true, it will create a <em>consolidatedres</em> object,
+passing self.results and job&#8217;s view_object</p>
+<p>consolidatedres will then store into it&#8217;s data property a consolidated result
+got from self.job.view_object.consolidate_result</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.WorkUnit.Workunit.create_tasks">
+<tt class="descname">create_tasks</tt><big>(</big><em>number</em>, <em>user</em><big>)</big><a class="reference internal" href="_modules/Core/WorkUnit.html#Workunit.create_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.Workunit.create_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a number of tasks objects and launches them on different threads.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.WorkUnit.Workunit.do_initial_tasks">
+<tt class="descname">do_initial_tasks</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Core/WorkUnit.html#Workunit.do_initial_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.Workunit.do_initial_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create job.initial_tasks tasks</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Core.WorkUnit.Workunit.read_config">
+<tt class="descname">read_config</tt><big>(</big><big>)</big><a class="headerlink" href="#Core.WorkUnit.Workunit.read_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads default furnivall config from ./furnivall.conf ~/.furnivall.conf and /etc/furnivall.ConfigPars
+Stores it in self.conf and returns it.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Core.WorkUnit.Workunit.status">
+<tt class="descname">status</tt><a class="reference internal" href="_modules/Core/WorkUnit.html#Workunit.status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.Workunit.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Workunit.status: Boolean property displaying if there&#8217;re enought ok tasks.
+If called as property, expected can&#8217;t be specified, will be got from self.expected.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Core.WorkUnit.Workunit.tasks_failed">
+<tt class="descname">tasks_failed</tt><a class="reference internal" href="_modules/Core/WorkUnit.html#Workunit.tasks_failed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.Workunit.tasks_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of tasks that have failed for this workunit</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Core.WorkUnit.Workunit.tasks_ok">
+<tt class="descname">tasks_ok</tt><a class="reference internal" href="_modules/Core/WorkUnit.html#Workunit.tasks_ok"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.Workunit.tasks_ok" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check all the tasks for this workunit with status true.
+Wich means they&#8217;re finished and possitive in validation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Core.WorkUnit.Workunit.tasks_running">
+<tt class="descname">tasks_running</tt><a class="reference internal" href="_modules/Core/WorkUnit.html#Workunit.tasks_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Core.WorkUnit.Workunit.tasks_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of tasks that are currently running for this workunit</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Workflow.html"
+                        title="previous chapter">Usage workflow</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Views.html"
+                        title="next chapter">Views API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/API.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Views.html" title="Views API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Workflow.html" title="Usage workflow"
+             >previous</a> |</li>
+        <li><a href="index.html">Furnivall v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Ibercivis.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+    </div>
+  </body>
+</html>

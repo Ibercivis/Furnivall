@@ -1,0 +1,10 @@
+<map id="inheritanceab7f7ecdb5" name="inheritanceab7f7ecdb5">
+<area shape="rect" id="node1" href="API.html#Core.Assignment.ConsolidatedResult" title="Core.Assignment.ConsolidatedResult" alt="" coords="605,3,764,20"/>
+<area shape="rect" id="node2" href="API.html#Core.Assignment.Result" title="Core.Assignment.Result" alt="" coords="466,3,574,20"/>
+<area shape="rect" id="node4" href="API.html#Core.Assignment.Assignment" title="Core.Assignment.Assignment" alt="" coords="304,19,434,36"/>
+<area shape="rect" id="node9" href="API.html#Core.Assignment.Task" title="Core.Assignment.Task" alt="" coords="469,35,570,51"/>
+<area shape="rect" id="node6" href="API.html#Core.Jobs.Job" title="Core.Jobs.Job" alt="" coords="337,50,401,67"/>
+<area shape="rect" id="node7" href="API.html#Core.common.FurnivallPersistent" title="Core.common.FurnivallPersistent" alt="" coords="129,66,273,83"/>
+<area shape="rect" id="node13" href="API.html#Core.WorkUnit.Workunit" title="Core.WorkUnit.Workunit" alt="" coords="316,82,422,98"/>
+<area shape="rect" id="node15" href="API.html#Core.Personality.User" title="Core.Personality.User" alt="" coords="320,113,418,130"/>
+</map>
