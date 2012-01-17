@@ -1,4 +1,5 @@
-import sample, Genealogy
+import Furnivall.Core.Views.Sample as sample
+import Furnivall.Core.Views.Genealogy as Genealogy
 
 __all__=['sample', 'Genealogy']
 ViewClasses = {}
