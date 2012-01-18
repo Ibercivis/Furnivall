@@ -76,7 +76,6 @@ Work method
 Proposals for organization of the system
 -------------------------------------------
 
-.. image:: http://yuml.me/diagram/scruffy/class/73e07696.png
 .. image:: http://yuml.me/diagram/scruffy;/class/%23%20Cool%20Class%20Diagram,%20%5BCore%7CAPI%20Exporter%5D%20%3C%20-%20Extends%20%20%5BPlugins%7CAPI%20Exporter;%20Task%20Manager;%20Administration%5D,%20%5BCore%5D%20%3C%20-%20%3E%20%5BViews%5D,%20%5BPlugins%5D%3C%20Extends%20via%20API%20-%20API%20%3E%20%5BExternal%20Plugins%7CAPI%20Exporter%5D.png
  
 Interaction between objects

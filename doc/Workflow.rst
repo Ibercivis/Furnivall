@@ -71,8 +71,6 @@ After we've developed the plugin, our researcher will have to go trought the fol
 Admin page
 +++++++++++
 
-.. image:: images/admin.png
-
 * Initialize a view, selecting it from the users' views selectbox.
 * Create a job based on that initialized view object, after reloading the page (this will be done with ajax at some point)
     - This creates the number of workunits provided in the plugins' initialization code. (this will be done manually)
