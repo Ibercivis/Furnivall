@@ -1,42 +1,157 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 {% extends "base.html" %}
 {% block title %} Furnivall Administration interface {%end%}
-{% block head %} <meta name="generator" value="Furnivall" /> {%end%}
-{% block body %}
-        {% if user_permissions == "root" %}
-        <h1> Researcher listing </h1>
-        <div class="researchers">
-            {% for researcher in researchers.keys() %}
-            <div class="researcher">
-                <form action="#" onclick="$('#form.submit')" id="form">
-                    <label for="researcher_name"> Name: </label> <input type="text" name="researcher_name" value="{{ researchers[researcher].user }}" /><br/>
-                    <label for="researcher_id"> ID: </label> <span name="researcher_id" value="{{ researchers[researcher].id_ or False }} " />
-                     <h2>Current jobs:</h2>
-                        <div class="jobs_creator">
-                            Available views to create new jobs:
-                        </div>
-                </form>
+{% block head %}
+    <style type="text/css"> h2{ text-align:center; width:100%; text-transform:uppercase; } </style>
+    <script>
+        function do_administration_profile(researcher){
+            $.post('/admin/update_profile/' + researcher, {'name': $('#' + researcher + 'name').val() }, function(response){$('.messages').html(response)});
+        }
 
-                <h3> Load plugin </h3>
-                <form action="/new/view">
-                    <label for="viewfile">File: </label><input type="text" name="viewfile" />
-                    <input type="hidden" name="researcher" value="{{ researcher }}" />
-                    <input type="submit"/>
-                </form>
-                <h3> Create new job from plugin </h3> 
-                {% for view in researchers[researcher].initialize_views %}
-                    <a href="/new/job?viewfile=\"{{researchers[researcher].initialize_views[view].name }}\"&researcher=\"{{researcher}}\"" > {{ researchers[researcher].initialize_views[view].description }} </a>
-                {% end %}
-            {%end%}
-        </div>
-        <h1> Create new researcher </h1>
-        <div class="new_researcher">
-            <form action="/new/researcher">
-                <label for="re_name">Name </label> <input type="text" name="re_name" />
-                <input type="submit" />
+        function do_create_tasks(job, workunit, number_){
+            console.debug(number_);
+            $.post('/new/task', {
+                'number' : number_,
+                'job' : job,
+                'workunit' : workunit,
+                '_xsrf': '{{xsrf}}'
+            });
+        }
+
+        function do_administration_newview(researcher){
+                console.debug($('#' + researcher + '_views :selected').val());
+                 $.post('/new/view', {
+                    'viewfile': $('#' + researcher + '_views :selected').val(),
+                    '_xsrf': '{{xsrf}}'
+                 }, function(response){$('.messages').html(response)});
+        }
+</script>
+{%end%}
+{% block body %} {% if is_root %}
+    <header> <h1> Per-researcher elements listing </h1> </header>
+    <div class="container">
+        {% for researcher in researchers.keys() %}
+            <h2> <a href="#" onclick="$('#form_{{researcher}}').toggle(250); return false"> {{researcher}} </a> </h2>
+            <form style="display:none" action="#" id="form_{{researcher}}" onsubmit="do_administration_profile('{{researcher}}'); return false;">
+                <div id="messages" class="warn"></div>
+                <input type="hidden" name="researcher" value="{{ researcher }}" />
+
+                <div class="span-7 colborder">
+                    <fieldset>
+                        <legend> User profile </legend>
+                        <label for="researcher_name"> Name: </label>
+                            <input type="text" name="researcher_name_{{researcher}}"  value="{{ researcher }}" /><br/>
+                    </fieldset>
+                </div>
+                <div class="span-7 colborder">
+                    <fieldset>
+                        <legend> Activate plugin </legend>
+                        <select id="{{researcher}}_views" onchange="do_administration_newview('{{researcher}}'); return false">
+                            {% for view in avail_views%}
+                                <option id="researcher_view_{{view}}" value="{{view}}"  >{{view}}</option>
+                            {%end%}
+                        </select>
+                    </fieldset>
+                </div>
+
+
+                <div class="span-8 last">
+                    <fieldset>
+                        <legend> Activated plugins </legend>
+                        <ul style="list-style:none">
+                        {% for available_view in researchers[researcher].initialized_views.keys() %}
+                            <li> <a href="/new/job?view_object={{ available_view }}&viewfile={{available_view}}"> Create job from {{ available_view }} </a></li>
+                        {% end %}
+                        </ul>
+                    </fieldset>
+                </div> <br/>
+
+                <div class="span-20">
+                    <fieldset> <legend> Current jobs</legend>
+                        <ul style="list-style:none">
+                        {% for job in researchers[researcher].jobs.keys() %}
+                            <li> 
+                                <a href="#" onclick="$('#box_{{job}}').toggle(); return false;">Job: {{job}}</a>
+                                <ul style="list-style:none">
+                                    <li>
+                                        Owner: {{researchers[researcher].jobs[job] }}
+                                    </li>
+                                    <li>
+                                    <div id="box_{{job}}" style="display:none"> 
+                                        {% for workunit in researchers[researcher].jobs[job].workunits.keys() %}
+                                        <div class="workunit">
+                                            <ul style="list-style:none;" class="rowborder">
+                                                <li>
+                                                    <a href="#" onclick="$('#{{workunit}}').toggle(); return false" >
+                                                         Workunit ID: {{workunit}}
+                                                     </a>
+                                                </li>
+                                                <li>
+                                                        Status :
+                                                    {% if researchers[researcher].jobs[job].workunits[workunit].status %} 
+                                                        Finished 
+                                                    {%else%} 
+                                                        Running 
+                                                    {%end%}
+    
+                                                    <div class="workunit_extended_info" id="{{workunit}}" style="display:none">
+                                                        <ul style="list-style:none;" class="rowborder">
+                                                            <li>
+                                                                Total tasks:
+                                                                {{ len(researchers[researcher].jobs[job].workunits[workunit].tasks) }}
+                                                            </li>
+                
+                                                            <li>
+                                                                Running tasks: 
+                                                                {{ len(researchers[researcher].jobs[job].workunits[workunit].tasks_running) }}
+                                                            </li>
+                                                            <li> Failed tasks: {{ len(researchers[researcher].jobs[job].workunits[workunit].tasks_failed) }} </li>
+                                                            <li> Correctly finished tasks: {{ len(researchers[researcher].jobs[job].workunits[workunit].tasks_ok) }} </li>
+                                                            <li>
+                                                                <label for="number"> Create tasks </label>
+                                                                <input type="number" id="create_tasks_{{workunit}}" name="create_tasks"><hr class="space" />
+                                                                <button class="button positive" type="button"
+                                                                    onclick="do_create_tasks('{{job}}', '{{workunit}}',
+                                                                             $('#create_tasks_{{workunit}}').val());
+                                                                             return false;">
+                                                                         Save
+                                                                </button>
+                                                                <hr class="space" />
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                            {%end%}
+                                        </div>
+                                     </div>
+                                     </li>
+                                    </ul>
+                                    </li>
+                                {%end%}
+                            </ul>
+                    </fieldset>
+                </div>
+                <hr class="space" />
+                <button class="button positive" type="submit" onclick="do_administration({{researcher}});"> Save </button>
+                <hr class="space" />
             </form>
-        </div>
-        {% else %}
-        <h1> Access denied </h1> <!-- Priority TODO: Implement an ACL. We should check current user permissions for creating/deleting/modifying others' researcher objects. So, check in each object if its owner is root or its own owner before doing anyghing. !-->
         {%end%}
+     </div>
+
+     <h1> Create new researcher </h1>
+     <div class="new_researcher container">
+        <form action="/new/researcher">
+            <ul style="list-style:none"> 
+                <li><label for="re_name">Name </label> <input type="text" name="re_name" /></li>
+                <li><button class="button positive" type="submit" > Create </button></li>
+            </ul>
+        </form>
+     </div>
+
+{% else %}
+    <h1> Permission denied </h1>
+    <div> <p> <a href="/">Go Back</a> </p> </div>
+{%end%}
+
 {%end%}       

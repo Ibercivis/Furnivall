@@ -1,2 +1,3 @@
-__all__=['sample']
-import sample
+__all__=['sample', 'GenealogyPlugin']
+from Furnivall.Plugins import sample
+from Furnivall.Plugins import GenealogyPlugin

@@ -1,192 +1,167 @@
 #!/usr/bin/env python
-import asyncore
-from concurrent.futures import *
-from collections import deque
-from Personality import *
-from Core.Tests import testclass
-from tornado.options import options, define
-from sqlobject import *
 
-define('tasks_total_queue', default=deque())
-define('tasks_failed_queue', default=deque())
-define('tasks_ok_queue', default=deque())
-define('results_queue', default=deque())
+"""
+    Assignment object and sons.
+"""
 
-class plugintest(testclass):
-    def __init__(self):
-        self.workunits=10
-        self.pluginmodule=Tests
-        self.pluginclass="testclass"
-        self.description="foobar"
+import concurrent.futures, logging, uuid
+from Furnivall.Core.common import FurnivallPersistent
 
-    def main(self):
-        return "foo" 
-
-class Assignment(object):
-    def __init__(self, creator_id, workunit_id, volunteer_id):
+# Assignment data {{{
+class Assignment(FurnivallPersistent):
+    """
+        Assignment object
+    """
+    def __init__(self, workunit_id, user, application):
         """
-            Superclass of task and Result, contains common properties
-            for both.
-
-            >>> a=Assignment(Job(viewtest, plugintest),[],[])
-            # Should not give response
+            Superclass of task and Result.
+            @param workunit_id: Id of the parent workunit of this assignment
+            @type workunit_id: int
+            @param user_id: Id of the user_ that got this assignment.
+            @result: None.
         """
-        self.creator=options.job_queue[creator_id]
-        self.workunit=options.workunit_queue[workunit_id]
-        self.volunteer=options.volunteer_queue[volunteer_id]
+        self.application = application
+        self.workunit = workunit_id
+        self.user_ = user
+        self.result = ""
+        self.id_ = 0
+        self.status = -1
 
-    def append_to_creator(self, place, notification):
+    def append_to_workunit(self, place, notification):
         """
-            Append notification to Assignment object's creator' list. 
+            Append notification to Assignment object's creator' list.
 
             Will get parent's list as specified in place argument and append
             notification.
 
             Should not produce output.
 
-            >>> a=Assignment(creatorTest(),[],[]) #doctest: +ELLIPSIS
-            >>> a.append_to_creator('tasks','fooobar')
-            >>> a.creator.tasks 
-            >>> # should be empty, as tasks are not executed synchronously
-            >>> # (except for the foobar we just notified) NOTE: As this is
-            >>> # not having control over the task time, MIGHT fail. )
-            ['fooobar']
-        
-        """
-        getattr(self.creator, place).append(notification)
-        
-class task(Assignment):
-    def __init__(self, creator, workunit, volunteer, description):
-        """
-            Will launch as executor the *launch* function, wich is actually a
-            call to job.pluginobject.launch_task. That will call the plugin
-            to launch the task itself, all of it is made asynchronously.
-            When created, it'll notify its creator that's been created,
-            and, when finished, it'll validate it.
+            @type place: string
+            @param place: queue object in the parent where we'll be storing notification
+            @type notification: string
+            @param notification: Object we'll add to parent place.
+            @returns: None
 
-            TODO: by default task's assigning a volunteer, empty, change it to FALSE.'
-            TODO: Right now this unit testing must be refactorished to use queues.
+w
+        """
+        getattr(self.workunit, place)[self.id_] = notification
+# }}}
 
-            >>> a=task(creatorTest(),[],[],"Task test")
-            >>> a.description
-            'Task test'
-            >>> a.creator #doctest: +ELLIPSIS
-            <__main__.creatorTest object at 0x...>
-            >>> a.workunit
-            []
-            >>> a.volunteer
-            []
-            >>> a.creator.tasks #doctest: +ELLIPSIS
-            [[<__main__.task object at 0x...>, <Future at 0x... state=finished returned NoneType>]]
+# Assignment {{{
+class Task(Assignment):
+    """
+        Task object
+    """
+
+    def __init__(self, workunit_, user_, application):
+        """
+            @type workunit_: Core.Workunit object
+            @param workunit_: Workunit directly responsible for this task.
+
+            @type user: Personality.User object
+            @param user: User directly responsible for this task
+
+            @returns: Appends to workunit, in the workunit's tasks
+                queue the result of launch_task from job's pluginobject.
 
         """
-        super(task, self).__init__(creator, workunit, volunteer) # Initialize superclass. 
-        self.description=description 
-        MAX_WORKERS=20 # FIXME This has to be configurable!
-        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor: # Async call 
-            self.futureobject=executor.submit(self.launch) 
-            self.futureobject.add_done_callback(self.task_validator) # We validate it once it's done.
-            self.append_to_creator('tasks',[self, self.futureobject])
- 
-    def scoreMatch(self, volunteer): #surely not volunteer, but architecture or something so
+
+        super(Task, self).__init__(workunit_, user_, application)
+        self.parent_job = getattr(self.workunit, "job")
+        self.job_plugin = getattr(self.parent_job, 'plugin_object')
+        self.description = self.job_plugin.description
+        self.id_ = uuid.uuid4().__str__()
+
+        try:
+            self.db = self.application.db[self.job_plugin.unique_name +\
+                "_" + self.user_ ]
+        except KeyError:
+            self.application.db[self.job_plugin.unique_name +\
+                "_" + self.user_ ] = {}
+            self.db = self.application.db[self.job_plugin.unique_name +\
+                "_" + self.user_ ]
+
+        self.append_to_workunit('tasks', self)
+
+    def score_match(self):
         """
-            Tells how adequate this task is for this volunteer.
-
-            Returns 0 if the task can not be executed by the volunteer's architecture. Else it returns
-            a real between 0 and 1.
-
+            Tells how adequate this task is for this user
         """
-        return 0
+        if self.user_ and self.description:
+            return getattr(self.workunit.job.plugin_object, 'score_match')(self.user_)
 
-    def launch(self):
+    def __call__(self):
         """
-            Produces asynchronously the Result.
-            Once we have the Result (we can do whatever here, it's async...
-
-            *Notes*
-
-            - We've got to use "Result" object for that, creating a result object in plugin.launch_task.
-
-            *Warns*
-
-            - Result needs the reference to task the task to notify its creator
-
-            *TODO*
-
-            - It might be more readable with self.creator.job.pluginObject.launch_task(self)
-            - It's a way to have each job with a different launch function (Result producer)
+            Executes launch_task from workunit's job plugin_object.
+            @returns: Assignment.Result object containing this task.
 
         """
-        logging.info('\t\t\t[Debug] Asynchronous init for task %s \n\t\t\t\t Parent %s \n\t\t\t\t Grandfather %s' %(self, self.workunit, self.creator.job))
-        return getattr(getattr(self.creator, "job"), self.pluginObject).launch_task(self) # This can be done like that in a futureObject
 
+        logging.debug("Task %s belongs to job %s and workunit %s",
+            self.id_, self.parent_job, self.workunit)
+        logging.debug("Plugin is %s with descpription %s",
+            self.job_plugin, self.job_plugin.description)
 
-    def task_validator(self, futureObject): #this is a bad name, because in BOINC validation is a wider concep
+        self.result = self.job_plugin.task_executor(self)
+        logging.info(self.result)
+        return Result(self, self.description, self.application)
+
+    def task_validator(self, result):
         """
-            Validates the task, calling the pluginObject's validate_task function.
+            @type futureObject:
+            @param futureObject: task
 
-            If task has passed, it'll append it to task_ok pool at it's creator, 
-            otherwise in tasks_fail
+            Validates the task, calling the plugin_object's validate_task function.
 
+            If task has passed, lets self.validated to true, otherwise it sets it to false.
+            self.validated has to be -1 if task_validator has not yet been executed
 
         """
-        passed=getattr(self.creator, "job").pluginObject.validate_task(self, futureObject)
-        if passed:
-            self.append_to_creator('tasks_ok', self)  
-            # TODO: create a result here? Or from http service?
-        else:
-            self.append_to_creator('tasks_fail', self)  #quizas mejor self.creator.FailTask(self) ???
+        plugin = self.workunit.job.plugin_object
+        self.status = getattr(plugin, 'validate_task')(result)
+# }}}
 
+# Result {{{
 class Result(Assignment):
-    def __init__(self, task, description):
+    """
+        Result class. Creates a result object when a task is done
+    """
+    def __init__(self, task_, description):
         """
+            @type task_
+            @params task_
+            @returns none
             Result object for a task.
 
-            >>> workunit=WorkUnit()
-            >>> a=task(creatorTest(),0,0,"Task test")
-            >>> a.description
-            'Task test'
-            >>> b=Result(a,'result description')
-            >>> b.creator #doctest: +ELLIPSIS
-            <__main__.creatorTest object at 0x...>
-            >>> b.workunit
-            []
-            >>> b.volunteer
-            []
-            >>> b.append_to_creator('tasks','fooobar')
-            >>> b.creator.tasks #doctest: +ELLIPSIS
-            [[<__main__.task object at 0x...>, <Future at 0x... state=finished returned NoneType>], 'fooobar']
-
         """
-        
-        super(Result, self).__init__(task.creator, task.workunit, task.volunteer)
-        self.description=description 
 
-    def Result_notification(self):
+        super(Result, self).__init__(task_.workunit, task_.user_)
+        self.description = description
+
+    def consolidate_result(self):
         """
             Notify task's creator itself to result (this will be called when task is finished).
             Then, call creator's consolidate_result function (wich probably will call this tasks's plugin
             consolidate_result function)
         """
-        self.append_to_creator('results', self) # This adds to results deque in workunit this result object. 
-        self.creator.consolidate_result()
 
+        # This adds to results deque in workunit this result object.
+        self.append_to_workunit('results', self)
+
+        self.result = ConsolidatedResult(self)
+# }}}
+
+# Consolidated result {{{
 class ConsolidatedResult(Result):
-    def __init__(self, data, plugin):
+    """
+        Consolidated result.
+    """
+    def __init__(self, task_):
         """
+           @param task_: Task to get result and creators
+           @type task_: Assignment.task
            Consolidated Result, data property returns inittialized data.
         """
-        self.data=plugin.consolidate_result(data)
-
-    @property
-    def data(self):
-        return self.data
-
-if __name__ == "__main__":
-    """
-        This should never be used as standalone but for unittests
-    """
-    import doctest
-    from Jobs import *
-    from Tests import *
-    doctest.testmod()
+        super(ConsolidatedResult, self).__init__(task_.workunit, task_.user_)
+        self.data = task_.job_plugin.consolidate_result(task_.result)
+# }}}
