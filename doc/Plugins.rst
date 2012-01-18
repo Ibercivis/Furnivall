@@ -1,7 +1,7 @@
 Plugins API
 ===========
 
-.. autoclass:: Plugins.sample.SamplePlugin
+.. autoclass:: Furnivall.Plugins.sample.SamplePlugin
     :members:
     :inherited-members:
     :undoc-members:

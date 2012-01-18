@@ -1,51 +1,51 @@
-Core API
+Furnivall.Core.API
 ========
 
-.. autoclass:: Core.UserHandler.UserManager
+.. autoclass:: Furnivall.Core.UserHandler.UserManager
     :members:
     :undoc-members:
 
-.. autoclass:: Core.UserHandler.ObjectManager
+.. autoclass:: Furnivall.Core.UserHandler.ObjectManager
     :members:
     :undoc-members:
 
-.. autoclass:: Core.Assignment.Assignment
-    :members:
-    :inherited-members:
-    :undoc-members:
-
-.. autoclass:: Core.Assignment.Task
+.. autoclass:: Furnivall.Core.Assignment.Assignment
     :members:
     :inherited-members:
     :undoc-members:
 
-.. autoclass:: Core.Assignment.Result
+.. autoclass:: Furnivall.Core.Assignment.Task
     :members:
     :inherited-members:
     :undoc-members:
 
-.. autoclass:: Core.Assignment.ConsolidatedResult
+.. autoclass:: Furnivall.Core.Assignment.Result
     :members:
     :inherited-members:
     :undoc-members:
 
-.. autoclass:: Core.Jobs.Job
+.. autoclass:: Furnivall.Core.Assignment.ConsolidatedResult
+    :members:
+    :inherited-members:
+    :undoc-members:
+
+.. autoclass:: Furnivall.Core.Jobs.Job
     :members:
     :inherited-members:
     :undoc-members:
 
 
-.. autoclass:: Core.common.FurnivallPersistent
+.. autoclass:: Furnivall.Core.common.FurnivallPersistent
     :members:
     :inherited-members:
     :undoc-members:
 
-.. autoclass:: Core.Personality.User
+.. autoclass:: Furnivall.Core.Personality.User
     :members:
     :inherited-members:
     :undoc-members:
 
-.. autoclass:: Core.WorkUnit.Workunit
+.. autoclass:: Furnivall.Core.WorkUnit.Workunit
     :members:
     :inherited-members:
     :undoc-members:
