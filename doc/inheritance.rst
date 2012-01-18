@@ -1,3 +1,3 @@
 Inheritance diagrams
 =====================
-.. inheritance-diagram:: Core.Assignment Core.common Core.Jobs Core.Personality Core.WorkUnit
+.. inheritance-diagram:: Furnivall.Core.Assignment Furnivall.Core.common Furnivall.Core.Jobs Furnivall.Core.Personality Furnivall.Core.WorkUnit
