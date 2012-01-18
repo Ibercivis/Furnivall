@@ -1,98 +1,111 @@
 #!/usr/bin/env python
-from collections import deque
-from Assignment import *
-from tornado import tasks
-from tornado.options import options, define
+"""
+    Workunit
+"""
+from Furnivall.Core.common import FurnivallPersistent
+from Furnivall.Core.Personality import User
+from Furnivall.Core.Assignment import ConsolidatedResult, Task
+import logging, concurrent.futures
 
-define('workunits_qeuque', default=deque())
-
-class workunit(object):
-    def __init__(self, job=0):
+class Workunit(FurnivallPersistent):
+    """
+        Workunit
+    """
+    def __init__(self, job_id, user, workunit, application = False):
         """
             Simple job unit.
         """
-        self.job=options.jobs_qeuque[job]
-        self.tasks=options.tasks
-        self.tasks_ok=options.tasks_ok
-        self.tasks_fail=options.tasks_failed
 
-        self.expected=0 #TODO this should get workunit expected tasks to return.
-        self.results=options.results
+        try:
+            self.self_db = application.db['users'][user].jobs[job_id].workunits[workunit]
+        except:
+            application.db['users'][user].jobs[job_id].workunits[workunit] = ""
+            self.self_db = application.db['users'][user].jobs[job_id].workunits[workunit]
 
-        logging.info('\t\tWorkunit %s (%s tasks)' %(self, job.initial_tasks))
+        self.consolidatedres = ""
+        self.application = application
+        self.user = user
 
-        for i in range(0, int(job.initial_tasks)): self.new_task()
+        if application:
+            self.job = self.application.db['users'][user].jobs[job_id]
+        else:
+            raise(Exception('Failure getting application, this wk is lost'))
+
+        self.tasks = {}
+        self.result = {}
+
+        #TODO this should get workunit expected tasks to return.
+        self.expected = 0
+        self.results = {}
+
+    def do_initial_tasks(self):
+        """
+            Create job.initial_tasks tasks
+        """
+        self.create_tasks(self.job.initial_tasks, self.user)
+
+    def create_tasks(self, number, user):
+        """
+            Creates a number of tasks objects and launches them on different threads.
+        """
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=int(number))
+        tasks = [Task(self, self.user, self.application) for _ in range(int(number)) ]
+        for task, future in [(i, executor.submit(i)) for i in tasks]:
+            try:
+                future.add_done_callback(task.task_validator)
+            except concurrent.futures.TimeoutError:
+                print("this took too long...")
+                task.interrupt()
 
     def consolidate_result(self):
         """
 
-            If workunit.status is true, it will create a *ConsolidatedResult* object, 
-            passing self.results and job's viewObject
-            
-            ConsolidatedResult will then store into it's data property a consolidated result 
-            got from self.job.viewObject.consolidate_result
+            If workunit.status is true, it will create a *consolidatedres* object,
+            passing self.results and job's view_object
+
+            consolidatedres will then store into it's data property a consolidated result
+            got from self.job.view_object.consolidate_result
 
         """
+
         if self.status:
-            self.ConsolidatedResult=ConsolidatedResult(self.results, self.job.pluginObject)
-        # What about making this one assignment's child too and notify "job" 
+            self.consolidatedres = ConsolidatedResult(self.results,
+                    self.job.plugin_object)
+        # What about making this one assignment's child too and notify "job"
         # (creator) with notify_creator when it's got a consolidated result?
-
-    def task_ok(self, task_id):
-        """
-            Append a task id to correct tasks queque.
-
-            >>> a=workunit()
-            >>> a.task_ok('123')
-            >>> a.tasks_ok
-            deque(['123'])
-        """
-        self.tasks_ok.append(task_id)
-    
-    def task_failed(self, task_id):
-        """
-            Append a task id to failed tasks queque
-
-            >>> a=workunit()
-            >>> a.task_failed('123')
-            >>> a.tasks_fail
-            deque(['123'])
-        """
-        self.tasks_fail.append(task_id)
-
-    def new_task(self):
-        """
-            Create task object and append it to task list deque
-
-            >>> a=workunit()
-            >>> a.tasks #doctest: +ELLIPSIS
-            deque([[0, <Assignment.task object at 0x...>]])
-            >>> a.new_task()
-            >>> a.tasks #doctest: +ELLIPSIS
-            deque([[0, <Assignment.task object at 0x...>], [1, <Assignment.task object at 0x...>]])
-
-        """
-        description = False if not self.job else self.job.description
-        self.tasks.append([len(self.tasks), task(self, self, Volunteer(), description )]) #TODO Store volunteer data somewhere.
 
     @property
     def status(self, expected=False):
         """
             Workunit.status: Boolean property displaying if there're enought ok tasks.
             If called as property, expected can't be specified, will be got from self.expected.
-
-            >>> workunit().status(0)
-            True
-            >>> workunit().status(1)
-            False
         """
         if not expected:
-            expected=self.expected
-        return not len(self.tasks_ok) - expected
+            expected = self.expected
+        return len(self.tasks_ok) >= expected
+
+    @property
+    def tasks_running(self):
+        """
+            Returns the number of tasks that are currently running for this workunit
+        """
+        return [self.self_db.tasks[uuid] for uuid in self.self_db.tasks if self.self_db.tasks[uuid].status == -1 ]
+
+    @property
+    def tasks_failed(self):
+        """
+            Returns the number of tasks that have failed for this workunit
+        """
+        return [self.self_db.tasks[uuid] for uuid in self.self_db.tasks if self.self_db.tasks[uuid].status == False ]
+
+    @property
+    def tasks_ok(self):
+        """
+            Check all the tasks for this workunit with status true.
+            Wich means they're finished and possitive in validation.
+        """
+        return [self.self_db.tasks[uuid] for uuid in self.self_db.tasks if self.self_db.tasks[uuid].status == True ]
 
 if __name__ == "__main__":
-    """
-        This should never be used as standalone but for unittests
-    """
     import doctest
     doctest.testmod()
