@@ -12,10 +12,11 @@ Contents:
    :maxdepth: 2
 
    intro
-   Install
    Readme
-   inheritance
+   Install
    Workflow
+   inheritance
+   InitialAnalisys
    API
    Views
    Plugins
