@@ -3,12 +3,12 @@
 from distutils.core import setup
 import os, shutil
 
-scripts=['Furnivall.py']
+scripts=['FurnivallDaemon.py']
 
 if os.name is not "posix":
     if os.name is "nt":
         import py2exe
-    scripts=['Furnivall.py']
+    scripts=['FurnivallDaemon.py']
 
 opts = {
         "py2exe": {
@@ -20,7 +20,7 @@ opts = {
                 "libglib-2.0-0.dll","libgmodule-2.0-0.dll",
                 "libgtk-win32-2.0-0.dll","libpango-1.0-0.dll",
                 "libpangowin32-1.0-0.dll"],
-            'packages': ['Core'],
+            'packages': ['Furnivall'],
             }
         }
 
@@ -39,11 +39,17 @@ setup(name='Furnivall',
       mantainer_email='xayon@xayon.net',
       description='Furnivall crowdsourcing daemon ',
       author='David Francos Cuartero (XayOn)',
-      console = [{"script": "Furnivall.py" }],
+      console = [{"script": "FurnivallDaemon.py" }],
       author_email='xayon@xayon.net',
       url='http://github.com/Ibercivis/Furnivall',
-      packages=['Core', 'Plugins', 'Views'],
+      packages=['Furnivall', 'Furnivall.Core', 'Furnivall.Views', 'Furnivall.Plugins'],
       scripts=scripts,
+      package_data={
+        'Furnivall' : [
+            'static/'
+            'templates/'
+            ]
+      },
       options=opts,
      )
 
