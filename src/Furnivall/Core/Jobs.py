@@ -3,8 +3,8 @@
     Jobs
 """
 
-from Core.common import FurnivallPersistent
-from Core.WorkUnit import Workunit
+from Furnivall.Core.common import FurnivallPersistent
+from Furnivall.Core.WorkUnit import Workunit
 import logging, uuid
 
 class Job(FurnivallPersistent):

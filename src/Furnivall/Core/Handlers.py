@@ -4,8 +4,8 @@
 
 import logging
 import tornado.web
-from Core.UserHandler import ObjectManager, UserManager
-from Core.common import get_highest_permission, get_best_task
+from Furnivall.Core.UserHandler import ObjectManager, UserManager
+from Furnivall.Core.common import get_highest_permission, get_best_task
 
 class Scheduler(ObjectManager):
     """

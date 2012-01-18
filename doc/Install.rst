@@ -3,22 +3,26 @@ Installation instructions
 
 Dependences
 ------------
-tornado-sessions
-mongodb
-python mongodb support ( python-pymongo package on debian ) 
+ZODB
+tornado
 
-Currently, furnivall only depends on tornado-sessions web server, the tornado
-fork by milancemark wich adds sessions to tornado, mongodb to store the 
-sessions and its python libs.
 
 Installing deps
 ----------------
 
 ::
 
-    easy_install tornado
+    easy_install tornado ZODB
 
 You should carefully consider installing David Francos' branch at http://www.github.com/XayOn/tornado
+
+Or, if you prefer the PIP method (for wich you'll need to have PIP installed), it will automatically read
+dependences from the deps file with this command:
+
+::
+    
+    pip install -r deps
+
 
 Installing Furnivall
 --------------------
@@ -26,6 +30,36 @@ Installing Furnivall
 ::
 
     python setup.py install 
+
+Since version 1.0 you can also install it from pypi:
+
+::
+    easy_install furnivall
+
+Wich will take care of deps for you.
+
+
+Packaging furnivall
+-------------------
+Furnivall's setup.py (got from http://github.com/XayOn/Digenpy ) has 
+some nice configurations to allow it to generate debian packages.
+
+::
+
+    python setup.py bdist_deb
+
+eggs
+
+::
+
+    python setup.py bdist_egg
+
+
+tgz
+
+::
+
+    python setup.py bdist_tgz
 
 Launching Furnivall
 -------------------

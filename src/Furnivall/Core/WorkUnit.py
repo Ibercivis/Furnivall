@@ -2,9 +2,9 @@
 """
     Workunit
 """
-from Core.common import FurnivallPersistent
-from Core.Personality import User
-from Core.Assignment import ConsolidatedResult, Task
+from Furnivall.Core.common import FurnivallPersistent
+from Furnivall.Core.Personality import User
+from Furnivall.Core.Assignment import ConsolidatedResult, Task
 import logging, concurrent.futures
 
 class Workunit(FurnivallPersistent):

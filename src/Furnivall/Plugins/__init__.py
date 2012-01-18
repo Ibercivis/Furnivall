@@ -1,3 +1,3 @@
 __all__=['sample', 'GenealogyPlugin']
-import Furnivall.Core.Plugins.sample
-import Furnivall.Core.Plugins.GenealogyPlugin
+from Furnivall.Plugins import sample
+from Furnivall.Plugins import GenealogyPlugin

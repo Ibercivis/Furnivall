@@ -2,16 +2,12 @@
 
 """
     Assignment object and sons.
-
 """
 
 import concurrent.futures, logging, uuid
-from Core.common import FurnivallPersistent
+from Furnivall.Core.common import FurnivallPersistent
 
-#from sqlalchemy import Integuer, String
-#from sqlalchemy.ext.declarative import declarative_base
 # Assignment data {{{
-
 class Assignment(FurnivallPersistent):
     """
         Assignment object
@@ -49,18 +45,6 @@ class Assignment(FurnivallPersistent):
 w
         """
         getattr(self.workunit, place)[self.id_] = notification
-
-    def globalize(self, id_, application):
-        """
-            Make this object part of the global queue, depending on the class
-            This has a lot of magic... it gets the main class and appends the
-            object to the list named as the  main class + 's', so we get results
-            and tasks in parent.result and parent.task classes.
-        """
-        global_queue = getattr(application, self.__class__.__name__.lower()) # Jajajaja, funny. No, too much not-documented magic. FIXME: make it documented magic, don't ever forget the spellbook
-        global_queue[id_] = self # TODO Check this.
-
-
 # }}}
 
 # Assignment {{{

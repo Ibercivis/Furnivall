@@ -5,7 +5,8 @@
 
 """
 import logging, os, daemon, lockfile
-from Core.Handlers import MainHandler, LoginHandler, ObjectManager
+from Furnivall.Core.Handlers import MainHandler, LoginHandler, ObjectManager
+from Furnivall import data_dir
 import tornado.httpserver, tornado.database, tornado.ioloop, tornado.web
 
 from ZODB.DB import DB
@@ -40,10 +41,8 @@ class Application(tornado.web.Application):
                 ]
 
         settings = dict(
-                template_path = os.path.join(os.path.dirname(__file__),
-                    "templates"),
-                static_path = os.path.join(os.path.dirname(__file__),
-                    "static"),
+                static_path=os.path.join(data_dir, "static"),
+                template_path=os.path.join(data_dir, "templates"),
                 xsrf_cookies = True,
                 cookie_secret = "11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
         )
@@ -62,7 +61,7 @@ class Application(tornado.web.Application):
         try:
             self.db['users']
         except KeyError:
-            from Core.Personality import User
+            from Furnivall.Core.Personality import User
             self.db['users'] = {
                     'anonymous' : User(self),
                     'root' : User(self)

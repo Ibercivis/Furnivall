@@ -2,8 +2,9 @@
     Furnivall user management
 """
 
-import logging, Core.Assignment, Jobs, uuid, Plugins, Views
-
+import logging, uuid
+from Furnivall.Core import Assignment, Jobs
+from Furnivall import Plugins, Views
 from tornado import web
 
 class UserManager(web.RequestHandler):

@@ -7,7 +7,7 @@
 """
 
 import uuid
-from Core.common import FurnivallPersistent
+from Furnivall.Core.common import FurnivallPersistent
 
 class User(FurnivallPersistent):
     def __init__(self, application):
