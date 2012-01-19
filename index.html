@@ -4,65 +4,87 @@
 <!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
 <head>
-  <title>Ibercivis/Furnivall @ GitHub</title>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="description" content="">
-  <meta name="author" content="Ibercivis">
-  <meta name="author" content="David Francos Cuartero">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/screen.css" type="text/css" media="screen, projection">
-  <link rel="stylesheet" href="css/print.css" type="text/css" media="print">
-  <!--[if lt IE 8]><link rel="stylesheet" href="../../blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
-  <!-- Import fancy-type plugin for the sample page. -->
-  <link rel="stylesheet" href="css/plugins/fancy-type/screen.css" type="text/css" media="screen, projection">
-
-  <script src="js/libs/modernizr-2.0.6.min.js"></script>
-  <style type="text/css">
-    #container { margin: 0 auto; width: 700px; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+    <title>Ibercivis/Furnivall @ GitHub</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="description" content="">
+    <meta name="author" content="Ibercivis">
+    <meta name="author" content="David Francos Cuartero">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/screen.css" type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="css/print.css" type="text/css" media="print">
+    <!--[if lt IE 8]><link rel="stylesheet" href="../../blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+    <!-- Import fancy-type plugin for the sample page. -->
+    <link rel="stylesheet" href="css/plugins/fancy-type/screen.css" type="text/css" media="screen, projection">
+    <script src="js/libs/modernizr-2.0.6.min.js"></script>
+    <style type="text/css">
+        #container { margin: 0 auto; width: 700px; }
+        .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+        .download { float: right; }
+        pre { background: #000; color: #fff; padding: 15px;}
+        hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+        .footer { text-align:center; padding-top:30px; font-style: italic; }
+        #forkme { position: absolute; top: 0; right: 0; border: 0; }
+    </style>
 </head>
 
 <body>
+    <div id="container">
 
-  <a href="http://github.com/Ibercivis/Furnivall"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+        <a href="http://github.com/Ibercivis/Furnivall">
+            <img id="forkme" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
+        </a>
 
-  <div id="container">
+        <div id="main" role="main">
+            <header>
+                <div class="download">
+                    <a href="http://github.com/Ibercivis/Furnivall/zipball/master">
+                        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png">
+                    </a>
+                    <a href="http://github.com/Ibercivis/Furnivall/tarball/master">
+                        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png">
+                    </a>
+                </div>
 
-    <div id="main" role="main">
-        <header>
-        <div class="download">
-          <a href="http://github.com/Ibercivis/Furnivall/zipball/master">
-            <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-          <a href="http://github.com/Ibercivis/Furnivall/tarball/master">
-            <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-        </div>
+                <h1>
+                    <a href="http://github.com/Ibercivis/Furnivall">Furnivall</a>
+                    <span class="small">by <a href="http://github.com/Ibercivis">Ibercivis</a></span>
+                </h1>
+            </header>
 
-        <h1><a href="http://github.com/Ibercivis/Furnivall">Furnivall</a>
-          <span class="small">by <a href="http://github.com/Ibercivis">Ibercivis</a></span></h1>
-        </header>
         <div class="description">
-          Open-source software framework for distributed thinking.<br/>
-            Helps to organize batches of tasks, collect them form volunteers and it does all the related housekeeping.<br/>
-            Currently Furnivall consists on a series of plugins + views and an integrated webserver, using threadspoolexecution to make tasks asynchronous.<br/>
+            <p>
+                Furnivall is an open source framework for distributed volunteer
+                science, mainly centered in distributed thinking. Allows
+                researchers to take advantage of volunteer's capabilities for
+                tasks that computers will bemuch less eficient, giving at the
+                same time the oportunity to actively collaborate with science
+                projects. Written in python, and using the non-blocking open
+                source web framework "tornado", aims to be the best approach to
+                minimize researchers effort for a collaborative thinking project,
+                allowing them to concentrate in what matters, and leave the
+                housekeeping to Furnivall.
+          </p> 
         </div>
 
-        <h2>Info</h2>
-        <p> 
-            You can <a href="html/"> have a look at furnivall's full documentations </a><br/>
-        </p>
+        <div id="info">
+            <h2>Info</h2>
+            <p> 
+                You can <a href="html/"> have a look at furnivall's full documentations </a><br/>
+            </p>
+        </div>
+        <div id="contact">
+            <h2>Contact</h2>
+            <ul style="list-style:none">
+                <li> <a href="mailto:info-ibercivis@bifi.es"> Contact us by e-mail</a> </li>
+                <li> <a href="http://ibercivis.es"> Ibercivis</a>  </li>
+                <li> <a href="http://bifi.es"> Institute of biocomputation and physics of complex systems</a> </li>
+            </ul>
+        </div>
 
-        <h2>Contact</h2>
-            <p> (info-ibercivis@bifi.es)<br/>      </p>
-    
-
-        <h2>Download</h2>
+        <div id="downloads">
+            <h2>Download</h2>
             <p>
               You can download this project in either
               <a href="http://github.com/Ibercivis/Furnivall/zipball/master">zip</a> or
@@ -72,37 +94,16 @@
               by running:
               <pre>$ git clone git://github.com/Ibercivis/Furnivall</pre>
             </p>
+        </div>
+
+        <footer class="footer">
+            Get the source code on GitHub : <a href="http://github.com/Ibercivis/Furnivall">Ibercivis/Furnivall</a>
+        </footer>
     </div>
 
-    <footer>
-            <div class="footer">
-              get the source code on GitHub : <a href="http://github.com/Ibercivis/Furnivall">Ibercivis/Furnivall</a>
-            </div>
-    </footer>
-  </div> <!--! end of #container -->
-
-
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.6.2.min.js"><\/script>')</script>
-
-
-  <!-- scripts concatenated and minified via ant build script-->
-  <script defer src="js/plugins.js"></script>
-  <script defer src="js/script.js"></script>
-  <!-- end scripts-->
-
-
-  <script> // Change UA-XXXXX-X to be your site's ID
-    window._gaq = [['_setAccount','UAXXXXXXXX1'],['_trackPageview'],['_trackPageLoadTime']];
-    Modernizr.load({
-      load: ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js'
-    });
-  </script>
-
-
-
-  
-</body>
-
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/libs/jquery-1.6.2.min.js"><\/script>')</script>
+    <script defer src="js/plugins.js"></script>
+    <script defer src="js/script.js"></script>
 </body>
 </html>
