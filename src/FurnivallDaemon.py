@@ -44,7 +44,7 @@ class Application(tornado.web.Application):
                 static_path=os.path.join(data_dir, "static"),
                 template_path=os.path.join(data_dir, "templates"),
                 xsrf_cookies = True,
-                cookie_secret = "11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
+                cookie_secret = "11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1ao/Vo=",
         )
 
         self.special_login_slugs = {
