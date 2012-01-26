@@ -1,7 +1,5 @@
-from Furnivall.Views import sample
-from Furnivall.Views import Genealogy
+from Furnivall.Views import Genealogy as Genealogy
 
-__all__=['sample', 'Genealogy']
+__all__=['Genealogy']
 ViewClasses = {}
-ViewClasses['sample'] = sample.classes_to_append
 ViewClasses['Genealogy'] = Genealogy.classes_to_append
