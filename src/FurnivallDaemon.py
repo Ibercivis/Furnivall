@@ -11,13 +11,17 @@ from Furnivall.Core.Handlers import MainHandler, LoginHandler, ObjectManager
 from Furnivall import data_dir
 import tornado.httpserver, tornado.database, tornado.ioloop, tornado.web
 import Furnivall.Views as Views
-
 from ZODB.DB import DB
 from ZODB.FileStorage import FileStorage
 
 from tornado.options import define, options
 define("port", default=8888, help="run on the given port", type=int)
 define("daemonize", default=False, help="Run as daemon")
+
+class StaticInterfaceProvider(tornado.web.RequestHandler):
+    def get(self, template):
+        template=template.replace('/', '_') # TODO Find something cleaner than this, subdirs for example
+        self.render_template(template)
 
 class DynamicUrlHandler(tornado.web.RequestHandler):
     """
@@ -57,6 +61,7 @@ class Application(tornado.web.Application):
                 ('/Login/([^/]+)', LoginHandler),
                 ('/RPC/([^/]+)/([^/]+)/([^/]+)', RPCDynamicUrlHandler),
                 ('/View/([^/]+)/([^/]+)/([^/]+)', DynamicUrlHandler),
+                ('/([^/]+)/([^/]+)', StaticInterfaceProvider ),
                 ]
 
         settings = dict(
