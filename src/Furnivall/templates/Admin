@@ -23,7 +23,7 @@
                  $.post('/new/view', {
                     'viewfile': $('#' + researcher + '_views :selected').val(),
                     '_xsrf': '{{xsrf}}'
-                 }, function(response){$('.messages').html(response)});
+                 }, function(response){$('.messages').html(response); document.location.reload(); });
         }
 </script>
 {%end%}
@@ -47,6 +47,7 @@
                     <fieldset>
                         <legend> Activate plugin </legend>
                         <select id="{{researcher}}_views" onchange="do_administration_newview('{{researcher}}'); return false">
+                            <option value="" > Select an option </option>
                             {% for view in avail_views%}
                                 <option id="researcher_view_{{view}}" value="{{view}}"  >{{view}}</option>
                             {%end%}

@@ -118,20 +118,21 @@ class ObjectManager(UserManager):
             Object manager get function.
             Creates as requested jobs or views
             Implement this user permissions on the ACL:
-                own_job
-                create_job
-                view_job
-                own_task
-                create_task
-                view_task
-                own_workunit
-                create_workunit
-                view_workunit
-                root
 
-                If we want a task to create another task, the assigned user_ has to have own_task permissions!
-                Note: For a task to create another task, I'd prefer it to be done via the web interface.
-                We can do it at plugin level, but that would mean we wouldn't have such a nice access to authentication methods.
+            * own_job
+            * create_job
+            * view_job
+            * own_task
+            * create_task
+            * view_task
+            * own_workunit
+            * create_workunit
+            * view_workunit
+            * root
+
+            If we want a task to create another task, the assigned user_ has to have own_task permissions!
+            Note: For a task to create another task, I'd prefer it to be done via the web interface.
+            We can do it at plugin level, but that would mean we wouldn't have such a nice access to authentication methods!
         """
 
         action = "assign" if "view" == slug else "own"

@@ -4,11 +4,13 @@
     It helps to organize batches of tasks, collect them form users and do all the related housekeeping.
 
 """
+from tornadorpc.json import JSONRPCHandler
+from tornadorpc import private
 import logging, os, daemon, lockfile
 from Furnivall.Core.Handlers import MainHandler, LoginHandler, ObjectManager
 from Furnivall import data_dir
 import tornado.httpserver, tornado.database, tornado.ioloop, tornado.web
-
+import Furnivall.Views as Views
 from ZODB.DB import DB
 from ZODB.FileStorage import FileStorage
 
@@ -16,12 +18,27 @@ from tornado.options import define, options
 define("port", default=8888, help="run on the given port", type=int)
 define("daemonize", default=False, help="Run as daemon")
 
+class StaticInterfaceProvider(tornado.web.RequestHandler):
+    def get(self, template):
+        template=template.replace('/', '_') # TODO Find something cleaner than this, subdirs for example
+        self.render_template(template)
+
 class DynamicUrlHandler(tornado.web.RequestHandler):
     """
         Manages views' urls.
     """
-    def get(self, view, askfor):
-        return self.render(Views[view].viewplugin.urls[askfor])
+    def get(self, researcher, view, askfor):
+        viewfile, viewclass = self.application.extra_urls[view]
+        researcher = researcher # TODO: Get researcher.
+        view = getattr(getattr(Views, view),viewfile)(False) # TODO: make this with a initialized object from somewhere
+        return self.write(getattr(view, viewclass)(askfor))
+
+class RPCDynamicUrlHandler(JSONRPCHandler):
+    def send_command(self, command):
+        viewfile, viewclass = self.application.extra_urls[view]
+        researcher = researcher # TODO: Get researcher.
+        view = getattr(getattr(Views, view),viewfile)(False) # TODO: make this with a initialized object from somewhere
+        return getattr(view, viewclass)(command)
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -31,20 +48,27 @@ class Application(tornado.web.Application):
         conn = DB(FileStorage('Data.fs')).open()
         self.db  = conn.root()
         self.initialize_db()
+        self.extra_urls = {}
         self.researchers = self.db['users']
+        for a in self.get_all_urls():
+            for template in a.keys():
+                self.extra_urls[template] = a[template]
+
         urls = [
                 ('/', MainHandler),
                 ('/([^/]+)', MainHandler),
                 ('/new/([^/]+)', ObjectManager),
                 ('/Login/([^/]+)', LoginHandler),
-                ('/View/([^/]+)', DynamicUrlHandler),
+                ('/RPC/([^/]+)/([^/]+)/([^/]+)', RPCDynamicUrlHandler),
+                ('/View/([^/]+)/([^/]+)/([^/]+)', DynamicUrlHandler),
+                ('/([^/]+)/([^/]+)', StaticInterfaceProvider ),
                 ]
 
         settings = dict(
                 static_path=os.path.join(data_dir, "static"),
                 template_path=os.path.join(data_dir, "templates"),
                 xsrf_cookies = True,
-                cookie_secret = "11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
+                cookie_secret = "11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1ao/Vo=",
         )
 
         self.special_login_slugs = {
@@ -56,6 +80,14 @@ class Application(tornado.web.Application):
         logging.debug('Starting server with urls: %s', urls)
 
         tornado.web.Application.__init__(self, urls, **settings)
+
+    def get_all_urls(self):
+        """
+            generator returning a dict of url: (file, class) list for the url building
+        """
+        views = Views.ViewClasses 
+        return ( getattr(getattr(Views, viewfile), views[viewfile][0])(None).templates\
+            for viewfile in views.keys() )
 
     def initialize_db(self):
         try:

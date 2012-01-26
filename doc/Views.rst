@@ -1,7 +1,7 @@
 Views API
 =========
 
-.. autoclass:: Furnival.Views.sample.SampleView
+.. automodule:: Furnivall.Views
     :members:
     :inherited-members:
     :undoc-members:
