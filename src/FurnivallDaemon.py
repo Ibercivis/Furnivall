@@ -19,9 +19,8 @@ define("port", default=8888, help="run on the given port", type=int)
 define("daemonize", default=False, help="Run as daemon")
 
 class StaticInterfaceProvider(tornado.web.RequestHandler):
-    def get(self, template):
-        template=template.replace('/', '_') # TODO Find something cleaner than this, subdirs for example
-        self.render_template(template)
+    def get(self, template, place):
+        return self.render(template + "_" + place, user_id=self.get_secure_cookie('username'))
 
 class DynamicUrlHandler(tornado.web.RequestHandler):
     """
@@ -61,7 +60,7 @@ class Application(tornado.web.Application):
                 ('/Login/([^/]+)', LoginHandler),
                 ('/RPC/([^/]+)/([^/]+)/([^/]+)', RPCDynamicUrlHandler),
                 ('/View/([^/]+)/([^/]+)/([^/]+)', DynamicUrlHandler),
-                ('/([^/]+)/([^/]+)', StaticInterfaceProvider ),
+                ('/([^/]+)/(.+)', StaticInterfaceProvider ),
                 ]
 
         settings = dict(
