@@ -214,6 +214,9 @@ class BaseRPCHandler(RequestHandler):
     BaseRPCParser above.
     """
     _RPC_ = None
+
+    def check_xsrf_cookie():
+        return 
     
     def post(self):
         # Very simple -- dispatches request body to the parser

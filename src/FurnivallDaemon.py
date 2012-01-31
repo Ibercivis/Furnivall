@@ -20,7 +20,7 @@ define("daemonize", default=False, help="Run as daemon")
 
 class StaticInterfaceProvider(tornado.web.RequestHandler):
     def get(self, template, place):
-        return self.render(template + "_" + place, user_id=self.get_secure_cookie('username'))
+        return self.render(template + "_" + place, xsrf=self.xsrf_token,user_id=self.get_secure_cookie('username'))
 
 class DynamicUrlHandler(tornado.web.RequestHandler):
     """
@@ -33,11 +33,11 @@ class DynamicUrlHandler(tornado.web.RequestHandler):
         return self.write(getattr(view, viewclass)(askfor))
 
 class RPCDynamicUrlHandler(JSONRPCHandler):
-    def send_command(self, command):
+    def send_command(self, view, command, values):
         viewfile, viewclass = self.application.extra_urls[view]
-        researcher = researcher # TODO: Get researcher.
+        #researcher = researcher # TODO: Get researcher.
         view = getattr(getattr(Views, view),viewfile)(False) # TODO: make this with a initialized object from somewhere
-        return getattr(view, viewclass)(command)
+        return getattr(view, command)(values)
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -58,7 +58,7 @@ class Application(tornado.web.Application):
                 ('/([^/]+)', MainHandler),
                 ('/new/([^/]+)', ObjectManager),
                 ('/Login/([^/]+)', LoginHandler),
-                ('/RPC/([^/]+)/([^/]+)/([^/]+)', RPCDynamicUrlHandler),
+                ('/RPC/', RPCDynamicUrlHandler),
                 ('/View/([^/]+)/([^/]+)/([^/]+)', DynamicUrlHandler),
                 ('/([^/]+)/(.+)', StaticInterfaceProvider ),
                 ]
@@ -66,7 +66,7 @@ class Application(tornado.web.Application):
         settings = dict(
                 static_path=os.path.join(data_dir, "static"),
                 template_path=os.path.join(data_dir, "templates"),
-                xsrf_cookies = True,
+                xsrf_cookies = False,
                 cookie_secret = "11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1ao/Vo=",
         )
 
