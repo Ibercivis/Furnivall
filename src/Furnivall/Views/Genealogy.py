@@ -9,30 +9,15 @@ class GenealogyView(object):
         """
         self.plugin = "GenealogyPlugin"
         self.class_ = "GenealogyTree"
-        self.name = "Genealogy_View"
+        self.name = "Genealogy"
         self.description = "Genealogy View"
         self.workunits = 1 
         self.templates = {'Genealogy': ('GenealogyView', 'main_view')} 
-        self.creator = creator
+        self.job = creator # TODO: pass job here.
 
-    def main_view(self, slug):
-        return "FOO"
+    def get_task(self):
+        """
+            Must be called via RPC first, it will return a task location, wich will need to be used on all stuff
+        """
+        return
 
-    def get_parent_nodes(self, foo):
-        try:
-            raise(Exception("UnimplementedError"))
-        except Exception, error:
-            logging.info(error)
-            return { '1' : ['3', '4'], '2' : ['3', '4'] }
-
-    def add_node(self, node):
-        # TODO: Get a free task and assign it this as result, and the user as parent.
-        # We might need to add something else than a result to the task, but it's free so...
-
-
-    def get_node_names(self, foo):
-        try:
-            raise(Exception("UnimplementedError"))
-        except Exception, error:
-            logging.info(error)
-            return { '1' : 'Mom', '2' : 'Dad', '3' : 'Son', '4' : 'Dau' }
