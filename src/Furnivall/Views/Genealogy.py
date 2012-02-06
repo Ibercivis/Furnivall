@@ -1,17 +1,11 @@
 import tornado.web
 
 classes_to_append = [ "GenealogyView" ]
-
+import logging 
 class GenealogyView(object):
     def __init__(self, creator):
         """
             Genealogy view object. 
-            Notes:
-            - If you want a view acting like this one looks to act, you'll have to implement persistence (see below)
-            - This one relys completly on plugin for the action.
-p
-
-            When /view/{{researcher}}/Genealogy/ has ben called, we call GenealogyView.main_view, remember to put / at the end. This is because it will support having ONE slug (/foo), wich can be, for example, 
         """
         self.plugin = "GenealogyPlugin"
         self.class_ = "GenealogyTree"
@@ -23,3 +17,22 @@ p
 
     def main_view(self, slug):
         return "FOO"
+
+    def get_parent_nodes(self, foo):
+        try:
+            raise(Exception("UnimplementedError"))
+        except Exception, error:
+            logging.info(error)
+            return { '1' : ['3', '4'], '2' : ['3', '4'] }
+
+    def add_node(self, node):
+        # TODO: Get a free task and assign it this as result, and the user as parent.
+        # We might need to add something else than a result to the task, but it's free so...
+
+
+    def get_node_names(self, foo):
+        try:
+            raise(Exception("UnimplementedError"))
+        except Exception, error:
+            logging.info(error)
+            return { '1' : 'Mom', '2' : 'Dad', '3' : 'Son', '4' : 'Dau' }

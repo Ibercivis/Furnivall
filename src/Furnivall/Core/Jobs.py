@@ -26,7 +26,7 @@ class Job(FurnivallPersistent):
         self.initial_tasks = self.conf('main', 'initial_tasks')
 
         self.description = self.view_object.description
-        self.name = "Default job name"
+        self.name = self.view_object.name
 
         self.workunits = {}
 
@@ -70,3 +70,9 @@ class Job(FurnivallPersistent):
             except Exception, error:
                 logging.info("Error: %s" %error)
 
+    def get_free_task(self):
+        for workunit in self.workunits:
+            for task in self.workunits[workunit].tasks_free:
+                task.status = -2
+                logging.debug((workunit, task))
+                return (workunit, task)

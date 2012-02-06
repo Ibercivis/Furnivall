@@ -118,7 +118,7 @@ class Task(Assignment):
 
         """
         plugin = self.workunit.job.plugin_object
-        self.status = getattr(plugin, 'validate_task')(result)
+        self.status = getattr(plugin, 'validate_task')(self, result)
 # }}}
 
 # Result {{{
