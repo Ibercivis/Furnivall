@@ -5,6 +5,7 @@
 
 """
 from tornadorpc.json import JSONRPCHandler
+from tornadorpc.xml import XMLRPCHandler
 from tornadorpc import private
 import logging, os, daemon, lockfile
 from Furnivall.Core.Handlers import MainHandler, LoginHandler, ObjectManager
@@ -42,6 +43,19 @@ class DynamicUrlHandler(tornado.web.RequestHandler):
         researcher = researcher # TODO: Get researcher.
         view = getattr(getattr(Views, view),viewfile)(False) # TODO: make this with a initialized object from somewhere
         return self.write(getattr(view, viewclass)(askfor))
+
+class RPCxmlDynamicUrlHandler(XMLRPCHandler):
+    def get_task(self, job, researcher=False):
+        if not researcher:
+            logging.info("Error: no researcher provided")
+        user_, job = get_researcher_job(self.application, job, researcher)
+        workunit, task = self.application.db['users'][user_].jobs[job].get_free_task()
+        logging.info(task.id_)
+        return [user_, job, workunit, task.id_ ]
+
+    def send_command(self, user=False, job=False, workunit=False, task=False, method=False, values=False):
+        task = self.application.db['users'][user].jobs[job].workunits[workunit].tasks[task]
+        return getattr(getattr(task, 'job_plugin'), method)(values)
 
 class RPCDynamicUrlHandler(JSONRPCHandler):
     def get_task(self, job, researcher=False):
@@ -82,6 +96,7 @@ class Application(tornado.web.Application):
                 ('/new/([^/]+)', ObjectManager),
                 ('/Login/([^/]+)', LoginHandler),
                 ('/RPC/', RPCDynamicUrlHandler),
+                ('/RPCXML/', RPCxmlDynamicUrlHandler),
                 ('/View/([^/]+)/([^/]+)/([^/]+)', DynamicUrlHandler),
                 ('/([^/]+)/(.+)', StaticInterfaceProvider ),
                 ]
