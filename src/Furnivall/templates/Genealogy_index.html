@@ -6,76 +6,15 @@
     <script src="http://www.headjump.de/javascripts/jquery_wz_jsgraphics.js" type="text/javascript"></script>
     <script src="http://www.headjump.de/javascripts/arrowsandboxes.js" type="text/javascript"></script>
     <script>
+        function relationship_add(){
+            $('add_relations').append("<div class=''>" + $('#hidden_base_relationship_add').html() + "</div>")
+        }
 
         $.jsonRPC.setup({
               endPoint: '/RPC/',
               namespace: '' // TODO
         });
 
-      $(document).ready(function(){
-
-
-      });
-
-        function paint_nodes(devdata, devdata_2){
-            var rels="", processed_relationships=Array();
-            $('#nodes').prepend('() ');
-            $.each(devdata, function(id, relationships){ 
-                $.each(relationships, function(key, rel) {
-                    if (jQuery.inArray(rel, processed_relationships) == -1){ 
-                        rels += "( "+rel+":"+devdata_2[rel]+") ";;
-                        processed_relationships.push(rel); 
-                    }
-                 });
-                $('#nodes').append( "(" + devdata_2[id] + " > [" + relationships.join(',') +  "] )" );
-            });
-
-            $('#nodes').append(' || ' + rels + "\n");
-            $('#nodes').addClass('arrows-and-boxes');
-            $('#nodes').arrows_and_boxes();
-        }
-
-        var devdata={}, devdata_2={};
-        $(function() { 
-
-            $.ajax({
-                url: '/RPC/',
-                type: 'POST',
-                dataType: 'json',
-                data: JSON.stringify ({jsonrpc:'2.0', method:'get_task', params:['Genealogy'], id:'jsonrpc', }),
-                success: function (result){ result=result.result;
-                    console.debug(result);
-                    var user = result[0], job = result[1], work = result[2], task = result[3];
-                    console.debug([user, job, work, task]);
-                    $.ajax({
-                       url: '/RPC/', 
-                       data: JSON.stringify ({jsonrpc:'2.0',
-                           method:'send_command',
-                           params:[ user, job, work, task, 'get_node_names', ''],
-                           id:"jsonrpc"} ),  // id is needed !!
-                       type:"POST",
-                       dataType:"json",
-                       success:  function (data_2){
-                          devdata_2=data_2; 
-                          $.ajax({
-                              url: '/RPC/', 
-                              data: JSON.stringify ({jsonrpc:'2.0',
-                                  method:'send_command',
-                                  params:[ user, job, work, task, 'get_parent_nodes', ''],
-                                  id:"jsonrpc"} ),  // id is needed !!
-                             type:"POST",
-                             dataType:"json",
-                             success:  function (data)       { 
-                                console.debug(data); console.debug(data_2);
-                                 paint_nodes(data.result, data_2.result);
-                             },
-                             error: function (err)  { alert ("Error");}
-                          });
-                       },
-                       error: function (err)  { alert ("Error");}
-                    }); }
-                });
-         });
     </script>
 {%end%}
 
@@ -87,12 +26,17 @@
        <h1 style="text-align:right;font-size:xx-small; width:100%"> Collaborate doing a global family tree </h1>
     </hgroup>
 </header>
+    
+    <div id="hidden_base_relationship_add">
+        FOO
+    </div>
 
 {% if user_id %}
     <small style="position:fixed; top:0px; left:0px"> Welcome {{ user_id }} </small>
+    <small style="position:fixed; top:0px; right:10px"> <a href="#" onclick="relationship_add"> Add a relationship </a> </small>
     <div role="main" style="height:90%; display:block;"> <pre id="nodes" style="clear:both"> </pre> </div>
 {%else%}
-    <div class="warn"> Sorry, you must log-in to collaborate with this stuff</div>
+    <div class="warn"> Sorry, you must log-in to view the genealogy tree</div>
 {% end %}
 
 <footer style="width:100%; text-align:center">
