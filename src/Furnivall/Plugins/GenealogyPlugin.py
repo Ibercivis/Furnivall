@@ -39,12 +39,23 @@ class GenealogyTree(object):
 
     def invert_relation(self, relation):
         rels = { 'cousin': 'cousin',
-          'father': 'son' } # And now, wtf?
+          'mother':'son', 
+          'mother':'son', 
+          'father':'daughter', 
+          'father': 'son' } # This is not ideal, numeric is not either, uf...
         return rels[relation]
 
     def search_for_identity(self, data):
-        # With all data, return the closest match to an identity
-        return "00000" # node
+        """
+            TODO: This is slow as hell, rewrite this.
+            With all data, return the closest match to an identity
+        """
+
+        for element in searchable_elements:
+            for current_search in self.get_all_members:
+                if self.valiadate_identity(data[element], current_search[element]):
+                    return current_search['id']
+        return False
 
     def get_task_from_node(self, node):
         """
