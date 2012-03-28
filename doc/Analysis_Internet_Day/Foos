@@ -1,0 +1,39 @@
+- Desarrollo de la interfaz
+    - Propuestas de nombres
+        - No incluir ni sentimientos ni analisis.
+            - Medicion
+            - Felicidad
+            - Alegria
+            - Emociones
+            - 
+    - Diseño de la interfáz
+        - Interfaz responsiva para moviles X
+    - Definir que parametros preguntar a los usuarios
+        - Alegre
+        - Triste
+        - Agresiva
+
+- Definición de funciones XMLRPC
+    - Get me a task
+    - Vote that task
+
+- Recolección de datos
+    - Decidir de donde sacar los datos
+    - Extraer los datos
+    - Desordenar los datos
+    - Importar los datos en la base de datos de furnivall
+
+Tareas pendientes en furnivall:
+    - Implementar plugin
+        - Sistema de consolidacion
+        - Llamadas xmlrpc
+        - Modificar el workflow de furnivall para contestar a esta pregunta.
+            - Now the thing is, may we create multiple workunits and really randomize it, or just a few workunits and keep sending user the data, if no wrkunits that the user has not completed are left, create a new workunit, and keep it that way?
+        
+        - Consolidación:
+            Una workunit tiene que tener más de tres tareas iguales con el mismo resultado para validar.
+        - Workflow:
+            - User asks for task
+            - Server creates workunit (if no workunit active)
+            - Sends task to user, if user has not already completed that task (important)
+    - Hackear la creacion de usuarios, con una interfaz bonita (ergo, tambien responsiva), de forma que permita la creación de usuarios al vuelo sin más, y que si el usuario está ya creado logee.
