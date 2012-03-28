@@ -4,6 +4,7 @@
 
 import logging, uuid
 from Furnivall.Core import Assignment, Jobs
+from Furnivall.Core.Personality import User
 from Furnivall import Plugins, Views
 from tornado import web
 
@@ -11,7 +12,7 @@ class UserManager(web.RequestHandler):
     """
         Handle login, and when asked for return current user object from database.
     """
-    def get_current_user(self):
+    def get_current_user(self, create_user=False):
         """
             Gets user set in "username" cookie from database.
             If not present, tries to log-in.
@@ -19,11 +20,11 @@ class UserManager(web.RequestHandler):
         request_username = self.get_argument('username', False)
         cookie_username = self.get_secure_cookie('username')
         if not cookie_username and request_username:
-            return self.login() # If there is no cookie set but there's
+            return self.login(create_user) # If there is no cookie set but there's
         elif cookie_username:
             return self.application.db['users'][cookie_username]
 
-    def login(self):
+    def login(self, create_user=False):
         """
             Checks out login against a database, given username and password
             as args and sets out a cookie.
@@ -32,14 +33,24 @@ class UserManager(web.RequestHandler):
             username = self.get_argument("username", False)
             password = self.get_argument("password", False)
             assert username and password # Umm... nice.
+
+            if create_user:
+                self.add_user(username, password)
+
             if self.application.db['users'][username].password == password:
                 self.set_secure_cookie('username', username)
                 return self.application.db['users'][username]
+
         except KeyError:
             logging.info("Bad auth for %s", username)
         except AssertionError:
             logging.info("Someone tried to login with empty username or password")
         return False
+
+    def add_user(self, username, password):
+        self.application.db['users'][username] = User(self)
+        self.application.db['users'][username].set_password(password)
+        self.application.db['users'][username].grant_permission('anonymous')
 
 class ObjectManager(UserManager):
     """
