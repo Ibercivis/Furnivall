@@ -26,7 +26,7 @@ class Job(FurnivallPersistent):
         self.initial_tasks = self.conf('main', 'initial_tasks')
 
         self.description = self.view_object.description
-        self.name = "Default job name"
+        self.name = self.view_object.name
 
         self.workunits = {}
 
@@ -78,4 +78,3 @@ class Job(FurnivallPersistent):
                 task.status = -2
                 self._p_changed = 1
                 return (workunit, task)
-

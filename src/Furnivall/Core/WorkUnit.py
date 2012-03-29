@@ -89,11 +89,16 @@ class Workunit(FurnivallPersistent):
         return len(self.tasks_ok) >= expected
 
     @property
+    def tasks_free(self):
+        return [self.self_db.tasks[uuid] for uuid in self.self_db.tasks if self.self_db.tasks[uuid].status == -1 ]
+    
+
+    @property
     def tasks_running(self):
         """
-            Returns the number of tasks that are currently running for this workunit
+            Returns the number of tasks that are currently running  for this workunit
         """
-        return [self.self_db.tasks[uuid] for uuid in self.self_db.tasks if self.self_db.tasks[uuid].status == -1 ]
+        return [self.self_db.tasks[uuid] for uuid in self.self_db.tasks if self.self_db.tasks[uuid].status == -2 ]
 
     @property
     def tasks_failed(self):
