@@ -30,6 +30,23 @@
         (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
         g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
         s.parentNode.insertBefore(g,s)}(document,'script'));
+        $(document).ready(function(){
+            jQuery.ajax({
+                type: "POST",
+                url: "",
+                dataType:"html",
+                data:"userId="+encodeURIComponent(trim(document.forms[0].userId.value)),
+                success:function(response){
+                    jQuery("#usergrid").trigger("reloadGrid");
+                    clear();
+                    alert("Details saved successfully!!!");
+                },
+                error:function (xhr, ajaxOptions, thrownError){
+                    alert(xhr.status);
+                    alert(thrownError);
+                }    
+            });
+        });
     </script>
     {% block head %}{% end %}
     <!--[if lt IE 9]>
@@ -46,6 +63,8 @@
                 <ul class="nav">
                   <li><a data-toggle="modal" href="#about">About</a></li>
                   <li><a href="mailto:ibercivis@ibercivis.es">Contact</a></li>
+                  <li><a href="/user/{{user_name}}"> {{user_name}} </a> </li>
+                  <li> {% if user_name != "anonymous" %} <a href="/Login/logout"> Logout </a> {%else%} <a href="/Login">Login</a> {%end%} </li> 
                 </ul>
            </div>
          </div>

@@ -1,7 +1,8 @@
 {%extends "base.html"%}
 {%block body%}
-<form action="/Login/auth">
 
+<div class="container-fluid" style="width:40%; float:left;">
+<form action="/Login/auth">
     <fieldset>
         <legend> Login </legend>
         <ul style="list-style:none">
@@ -22,6 +23,8 @@
     </fieldset>
 
 </form>
+</div>
+<div class="container-fluid" style="width:40%; float:left">
 <form action="/Login/register">
     <fieldset>
         <legend> Register </legend>
@@ -42,6 +45,6 @@
         </ul>
     </fieldset>
 </form>
-
+</div>
 
 {%end%}

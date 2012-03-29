@@ -24,7 +24,7 @@ class StaticInterfaceProvider(tornado.web.RequestHandler):
         Renders templates dinamically to build static interfaces to be used with rpc handlers
     """
     def get(self, template, place):
-        return self.render(template + "_" + place, xsrf=self.xsrf_token,user_id=self.get_secure_cookie('username'))
+        return self.render(template + "_" + place, xsrf=self.xsrf_token,user_name=self.get_secure_cookie('username'))
 
 def get_task_from_user(application, job, user, researcher):
     """
