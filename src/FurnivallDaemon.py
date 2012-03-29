@@ -19,9 +19,19 @@ define("port", default=8888, help="run on the given port", type=int)
 define("daemonize", default=False, help="Run as daemon")
 
 class StaticInterfaceProvider(tornado.web.RequestHandler):
-    def get(self, template):
-        template=template.replace('/', '_') # TODO Find something cleaner than this, subdirs for example
-        self.render_template(template)
+    def get(self, template, place):
+        return self.render(template + "_" + place, xsrf=self.xsrf_token,user_id=self.get_secure_cookie('username'))
+
+def get_researcher_job(application, job, researcher=False):
+    if researcher:
+        logging.debug(application.db['users'][researcher])
+        return application.db['users'][researcher].jobs[job] # TODO Test me
+    else:
+        for user_ in application.db['users']:
+            user=application.db['users'][user_]
+            for job_ in user.jobs.keys():
+                if user.jobs[job_].name == job:
+                    return ( user_, job_)
 
 class DynamicUrlHandler(tornado.web.RequestHandler):
     """
@@ -34,11 +44,23 @@ class DynamicUrlHandler(tornado.web.RequestHandler):
         return self.write(getattr(view, viewclass)(askfor))
 
 class RPCDynamicUrlHandler(JSONRPCHandler):
-    def send_command(self, command):
-        viewfile, viewclass = self.application.extra_urls[view]
-        researcher = researcher # TODO: Get researcher.
-        view = getattr(getattr(Views, view),viewfile)(False) # TODO: make this with a initialized object from somewhere
-        return getattr(view, viewclass)(command)
+    def get_task(self, job, researcher=False):
+        """
+            Return a view initialzed object
+        """
+        if not researcher:
+            logging.info("Error: no researcher provided")
+        user_, job = get_researcher_job(self.application, job, researcher)
+        workunit, task = self.application.db['users'][user_].jobs[job].get_free_task()
+        logging.info(task.id_)
+        return [user_, job, workunit, task.id_ ]
+
+    def send_command(self, user=False, job=False, workunit=False, task=False, method=False, values=False):
+        """
+            Send a command to a view object.
+        """
+        task = self.application.db['users'][user].jobs[job].workunits[workunit].tasks[task]
+        return getattr(getattr(task, 'job_plugin'), method)(values)
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -59,15 +81,15 @@ class Application(tornado.web.Application):
                 ('/([^/]+)', MainHandler),
                 ('/new/([^/]+)', ObjectManager),
                 ('/Login/([^/]+)', LoginHandler),
-                ('/RPC/([^/]+)/([^/]+)/([^/]+)', RPCDynamicUrlHandler),
+                ('/RPC/', RPCDynamicUrlHandler),
                 ('/View/([^/]+)/([^/]+)/([^/]+)', DynamicUrlHandler),
-                ('/([^/]+)/([^/]+)', StaticInterfaceProvider ),
+                ('/([^/]+)/(.+)', StaticInterfaceProvider ),
                 ]
 
         settings = dict(
                 static_path=os.path.join(data_dir, "static"),
                 template_path=os.path.join(data_dir, "templates"),
-                xsrf_cookies = True,
+                xsrf_cookies = False,
                 cookie_secret = "11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1ao/Vo=",
         )
 
