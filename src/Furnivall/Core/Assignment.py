@@ -45,6 +45,7 @@ class Assignment(FurnivallPersistent):
 w
         """
         getattr(self.workunit, place)[self.id_] = notification
+        self._p_changed = 1
 # }}}
 
 # Assignment {{{
@@ -104,6 +105,7 @@ class Task(Assignment):
 
         self.result = self.job_plugin.task_executor(self)
         logging.info(self.result)
+        self._p_changed = 1
         return Result(self, self.description, self.application)
 
     def task_validator(self, result):
@@ -119,6 +121,7 @@ class Task(Assignment):
         """
         plugin = self.workunit.job.plugin_object
         self.status = getattr(plugin, 'validate_task')(self, result)
+        self._p_changed = 1
 # }}}
 
 # Result {{{
@@ -147,8 +150,8 @@ class Result(Assignment):
 
         # This adds to results deque in workunit this result object.
         self.append_to_workunit('results', self)
-
         self.result = ConsolidatedResult(self)
+        self._p_changed = 1
 # }}}
 
 # Consolidated result {{{
@@ -164,4 +167,5 @@ class ConsolidatedResult(Result):
         """
         super(ConsolidatedResult, self).__init__(task_.workunit, task_.user_)
         self.data = task_.job_plugin.consolidate_result(task_.result)
+        self._p_changed = 1
 # }}}

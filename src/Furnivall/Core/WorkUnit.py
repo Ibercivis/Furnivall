@@ -43,6 +43,7 @@ class Workunit(FurnivallPersistent):
             Create job.initial_tasks tasks
         """
         self.create_tasks(self.job.initial_tasks, self.user)
+        self._p_changed = 1
 
     def create_tasks(self, number, user):
         """
@@ -53,9 +54,11 @@ class Workunit(FurnivallPersistent):
         for task, future in [(i, executor.submit(i)) for i in tasks]:
             try:
                 future.add_done_callback(task.task_validator)
+                self._p_changed = 1
             except concurrent.futures.TimeoutError:
                 print("this took too long...")
                 task.interrupt()
+                self._p_changed = 1
 
     def consolidate_result(self):
         """
@@ -71,6 +74,7 @@ class Workunit(FurnivallPersistent):
         if self.status:
             self.consolidatedres = ConsolidatedResult(self.results,
                     self.job.plugin_object)
+            self._p_changed = 1
         # What about making this one assignment's child too and notify "job"
         # (creator) with notify_creator when it's got a consolidated result?
 
