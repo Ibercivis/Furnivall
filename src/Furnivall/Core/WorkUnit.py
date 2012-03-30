@@ -25,6 +25,7 @@ class Workunit(FurnivallPersistent):
         self.consolidatedres = ""
         self.application = application
         self.user = user
+        self.done_users = []
 
         if application:
             self.job = self.application.db['users'][user].jobs[job_id]

@@ -72,10 +72,16 @@ class Job(FurnivallPersistent):
             except Exception, error:
                 logging.info("Error: %s" %error)
 
-    def get_free_task(self):
+    def get_free_task(self, user):
         for workunit in self.workunits:
-            for task in self.workunits[workunit].tasks_free:
-                task.status = -2
-                self._p_changed = 1
-                return (workunit, task)
+            if user not in self.workunits[workunit].done_users:
+                for task in self.workunits[workunit].tasks_free:
+                    task.status = -2
+                    self._p_changed = 1
+                    self.workunits[workunit].done_users.append(user)
+                    logging.debug(task)
+                    return (workunit, task)
+        self.produce_workunits(1)
+        return get_free_task(self, user)
+
 

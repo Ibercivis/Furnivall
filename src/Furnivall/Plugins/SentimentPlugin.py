@@ -28,24 +28,10 @@ class SentimentAnalysis(object):
         """
         return results
 
-    def get_task(self, node):
+    def get_random_phrase(self, data=False):
         """
-            Search on all job's workunits, if there's a task with that ID, return it.
-            Otherwise, search in user's tasks in database, *this must not happen* but
-            the task might have get lost!
+            If the task 
         """
-        try:
-            for wk in task.workunit.job.workunits: # TODO check the path
-                try:
-                    return wk.tasks[node]
-                except:
-                    pass
-            for user in task.application.db['users']:
-                try:
-                    return task.application.db['users'][user].tasks[node]
-                except:
-                    pass
-            raise Exception("Could not find task")
-        except Exception, warning:
-            logging.debug(warning)
-            return False
+        logging.debug("FOO")
+        return "FOOOBAR"
+

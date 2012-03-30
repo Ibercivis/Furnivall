@@ -86,20 +86,27 @@ class RPCDynamicUrlHandler(JSONRPCHandler):
             workunit, task = self.application.db['users'][researcher].jobs[job].get_free_task()
         return [researcher, job, workunit, task.id_ ]
 
-    def get_or_create_task(self, job, user, researcher = False):
+    def get_or_create_task(self, volunteer = False, view_name = False):
         """
             return the full path of a task if exists, creates a new one and returns its path if not
         """
-        task = get_task_from_user(self.application, job, user)
-        if not task: 
-            return self.get_task(job, user, researcher)
+
+        for user in self.application.db['users']:
+            try:
+                for job in self.application.db['users'][user].jobs:
+                    if self.application.db['users'][user].jobs[job].name == view_name:
+                        r = self.application.db['users'][user].jobs[job].get_free_task(self.application.db['users'][volunteer])
+                        return ( user, job, r[0], r[1].id_ )
+            except Exception, error:
+                logging.info(error)
+                pass
 
     def send_command(self, user=False, job=False, workunit=False, task=False, method=False, values=False):
         """
             Send a command to a view object.
         """
         task = self.application.db['users'][user].jobs[job].workunits[workunit].tasks[task]
-        return getattr(getattr(task, 'job_plugin'), method)(values)
+        return getattr(getattr(task, 'job_plugin'), method)(task, values)
 
 class Application(tornado.web.Application):
     def __init__(self):
