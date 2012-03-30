@@ -21,7 +21,10 @@ class UserManager(web.RequestHandler):
         if not cookie_username and request_username:
             return self.login() # If there is no cookie set but there's
         elif cookie_username:
-            return self.application.db['users'][cookie_username]
+            try:
+                return self.application.db['users'][cookie_username]
+            except:
+                return False
 
     def login(self):
         """

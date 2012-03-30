@@ -26,7 +26,7 @@ class Job(FurnivallPersistent):
         self.initial_tasks = self.conf('main', 'initial_tasks')
 
         self.description = self.view_object.description
-        self.name = "Default job name"
+        self.name = self.view_object.name
 
         self.workunits = {}
 
@@ -36,6 +36,7 @@ class Job(FurnivallPersistent):
 
     def produce_initial_workunits(self):
         self.produce_workunits(self.view_object.workunits)
+        self._p_changed = 1
 
     def produce_workunits(self, number=1):
         """
@@ -65,8 +66,15 @@ class Job(FurnivallPersistent):
                 self.workunits[uuid_] = work # Append it to our workunits queuqe
                 work.self_db = self.application.db['users'][self.user].jobs[self.id_].workunits[uuid_]
                 work.do_initial_tasks()
+                self._p_changed = 1
                 if number is 1:
                     return work
             except Exception, error:
                 logging.info("Error: %s" %error)
 
+    def get_free_task(self):
+        for workunit in self.workunits:
+            for task in self.workunits[workunit].tasks_free:
+                task.status = -2
+                self._p_changed = 1
+                return (workunit, task)
