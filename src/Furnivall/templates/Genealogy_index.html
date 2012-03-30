@@ -5,80 +5,25 @@
     <link href="http://www.headjump.de/stylesheets/arrowsandboxes.css" rel="stylesheet" type="text/css" />
     <script src="http://www.headjump.de/javascripts/jquery_wz_jsgraphics.js" type="text/javascript"></script>
     <script src="http://www.headjump.de/javascripts/arrowsandboxes.js" type="text/javascript"></script>
+
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" />
+    <script src="/static/js/bootstrap.min.js" type="text/javascript"></script>
+
     <script>
-        var devdata_2={
-            '1' : 'Mom',
-            '2' : 'Dad',
-            '3' : 'Son',
-            '4' : 'Dau',
+        function relationship_adder(){
+            $('.add_relations').append("<div class='relationship_adder'>" + $('#hidden_base_relationship_add').html() + "</div>")
         }
 
-        var devdata={
-            '1' : ['3', '4'],
-            '2' : ['3', '4']
-        } // TODO Get this from RPC.
+        function add_relationship(){
+            // AJAXize the form call
+        }
 
         $.jsonRPC.setup({
               endPoint: '/RPC/',
               namespace: '' // TODO
         });
 
-      $(document).ready(function(){
-
-
-      });
-
-        function paint_nodes(devdata, devdata_2){
-            var rels="", processed_relationships=Array();
-            $('#nodes').prepend('() ');
-            $.each(devdata, function(id, relationships){ 
-                $.each(relationships, function(key, rel) {
-                    if (jQuery.inArray(rel, processed_relationships) == -1){ 
-                        rels += "( "+rel+":"+devdata_2[rel]+") ";;
-                        processed_relationships.push(rel); 
-                    }
-                 });
-                $('#nodes').append( "(" + devdata_2[id] + " > [" + relationships.join(',') +  "] )" );
-            });
-
-            $('#nodes').append(' || ' + rels + "\n");
-            $('#nodes').addClass('arrows-and-boxes');
-            $('#nodes').arrows_and_boxes();
-        }
-
-        $(function() { 
-
-             var devdata="", devdata_2="";
-             $.ajax({
-                url: '/RPC/', 
-                data: JSON.stringify ({jsonrpc:'2.0',
-                    method:'send_command',
-                    params:['Genealogy','get_node_names', ''],
-                    id:"jsonrpc"} ),  // id is needed !!
-                type:"POST",
-                dataType:"json",
-                success:  function (data_2)       { 
-                   devdata_2=data_2; 
-                   $.ajax({
-                       url: '/RPC/', 
-                       data: JSON.stringify ({jsonrpc:'2.0',
-                           method:'send_command',
-                           params:['Genealogy','get_parent_nodes', ''],
-                           id:"jsonrpc"} ),  // id is needed !!
-                      type:"POST",
-                      dataType:"json",
-                      success:  function (data)       { 
-                          paint_nodes(data.result, devdata_2.result);
-                      },
-                      error: function (err)  { alert ("Error");}
-                   });
-                },
-                error: function (err)  { alert ("Error");}
-
-             });
-
-
-         });
     </script>
 {%end%}
 
@@ -91,11 +36,54 @@
     </hgroup>
 </header>
 
+    <a href="#" onclick="relationship_adder(); "> Add a relationship </a>
+
+    <div id="hidden_base_relationship_add" style="display:none">
+        <form class="form-horizontal" action="#" method="POST" onsubmit="add_relationship()" >
+            <fieldset>
+                <legend> Add a node </legend>
+                <div class="control-group">
+                    <label for="name" class="control-label"> Name </label>
+                    <div class="controls">
+                        <input type="text" required name="name" placeholder="Sir ... " value="">
+                        <p class="help-block"> Enter your familiar's name (it will autocomplete to known names) </p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="surname"> Surname </label>
+                    <div class="controls">
+                        <input required type="text" name="surname" placeholder="Hernandez" />
+                    </div>
+                </div>
+            
+                <div class="control-group">
+                    <label class="control-label" for="radio"> Relationship </label>
+                    <div class="controls">
+                        <select name="radio">
+                            <option selected value="mother">Mother</option>
+                            <option value="daughter">Daughter</option>
+                        </select>
+                    </div>
+                </div>
+             
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+
+            </fieldset>
+        </form>
+    </div>
+
 {% if user_id %}
     <small style="position:fixed; top:0px; left:0px"> Welcome {{ user_id }} </small>
-    <div role="main" style="height:90%; display:block;"> <pre id="nodes" style="clear:both"> </pre> </div>
+    <small style="position:fixed; top:0px; right:10px"> <a href="#" onclick="relationship_add"> Add a relationship </a> </small>
+    <div role="main" style="height:90%; display:block;"> 
+        <pre id="nodes" style="clear:both; background:none; border:none"> </pre> 
+        <div class="add_relations"> </div>
+    </div>
 {%else%}
-    <div class="warn"> Sorry, you must log-in to collaborate with this stuff</div>
+    <div class="warn"> Sorry, you must log-in to view the genealogy tree</div>
 {% end %}
 
 <footer style="width:100%; text-align:center">

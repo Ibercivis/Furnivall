@@ -100,7 +100,7 @@ class Task(Assignment):
 
         logging.debug("Task %s belongs to job %s and workunit %s",
             self.id_, self.parent_job, self.workunit)
-        logging.debug("Plugin is %s with descpription %s",
+        logging.debug("Plugin is %s with descpription %s - ",
             self.job_plugin, self.job_plugin.description)
 
         self.result = self.job_plugin.task_executor(self)

@@ -5,6 +5,7 @@
 
 """
 from tornadorpc.json import JSONRPCHandler
+from tornadorpc.xml import XMLRPCHandler
 from tornadorpc import private
 import logging, os, daemon, lockfile
 from Furnivall.Core.Handlers import MainHandler, LoginHandler, ObjectManager
@@ -19,10 +20,28 @@ define("port", default=8888, help="run on the given port", type=int)
 define("daemonize", default=False, help="Run as daemon")
 
 class StaticInterfaceProvider(tornado.web.RequestHandler):
+    """
+        Renders templates dinamically to build static interfaces to be used with rpc handlers
+    """
     def get(self, template, place):
         return self.render(template + "_" + place, xsrf=self.xsrf_token,user_id=self.get_secure_cookie('username'))
 
+def get_task_from_user(application, job, user, researcher):
+    """
+        Implement me, I have to search on all tasks from the job to see if one belongs to a determinate user
+        if i cant find it first looking for user's tasks.
+    """
+    for wk in job.tasks:
+        for task in wk.tasks:
+            if task.user == user: # TODO Check if we're dealing with ids here correctly.
+                return [researcher, job, wk, task.id_ ]
+    return False 
+
 def get_researcher_job(application, job, researcher=False):
+    """
+        Returns the job path for a specific job name.
+        If researcher is specified it will filter jobs from that researcher
+    """
     if researcher:
         logging.debug(application.db['users'][researcher])
         return application.db['users'][researcher].jobs[job] # TODO Test me
@@ -43,17 +62,37 @@ class DynamicUrlHandler(tornado.web.RequestHandler):
         view = getattr(getattr(Views, view),viewfile)(False) # TODO: make this with a initialized object from somewhere
         return self.write(getattr(view, viewclass)(askfor))
 
-class RPCDynamicUrlHandler(JSONRPCHandler):
+class RPCxmlDynamicUrlHandler(XMLRPCHandler):
     def get_task(self, job, researcher=False):
-        """
-            Return a view initialzed object
-        """
         if not researcher:
             logging.info("Error: no researcher provided")
         user_, job = get_researcher_job(self.application, job, researcher)
         workunit, task = self.application.db['users'][user_].jobs[job].get_free_task()
         logging.info(task.id_)
         return [user_, job, workunit, task.id_ ]
+
+    def send_command(self, user=False, job=False, workunit=False, task=False, method=False, values=False):
+        task = self.application.db['users'][user].jobs[job].workunits[workunit].tasks[task]
+        return getattr(getattr(task, 'job_plugin'), method)(values)
+
+class RPCDynamicUrlHandler(JSONRPCHandler):
+    def get_task(self, job, user, researcher=False):
+        """
+            Create task and return its full path
+        """
+        researcher, job = get_researcher_job(self.application, job, researcher)
+        workunit, task = get_task_from_user(self.application, job, researcher)
+        if not workunit and task:
+            workunit, task = self.application.db['users'][researcher].jobs[job].get_free_task()
+        return [researcher, job, workunit, task.id_ ]
+
+    def get_or_create_task(self, job, user, researcher = False):
+        """
+            return the full path of a task if exists, creates a new one and returns its path if not
+        """
+        task = get_task_from_user(self.application, job, user)
+        if not task: 
+            return self.get_task(job, user, researcher)
 
     def send_command(self, user=False, job=False, workunit=False, task=False, method=False, values=False):
         """
@@ -82,6 +121,7 @@ class Application(tornado.web.Application):
                 ('/new/([^/]+)', ObjectManager),
                 ('/Login/([^/]+)', LoginHandler),
                 ('/RPC/', RPCDynamicUrlHandler),
+                ('/RPCXML/', RPCxmlDynamicUrlHandler),
                 ('/View/([^/]+)/([^/]+)/([^/]+)', DynamicUrlHandler),
                 ('/([^/]+)/(.+)', StaticInterfaceProvider ),
                 ]
