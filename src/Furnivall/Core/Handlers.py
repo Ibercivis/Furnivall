@@ -137,7 +137,10 @@ class MainHandler(Scheduler):
         logging.info(high_perm)
         perms = user.permissions if user else high_perm
         username = username if username else "anonymous"
-        user = user if user else self.application.db["users"][username]
+        try:
+            user = user if user else self.application.db["users"][username]
+        except:
+            user = "anonymous"
 
         if what == "home":
             what = self.application.special_login_slugs[high_perm]
@@ -154,6 +157,7 @@ class MainHandler(Scheduler):
                 user_permissions = perms,
                 xsrf = self.xsrf_token,
                 is_root = high_perm == "root",
+                is_researcher = high_perm == "researcher",
                 jobs = self.application.created_jobs,
                 researchers = self.application.researchers,
                 slug = what )

@@ -1,6 +1,5 @@
 {% extends "base.html" %}
-{%block head%}
-{%end%}
+{%block head%}{%end%}
 
 {%block header%}
     <h1> Furnivall </h1>
@@ -10,8 +9,12 @@
 {% block body %}
     <div class="login">
         <ul style="list-style:none">
-            <li> <a href="{% if user_name == "anonymous" %}/Login?next=/Admin{% else %}/Admin{% end %}"> Administration page </a> </li>
-            <li><a href="{% if user_name == "anonymous" %}/Login=next=/Research{% else %}/Researcher{% end %}"> Researcher profile </a> </li>
+            {% if is_root %}
+                <li> <a href="{% if user_name == "anonymous" %}/Login?next=/Admin{% else %}/Admin{% end %}"> Administration page </a> </li>
+            {% end %}
+            {% if is_researcher %}
+                <li><a href="{% if user_name == "anonymous" %}/Login=next=/Research{% else %}/Researcher{% end %}"> Researcher profile </a> </li>
+            {% end %}
         </ul>
     </div>
     <div class="user"> 
@@ -20,8 +23,18 @@
         {% else %}
             <a href="/Login"> Log-in </a>
         {%end%}
- </div>
-    
+    </div>
+
+    <div class="hero-unit">
+        <h3> Currently available works </h3>
+        <ul class="unstyled">
+            {% for researcher in researchers.keys() %}
+                {% for available_view in researchers[researcher].initialized_views.keys() %}
+                    <li><a href="/{{available_view}}/index.html"> {{available_view}} </a></li>
+                {% end %}
+            {% end %}
+        </ul>
+    </div>
 
 {%end%}
 

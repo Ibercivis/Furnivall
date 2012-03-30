@@ -43,12 +43,15 @@ class User(FurnivallPersistent):
            Returns user and host.
         """
         self.id_ = id_
+        self._p_changed = 1
 
     def set_password(self, password):
         self.password = password
+        self._p_changed = 1
 
     def grant_permission(self, permission):
         self.permissions.append(permission)
+        self._p_changed = 1
 
     @property
     def completed_tasks(self):
