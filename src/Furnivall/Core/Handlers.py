@@ -110,9 +110,15 @@ class LoginHandler(UserManager):
                 self.redirect('/')
             else:
                 self.redirect('/Login?login_failed=true')
-        if action == "logout":
+        elif action == "logout":
             self.clear_cookie('username')
             self.redirect('/')
+        elif action == "register":
+            if self.get_current_user(True):
+                self.redirect('/')
+            else:
+                self.redirect('/Login?login_failed=true')
+                        
 
 class MainHandler(Scheduler):
     """

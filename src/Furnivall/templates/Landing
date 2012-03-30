@@ -17,14 +17,9 @@
             {% end %}
         </ul>
     </div>
-    <div class="user"> 
-        {% if user_name != "anonymous" %} 
-            <p> Welcome {{ user_name }} <a href="/Login/logout"> Logout </a></p>
-        {% else %}
-            <a href="/Login"> Log-in </a>
-        {%end%}
-    </div>
 
+
+    {% if user_name != "anonymous" %}
     <div class="hero-unit">
         <h3> Currently available works </h3>
         <ul class="unstyled">
@@ -35,6 +30,6 @@
             {% end %}
         </ul>
     </div>
-
+    {%end%}
 {%end%}
 

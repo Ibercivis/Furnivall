@@ -1,0 +1,78 @@
+{%extends 'base.html'%}
+{% block title%} Sentiment analysis {%end%}
+{% block head%}
+    <script src="/static/js/jquery.jsonrpc.js"></script>
+    <script>
+        var devdata={}, devdata_2={};
+        $(function() { 
+
+            $.ajax({
+                url: '/RPC/',
+                type: 'POST',
+                dataType: 'json',
+                data: JSON.stringify ({jsonrpc:'2.0', method:'get_or_create_task', params:['{{ user_name }}','Sentiment'], id:'jsonrpc', }),
+                success: function (result){ 
+                    result=result.result;
+                    var user = result[0], job = result[1], work = result[2], task = result[3];
+                    console.debug([user, job, work, task]);
+                    console.debug("FOO")
+                    $.ajax({
+                       url: '/RPC/', 
+                       data: JSON.stringify ({jsonrpc:'2.0',
+                           method:'send_command',
+                           params:[ user, job, work, task, 'get_random_phrase', ''],
+                           id:"jsonrpc"} ),  // id is needed !!
+                       type:"POST",
+                       dataType:"json",
+                       success:  function (data_2){
+                            $('#data').html(data_2.result);
+                       },
+                       error: function (err)  { alert ("Error");}
+                    }); }
+                });
+         });
+
+    </script>
+{%end%}
+{% block body %}
+    <div class="container-fluid" style="padding-top:50px">
+
+        <header class="jumbotron subhead" id="overview" style="margin-bottom:1em;">
+            <h1> ¿Que emoción te produce esta frase? </h1>
+        </header>
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span10">
+        <div class="hero-unit">
+            <p id="data"> En este momento no hay ningúna frase disponible </p>
+        </div>
+    </div>
+
+    <div class="span2">
+        <p style="">
+             <a style="width:33%; "  class="btn btn-primary btn-large btn"> Agresividad </a>
+             <a style="width:33%; float:right "  class="btn btn-primary btn-large btn"> Alegria </a>
+             <br/>
+             <a style="width:33%;margin-top:10px; "  class="btn btn-primary btn-large btn"> Tristeza </a>
+             <a style="width:33%;margin-top:10px; float:right "  class="btn btn-primary btn-large btn"> Calma </a>
+             <br/>
+             <a style="width:33%;margin-top:10px; "  class="btn btn-primary btn-large btn"> Tristeza </a>
+             <a style="width:33%;margin-top:10px; float:right "  class="btn btn-primary btn-large btn"> Calma </a>
+             <br/>
+             <a style="width:33%;margin-top:10px; "  class="btn btn-primary btn-large btn"> Tristeza </a>
+             <a style="width:33%;margin-top:10px; float:right "  class="btn btn-primary btn-large btn"> Calma </a>
+             <br/>
+             <a style="width:33%;margin-top:10px; "  class="btn btn-primary btn-large btn"> Tristeza </a>
+             <a style="width:33%;margin-top:10px; float:right "  class="btn btn-primary btn-large btn"> Calma </a>
+             <br/>
+             <a style="width:33%;margin-top:10px; "  class="btn btn-primary btn-large btn"> Tristeza </a>
+             <a style="width:33%;margin-top:10px; float:right "  class="btn btn-primary btn-large btn"> Calma </a>
+             <br/>
+             <a style="width:33%;margin-top:10px; "  class="btn btn-primary btn-large btn"> Tristeza </a>
+             <a style="width:33%;margin-top:10px; float:right "  class="btn btn-primary btn-large btn"> Calma </a>
+        </p>
+        </p>
+        </p>
+    </div>
+  </div>
+{%end%}

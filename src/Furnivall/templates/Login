@@ -1,5 +1,7 @@
 {%extends "base.html"%}
 {%block body%}
+
+<div class="container-fluid" style="width:40%; float:left;">
 <form action="/Login/auth">
     <fieldset>
         <legend> Login </legend>
@@ -19,5 +21,30 @@
             </li>
         </ul>
     </fieldset>
+
 </form>
+</div>
+<div class="container-fluid" style="width:40%; float:left">
+<form action="/Login/register">
+    <fieldset>
+        <legend> Register </legend>
+        <ul style="list-style:none">
+            <li>
+                <label for="username">Username:</label>
+                <input type="text" name="username" />
+            </li>
+
+            <li>
+                <label for="password">Password:</label>
+                <input type="password" name="password" />
+            </li>
+
+            <li>
+                <input type="submit">
+            </li>
+        </ul>
+    </fieldset>
+</form>
+</div>
+
 {%end%}

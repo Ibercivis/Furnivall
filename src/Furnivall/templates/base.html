@@ -46,6 +46,8 @@
                 <ul class="nav">
                   <li><a data-toggle="modal" href="#about">About</a></li>
                   <li><a href="mailto:ibercivis@ibercivis.es">Contact</a></li>
+                  <li><a href="/user/{{user_name}}"> {{user_name}} </a> </li>
+                  <li> {% if user_name != "anonymous" %} <a href="/Login/logout"> Logout </a> {%else%} <a href="/Login">Login</a> {%end%} </li> 
                 </ul>
            </div>
          </div>
