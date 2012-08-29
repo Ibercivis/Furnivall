@@ -42,6 +42,7 @@ class UserManager(web.RequestHandler):
             logging.info("Bad auth for %s", username)
         except AssertionError:
             logging.info("Someone tried to login with empty username or password")
+
         return False
 
 class ObjectManager(UserManager):

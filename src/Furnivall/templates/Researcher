@@ -1,6 +1,0 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-{% extends "base.html" %}
-{% block title %} Furnivall Administration interface {%end%}
-{% block head %} <meta name="generator" value="Furnivall" /> {%end%}
-{% block body %}
-{%end%}       

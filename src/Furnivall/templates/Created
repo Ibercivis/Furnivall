@@ -1,7 +1,0 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-{% extends "Admin" %}
-{% block alerts %}
-    <p style="background:#f01212; color:f0f0f0; width:100%;padding:10px;" >
-        New {{ slug }} has been created.
-    </p>
-{% end %}       

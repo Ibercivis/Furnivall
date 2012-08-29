@@ -110,6 +110,7 @@ class LoginHandler(UserManager):
                 self.redirect('/')
             else:
                 self.redirect('/Login?login_failed=true')
+
         if action == "logout":
             self.clear_cookie('username')
             self.redirect('/')
@@ -163,4 +164,5 @@ class MainHandler(Scheduler):
                 slug = what )
 
     def render_task(self, task):
+        ## FIXME: [JUANJO] Esto no hace nada?
         return        
