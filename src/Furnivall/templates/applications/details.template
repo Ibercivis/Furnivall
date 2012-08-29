@@ -1,0 +1,41 @@
+{% extends "../layout.html" %}
+{%block head%}
+<script type="text/javascript" src="/static/js/applications/details.js"></script>
+{%end%}
+
+
+{% block body %}
+
+<input type="hidden" id="app-name" name="app-name" value="{{ app_details['name'] }}" />
+
+<h1>{{ app_details['name'] }}</h1>
+
+<p>
+  {{ app_details['description'] }}
+</p>
+
+<button id="btn-new-job" name="btn-new-job" type="button" class="btn btn-primary">Nuevo job</button>
+
+<h3>Jobs</h3>
+
+<table class="table table-striped">
+  <thead>
+    <th>#</th>
+    <th>Description</th>
+    <th>Fecha de creación</th>
+    <th></th>
+  </thead>
+  <tbody>
+    {% for job in jobs %}
+    <tr>
+      <td></td>
+      <td>{{ job['description'] }}</td>
+      <td>{{ job['creation_date'] }}</td>
+      <td><button id="btn-job-details" name="btn-job-details" type="button" class="btn btn-small btn-primary">Detalles</button></td>
+    </tr>
+    {% end %}
+  </tbody>
+</table>
+
+
+{%end%}

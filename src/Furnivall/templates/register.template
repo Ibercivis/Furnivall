@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{%block head%}
+<script type="text/javascript" src="/static/js/register.js"></script>
+{%end%}
+
+
+{% block body %}
+<h1>Registrar nuevo usuario</h1>
+
+<form id="form-save-user" name="form-save-user" class="well" action="/register" method="post">
+<label>Nickname</label>
+  <input type="text" id="txt-nickname" name="txt-nickname" class="span3" />
+
+<label>Correo electrónico</label>
+  <input type="text" id="txt-email" name="txt-email" class="span3" />
+
+  <label>Contraseña</label>
+  <input type="password" id="txt-password" name="txt-password" class="span3" />
+
+  <label>Repetir contraseña</label>
+  <input type="password" id="txt-repeat-password" name="txt-repeat-password" class="span3" />
+
+  <br />
+
+  <div>
+    <button id="btn-save-user" name="btn-save-user" type="button" class="btn btn-primary">Guardar</button>
+    <button class="btn" type="reset">Limpiar</button>
+  </div>
+</form>
+
+{%end%}

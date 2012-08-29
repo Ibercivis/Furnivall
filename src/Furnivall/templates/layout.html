@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Furnivall Citizen Science Framework</title>
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" media="all" href="/static/css/bootstrap-responsive.css" />
+  
+  <script type="text/javascript" src="/static/js/jquery-1.7.2.js"></script>
+  <script type="text/javascript" src="/static/js/bootstrap.js"></script>
+  {% block head %}{% end %}
+</head>
+<body>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+	<a class="brand" href="#">Furnivall</a>
+	
+	<ul class="nav">
+	  <li id="menu-item-home"><a href="/">Inicio</a></li>
+	  <li id="menu-item-aplicaciones" class="dropdown">
+	    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+	      Aplicaciones <b class="caret"></b>
+	    </a>
+	    <ul class="dropdown-menu">
+	      <li><a href="/application/new">-- Nueva aplicación</a></li>
+	      {% for app in application_list %}
+	      <li><a href="/application/details/{{ app }}">{{ app }}</a></li>
+	      {% end %}
+	    </ul>
+	  </li>
+
+	  <li id="menu-item-admin" class="dropdown">
+	    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              Admin <b class="caret"></b>
+	    </a>
+	    <ul class="dropdown-menu">
+	      <li><a href="/admin/users">Usuarios</a></li>
+	    </ul>
+	  </li>
+	</ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    {% block body %}{% end %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{%block head%}
+<script type="text/javascript" src="/static/js/login.js"></script>
+{%end%}
+
+
+{% block body %}
+<form id="form-login" name="form-login" class="well" action="/login" method="post">
+<label>Nickname or email</label>
+  <input type="text" id="txt-username" name="txt-username" class="span3" />
+
+
+  <label>Contraseña</label>
+  <input type="password" id="txt-password" name="txt-password" class="span3" />
+
+  <div>
+    <button id="btn-login" name="btn-login" type="button" class="btn btn-primary">Entrar</button>
+<button id="btn-register" name="btn-register" type="button" class="btn btn-primary">Nuevo usuario</button>
+  </div>
+
+<br />
+<a href="/resend_password">¿Has olvidado tu contraseña?</a>
+</form>
+
+{%end%}

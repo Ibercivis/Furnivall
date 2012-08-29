@@ -1,0 +1,24 @@
+{% extends "../layout.html" %}
+{%block head%}
+<script type="text/javascript" src="/static/js/applications/new.js"></script>
+{%end%}
+
+
+{% block body %}
+<h1>Nueva applicación</h1>
+
+<form id="form-save-app" name="form-save-app" class="well" action="/applications/new" method="post">
+<label>Nombre</label>
+  <input type="text" id="txt-name" name="txt-name" class="span3" />
+
+<label>Descripción</label>
+  <textarea id="txt-description" name="txt-description" rows="6" class="span6"></textarea>
+
+  <br />
+
+  <div>
+    <button id="btn-save-app" name="btn-save-app" type="button" class="btn btn-primary">Guardar</button>
+  </div>
+</form>
+
+{%end%}

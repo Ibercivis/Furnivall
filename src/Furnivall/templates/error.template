@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{%block head%}
+
+{%end%}
+
+
+{% block body %}
+<h1>Error</h1>
+
+<h3>{{ message }}</h3>
+
+{%end%}

@@ -1,0 +1,25 @@
+{% extends "../../layout.html" %}
+{%block head%}
+<script type="text/javascript" src="/static/js/applications/jobs/new.js"></script>
+{%end%}
+
+
+{% block body %}
+<h1>Nuevo job</h1>
+
+<form id="form-save-job" name="form-save-job" class="well" action="/application/{{ app_name }}/job/new" method="post">
+
+  <input type="hidden" id="app-name" name="app-name" value="{{ app_name }}" />
+
+
+  <label>Descripción</label>
+  <textarea id="txt-description" name="txt-description" rows="6" class="span6"></textarea>
+
+  <br />
+
+  <div>
+    <button id="btn-save-job" name="btn-save-job" type="button" class="btn btn-primary">Guardar</button>
+  </div>
+</form>
+
+{%end%}

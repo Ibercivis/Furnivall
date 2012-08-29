@@ -1,0 +1,28 @@
+{% extends "../layout.html" %}
+{%block head%}
+<script type="text/javascript" src="/static/js/admin/users.js"></script>
+{%end%}
+
+
+{% block body %}
+<h1>Usuarios</h1>
+
+<table class="table table-striped">
+  <thead>
+    <th>#</th>
+    <th>Nombre</th>
+    <th>Email</th>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td></td>
+      <td>{{ user['name'] }}</td>
+      <td>{{ user['email'] }}</td>
+      <td></td>
+    </tr>
+    {% end %}
+  </tbody>
+</table>
+
+{%end%}
