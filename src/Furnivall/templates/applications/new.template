@@ -7,7 +7,7 @@
 {% block body %}
 <h1>Nueva applicación</h1>
 
-<form id="form-save-app" name="form-save-app" class="well" action="/applications/new" method="post">
+<form id="form-save-app" name="form-save-app" class="well" action="/application/new" method="post">
 <label>Nombre</label>
   <input type="text" id="txt-name" name="txt-name" class="span3" />
 
