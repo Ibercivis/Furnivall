@@ -8,6 +8,7 @@ import os, sys
 import tornado.httpserver, tornado.database, tornado.ioloop, tornado.web
 from tornado.options import define, options
 from pymongo import Connection
+from yapsy.PluginManager import PluginManager
 from libs.route import Route
 from Furnivall import data_dir
 from Furnivall.Core.handlers import *
@@ -24,9 +25,18 @@ class FurnivallApplication(tornado.web.Application):
 		"""
 		Sets up the Tornado web server and loads all the init data
 		"""
+
+		# Init mongodb database
 		self.dbconnection = Connection()
 		self.db = self.dbconnection['furnivall']
 
+		# Init plugins
+		self.plugin_manager = PluginManager()
+		self.plugin_manager.setPluginPlaces(["./plugins"])
+		self.plugin_manager.collectPlugins()
+		print self.plugin_manager.getAllPlugins()
+
+		# Init routes
 		urls = [
 		] + Route.routes()
 

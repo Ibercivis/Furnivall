@@ -23,3 +23,14 @@ class NewJobHandler(BaseHandler):
 		jobs.insert(new_job)
 
 		self.redirect("/application/details/" + app_name)
+
+@Route(r"/application/([a-zA-Z]+)/job/([a-fA-F0-9]+)/generate_workunits")
+class GenerateWorkunitsHandler(BaseHandler):
+	def get(self, app_name, job_id):
+		plugin = self.application.plugin_manager.getPluginByName(app_name)
+		workunits = self.application.db.workunits
+		new_workunits = plugin.plugin_object.generate_workunits(job_id)
+		for new_workunit in new_workunits:
+			workunits.insert(new_workunit)
+
+		self.redirect("/application/details/" + app_name)

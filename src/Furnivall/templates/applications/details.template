@@ -34,7 +34,7 @@
       <td>{{ job['creation_date'] }}</td>
       <td>
 	<button id="btn-job-details" name="btn-job-details" type="button" class="btn btn-small btn-primary">Detalles</button>
-	<button id="btn-generate-workunits" name="btn-generate-workunits" type="button" class="btn btn-small">Generar workunits</button>
+	<button id="btn-generate-workunits" name="btn-generate-workunits" type="button" class="btn btn-small" onclick="generateWorkunits('{{job['_id'].__str__()}}')">Generar workunits</button>
       </td>
     </tr>
     {% end %}
