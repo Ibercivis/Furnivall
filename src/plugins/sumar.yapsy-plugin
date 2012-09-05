@@ -1,0 +1,9 @@
+[Core]
+Name = sumar
+Module = sumar
+
+[Documentation]
+Description = Crea pares de numeros aleatorios que luego seran sumados por los clientes
+Author = Juanjo Molinero
+Version = 1.0
+Website = https://github.com/Ibercivis/Furnivall
