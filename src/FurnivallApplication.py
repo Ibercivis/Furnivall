@@ -34,7 +34,9 @@ class FurnivallApplication(tornado.web.Application):
 		self.plugin_manager = PluginManager()
 		self.plugin_manager.setPluginPlaces(["./plugins"])
 		self.plugin_manager.collectPlugins()
-		print self.plugin_manager.getAllPlugins()
+		print "Loaded plugins:"
+		for plugin_info in self.plugin_manager.getAllPlugins():
+			print ' * ' + plugin_info.name
 
 		# Init routes
 		urls = [

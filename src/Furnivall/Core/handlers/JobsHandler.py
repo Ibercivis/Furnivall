@@ -19,7 +19,8 @@ class NewJobHandler(BaseHandler):
 		jobs = self.application.db.jobs
 		new_job = {'applicationId': app_details['_id'],
 				   'description': description,
-				   'creation_date': creation_date}
+				   'creation_date': creation_date,
+				   'finished': False}
 		jobs.insert(new_job)
 
 		self.redirect("/application/details/" + app_name)
