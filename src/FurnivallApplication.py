@@ -5,6 +5,8 @@
 
 """
 import os, sys
+import daemon
+import lockfile
 import tornado.httpserver, tornado.database, tornado.ioloop, tornado.web
 from tornado.options import define, options
 from pymongo import Connection
@@ -14,7 +16,6 @@ from Furnivall import data_dir
 from Furnivall.Core.handlers import *
 from Furnivall.Core.handlers.api import *
 
-# import daemon
 
 # Default options for the server
 define("port", default=8888, help="run on the given port", type=int)
@@ -57,22 +58,14 @@ def do_main_program():
 	tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":
-	tornado.options.parse_command_line()
-	do_main_program()
-
-
-	#if __name__ == "__main__":
-    #tornado.options.parse_command_line()
-    #if options.daemonize:
-    #    log_file = 'furnivall.%s.log' % options.port
-    #    log = open(os.path.join('/var/log', log_file), 'a+')
-    #    with daemon.DaemonContext(
-    #        working_directory='/var/lib/furnivall',
-    #        umask=0o002,
-    #        pidfile=lockfile.FileLock('/var/run/furnivall.pid'),
-    #        stdout=log,
-    #        stderr=log
-    #    ):
-    #        do_main_program()
-    #else:
-    #    do_main_program()
+    tornado.options.parse_command_line()
+    if options.daemonize:
+		log_file = 'furnivall.log'
+		log = open(os.path.join('/var/log', log_file), 'a+')
+		with daemon.DaemonContext(working_directory=os.getcwd(),
+								  pidfile=lockfile.FileLock('/var/run/furnivall.pid'),
+								  stdout=log,
+								  stderr=log):
+			do_main_program()
+    else:
+		do_main_program()
