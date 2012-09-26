@@ -1,1 +1,1 @@
-__all__ = ['ApplicationHandler']
+__all__ = ['ApplicationHandler', 'UserHandler']
